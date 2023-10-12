@@ -43,6 +43,21 @@ class ReviewersControlReportPlugin extends ReportPlugin
 
     public function display($args, $request)
     {
-        return parent::display($args, $request);
+        $templateManager = TemplateManager::getManager();
+        $templateManager->assign([
+            'breadcrumbs' => [
+                [
+                    'id' => 'reports',
+                    'name' => __('manager.statistics.reports'),
+                    'url' => $request->getRouter()->url($request, null, 'stats', 'reports'),
+                ],
+                [
+                    'id' => 'reviewersControlReport',
+                    'name' => __('plugins.reports.reviewersControlReport.displayName')
+                ],
+            ],
+            'pageTitle', __('plugins.reports.reviewersControlReport.displayName')
+        ]);
+        $templateManager->display($this->getTemplateResource('index.tpl'));
     }
 }
