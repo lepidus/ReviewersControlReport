@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE version SYSTEM "../../../lib/pkp/dtd/pluginVersion.dtd">
+
+<!--
+  * plugins/reports/reviewersControlReport/version.xml
+  *
+  * Copyright (c) 2014 - 2023 Lepidus Tecnologia
+  * Distributed under the GNU GPL v3. For full terms see the file LICENSE.
+  *
+  * Plugin version information.
+-->
+
+<version>
+	<application>reviewersControlReport</application>
+	<type>plugins.reports</type>
+	<release>1.0.0.0</release>
+	<date>2023-07-13</date>
+</version>
