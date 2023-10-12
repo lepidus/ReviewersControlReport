@@ -20,13 +20,15 @@ class ReviewersControlReportPlugin extends ReportPlugin
     {
         $success = parent::register($category, $path, $mainContextId);
         if ($success && Config::getVar('general', 'installed')) {
+            $this->addLocaleData();
+            return true;
         }
         return $success;
     }
 
     public function getName()
     {
-        return 'ReviewersControlReport';
+        return 'ReviewersControlReportPlugin';
     }
 
     public function getDisplayName()

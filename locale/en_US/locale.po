@@ -14,8 +14,8 @@ msgstr ""
 "X-Generator: Weblate 3.9.1\n"
 
 
-msgid "plugins.reports.reviewerscontrol.displayName"
+msgid "plugins.reports.reviewersControlReport.displayName"
 msgstr "Reviewers Control Report"
 
-msgid "plugins.reports.reviewerscontrol.description"
+msgid "plugins.reports.reviewersControlReport.description"
 msgstr "Generates a control report for editors to manage reviewers."
