@@ -13,6 +13,7 @@
  */
 
 import('lib.pkp.classes.plugins.ReportPlugin');
+require_once('ReviewersControlReport.inc.php');
 
 class ReviewersControlReportPlugin extends ReportPlugin
 {
@@ -58,6 +59,14 @@ class ReviewersControlReportPlugin extends ReportPlugin
             ],
             'pageTitle', __('plugins.reports.reviewersControlReport.displayName')
         ]);
+        $templateManager->assign('report', $this->getReport($request));
+
         $templateManager->display($this->getTemplateResource('index.tpl'));
+    }
+
+    public function getReport($request)
+    {
+        $reviewersControlReport = new ReviewersControlReport($request);
+        return $reviewersControlReport->assembleReport();
     }
 }

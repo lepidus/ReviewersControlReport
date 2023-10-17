@@ -13,5 +13,7 @@
 
     <div class="app__contentPanel">
         <p>{translate key="plugins.reports.reviewersControlReport.description"}</p>
+        <p>Reviewers:
+        {$report}</p>
     </div>
 {/block}
