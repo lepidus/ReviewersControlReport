@@ -31,13 +31,13 @@ class ReviewersControlReportDAO extends DAO
             $query->select('user_id')
             ->from('user_user_groups')
             ->where('user_group_id', $userGroupId);
-        })->leftJoin('user_settings AS us_givenName', 'us_givenName.user_id', '=', 'u.user_id')->where(function ($query) use ($givenName) {
+        })->leftJoin('user_settings AS us_givenName', 'us_givenName.user_id', '=', 'u.user_id')->where(function ($query) {
             $query->where('us_givenName.setting_name', '=', 'givenName')
             ->where('us_givenName.locale', '=', $this->locale);
-        })->leftJoin('user_settings AS us_familyName', 'us_familyName.user_id', '=', 'u.user_id')->where(function ($query) use ($familyName) {
+        })->leftJoin('user_settings AS us_familyName', 'us_familyName.user_id', '=', 'u.user_id')->where(function ($query) {
             $query->where('us_familyName.setting_name', '=', 'familyName')
             ->where('us_familyName.locale', '=', $this->locale);
-        })->leftJoin('user_settings AS us_affiliation', 'us_affiliation.user_id', '=', 'u.user_id')->where(function ($query) use ($affiliation) {
+        })->leftJoin('user_settings AS us_affiliation', 'us_affiliation.user_id', '=', 'u.user_id')->where(function ($query) {
             $query->where('us_affiliation.setting_name', '=', 'affiliation')
             ->where('us_affiliation.locale', '=', $this->locale);
         });
