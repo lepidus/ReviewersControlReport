@@ -13,7 +13,27 @@
 
     <div class="app__contentPanel">
         <p>{translate key="plugins.reports.reviewersControlReport.description"}</p>
-        <p>Reviewers:
-        {$report}</p>
+        {if $report}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Full Name</th>
+                        <th>Affiliation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach from=$report item=reviewer}
+                        <tr>
+                            <td>{$reviewer->getEmail()}</td>
+                            <td>{$reviewer->getFullName()}</td>
+                            <td>{$reviewer->getAffiliation()}</td>
+                        </tr>
+                    {/foreach}
+                </tbody>
+            </table>
+        {else}
+            <p>No reviewers found.</p>
+        {/if}
     </div>
 {/block}
