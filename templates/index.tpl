@@ -22,6 +22,7 @@
                         <th>Affiliation</th>
                         <th>Interests</th>
                         <th>Quality Average</th>
+                        <th>Reviewed Submissions(Title and Completed Date)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -32,6 +33,7 @@
                             <td>{$reviewer->getAffiliation()}</td>
                             <td>{$reviewer->getInterests()}</td>
                             <td>{$reviewer->getQualityAverage()}</td>
+                            <td>{$reviewer->getReviewedSubmissions()}</td>
                         </tr>
                     {/foreach}
                 </tbody>
