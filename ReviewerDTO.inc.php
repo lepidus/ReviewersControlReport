@@ -7,9 +7,9 @@ class ReviewerDTO
     private $affiliation;
     private $interests;
 
-    public function __construct($email, $firstName, $lastName, $affiliation, $interests)
+    public function __construct($email, $fullName, $affiliation, $interests)
     {
-        $this->fullName = $firstName . ' ' . $lastName;
+        $this->fullName = $fullName;
         $this->email = $email;
         $this->affiliation = $affiliation;
         $this->interests = $interests;
@@ -32,10 +32,6 @@ class ReviewerDTO
 
     public function getInterests()
     {
-        $output = "";
-        foreach($this->interests as $interest) {
-            $output .= $interest . ", ";
-        }
-        return $output;
+        return $this->interests;
     }
 }

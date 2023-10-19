@@ -23,15 +23,15 @@ class ReviewersControlReport
 
     private function getReviewers()
     {
-        $result = $this->reportDAO->getReviewers($this->contextId);
+        $reviewersIds = $this->reportDAO->getReviewersIds($this->contextId);
         $reviewers = array();
-        foreach ($result as $resultReviewer) {
+        foreach ($reviewersIds as $reviewerId) {
+            $reviewerUser = $this->reportDAO->getReviewerUser($reviewerId);
             $reviewer = new ReviewerDTO(
-                $resultReviewer->email,
-                $resultReviewer->givenName,
-                $resultReviewer->familyName,
-                $resultReviewer->affiliation,
-                $this->getReviewerInterests($resultReviewer->user_id)
+                $reviewerUser->getEmail(),
+                $reviewerUser->getFullName(),
+                $reviewerUser->getLocalizedAffiliation(),
+                $reviewerUser->getInterestString()
             );
             $reviewers[] = $reviewer;
         }

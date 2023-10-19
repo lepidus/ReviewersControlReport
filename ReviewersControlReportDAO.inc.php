@@ -7,51 +7,22 @@ use Illuminate\Support\Collection;
 
 class ReviewersControlReportDAO extends DAO
 {
-    private $locale;
-
-    public function getReviewers($journalId)
+    public function getReviewersIds($journalId)
     {
-        $resultGroup = Capsule::table('user_groups')
-        ->select('user_group_id')
-        ->where('role_id', ROLE_ID_REVIEWER)
-        ->where('context_id', $journalId)
-        ->first();
-        $userGroupId = get_object_vars($resultGroup)['user_group_id'];
+        $roleDao = DAORegistry::getDAO('RoleDAO'); /* @var $roleDao RoleDAO */
 
-        $this->locale = AppLocale::getLocale();
+        $reviewers = $roleDao
+            ->getUsersByRoleId(ROLE_ID_REVIEWER, $journalId)
+            ->toAssociativeArray();
+        $allUserReviewersIds = array_keys($reviewers);
 
-        $query = Capsule::table('users AS u')
-        ->select(
-            'u.user_id',
-            'u.email',
-            'us_givenName.setting_value AS givenName',
-            'us_familyName.setting_value as familyName',
-            'us_affiliation.setting_value as affiliation'
-        )
-        ->whereIn('u.user_id', function ($query) use ($userGroupId) {
-            $query->select('user_id')
-            ->from('user_user_groups')
-            ->where('user_group_id', $userGroupId);
-        })->leftJoin('user_settings AS us_givenName', 'us_givenName.user_id', '=', 'u.user_id')->where(function ($query) {
-            $query->where('us_givenName.setting_name', '=', 'givenName')
-            ->where('us_givenName.locale', '=', $this->locale);
-        })->leftJoin('user_settings AS us_familyName', 'us_familyName.user_id', '=', 'u.user_id')->where(function ($query) {
-            $query->where('us_familyName.setting_name', '=', 'familyName')
-            ->where('us_familyName.locale', '=', $this->locale);
-        })->leftJoin('user_settings AS us_affiliation', 'us_affiliation.user_id', '=', 'u.user_id')->where(function ($query) {
-            $query->where('us_affiliation.setting_name', '=', 'affiliation')
-            ->where('us_affiliation.locale', '=', $this->locale);
-        });
-
-        return $query->get();
+        return $allUserReviewersIds;
     }
 
-    public function getUserInterestsById($userId)
+    public function getReviewerUser($reviewerId)
     {
-        $query = Capsule::table('user_interests AS ui')
-            ->select('cves.setting_value AS interest')
-            ->leftJoin('controlled_vocab_entry_settings AS cves', 'ui.controlled_vocab_entry_id', '=', 'cves.controlled_vocab_entry_id')
-            ->where('ui.user_id', '=', $userId);
-        return $query->get();
+        $userDao = DAORegistry::getDAO('UserDAO'); /* @var $userDao UserDAO */
+        $user = $userDao->getById($reviewerId);
+        return $user;
     }
 }
