@@ -30,10 +30,21 @@ class ReviewersControlReport
                 $resultReviewer->email,
                 $resultReviewer->givenName,
                 $resultReviewer->familyName,
-                $resultReviewer->affiliation
+                $resultReviewer->affiliation,
+                $this->getReviewerInterests($resultReviewer->user_id)
             );
             $reviewers[] = $reviewer;
         }
         return $reviewers;
+    }
+
+    private function getReviewerInterests($userId)
+    {
+        $reviewerInterestsResult = $this->reportDAO->getUserInterestsById($userId);
+        $interests = array();
+        foreach ($reviewerInterestsResult as $interest) {
+            $interests[] = get_object_vars($interest)['interest'];
+        }
+        return $interests;
     }
 }

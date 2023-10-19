@@ -22,6 +22,7 @@ class ReviewersControlReportDAO extends DAO
 
         $query = Capsule::table('users AS u')
         ->select(
+            'u.user_id',
             'u.email',
             'us_givenName.setting_value AS givenName',
             'us_familyName.setting_value as familyName',
@@ -42,6 +43,15 @@ class ReviewersControlReportDAO extends DAO
             ->where('us_affiliation.locale', '=', $this->locale);
         });
 
+        return $query->get();
+    }
+
+    public function getUserInterestsById($userId)
+    {
+        $query = Capsule::table('user_interests AS ui')
+            ->select('cves.setting_value AS interest')
+            ->leftJoin('controlled_vocab_entry_settings AS cves', 'ui.controlled_vocab_entry_id', '=', 'cves.controlled_vocab_entry_id')
+            ->where('ui.user_id', '=', $userId);
         return $query->get();
     }
 }

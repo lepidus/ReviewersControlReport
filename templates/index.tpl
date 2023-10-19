@@ -20,6 +20,7 @@
                         <th>Email</th>
                         <th>Full Name</th>
                         <th>Affiliation</th>
+                        <th>Interests</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -28,6 +29,7 @@
                             <td>{$reviewer->getEmail()}</td>
                             <td>{$reviewer->getFullName()}</td>
                             <td>{$reviewer->getAffiliation()}</td>
+                            <td>{$reviewer->getInterests()}</td>
                         </tr>
                     {/foreach}
                 </tbody>
