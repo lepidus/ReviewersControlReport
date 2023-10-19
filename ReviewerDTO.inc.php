@@ -6,13 +6,15 @@ class ReviewerDTO
     private $email;
     private $affiliation;
     private $interests;
+    private $qualityAverage;
 
-    public function __construct($email, $fullName, $affiliation, $interests)
+    public function __construct($email, $fullName, $affiliation, $interests, $qualityAverage)
     {
         $this->fullName = $fullName;
         $this->email = $email;
         $this->affiliation = $affiliation;
         $this->interests = $interests;
+        $this->qualityAverage = $qualityAverage;
     }
 
     public function getFullName()
@@ -33,5 +35,10 @@ class ReviewerDTO
     public function getInterests()
     {
         return $this->interests;
+    }
+
+    public function getQualityAverage()
+    {
+        return number_format($this->qualityAverage, 2, '.', '');
     }
 }

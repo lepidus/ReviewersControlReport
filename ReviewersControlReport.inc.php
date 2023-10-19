@@ -31,7 +31,8 @@ class ReviewersControlReport
                 $reviewerUser->getEmail(),
                 $reviewerUser->getFullName(),
                 $reviewerUser->getLocalizedAffiliation(),
-                $reviewerUser->getInterestString()
+                $reviewerUser->getInterestString(),
+                $this->reportDAO->getQualityAverage($reviewerId)
             );
             $reviewers[] = $reviewer;
         }

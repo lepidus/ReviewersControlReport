@@ -21,6 +21,7 @@
                         <th>Full Name</th>
                         <th>Affiliation</th>
                         <th>Interests</th>
+                        <th>Quality Average</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -30,6 +31,7 @@
                             <td>{$reviewer->getFullName()}</td>
                             <td>{$reviewer->getAffiliation()}</td>
                             <td>{$reviewer->getInterests()}</td>
+                            <td>{$reviewer->getQualityAverage()}</td>
                         </tr>
                     {/foreach}
                 </tbody>

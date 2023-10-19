@@ -25,4 +25,16 @@ class ReviewersControlReportDAO extends DAO
         $user = $userDao->getById($reviewerId);
         return $user;
     }
+
+    public function getQualityAverage($reviewerId)
+    {
+        $reviewAssignmentDao = DAORegistry::getDAO('ReviewAssignmentDAO');
+        $reviewAssignments = $reviewAssignmentDao->getByUserId($reviewerId);
+        $qualityRatings = array();
+        foreach ($reviewAssignments as $reviewAssignment) {
+            $qualityRatings[] = $reviewAssignment->getQuality();
+        }
+        $qualityAverage = array_sum($qualityRatings) / count($qualityRatings);
+        return $qualityAverage;
+    }
 }
