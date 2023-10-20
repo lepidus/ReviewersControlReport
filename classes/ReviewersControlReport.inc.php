@@ -5,23 +5,23 @@ import('plugins.reports.reviewersControlReport.classes.ReviewerDTO');
 
 class ReviewersControlReport
 {
-    private int $contextId;
+    private $contextId;
 
     private ReviewersControlReportDAO $reportDAO;
 
-    public function __construct($contextId)
+    public function __construct(int $contextId)
     {
         $this->contextId = $contextId;
         $this->reportDAO = new ReviewersControlReportDAO();
     }
 
-    public function assembleReport()
+    public function assembleReport(): array
     {
         $reviewers = $this->getReviewers();
         return $reviewers;
     }
 
-    private function getReviewers()
+    private function getReviewers(): array
     {
         $reviewersIds = $this->reportDAO->getReviewersIds($this->contextId);
         $reviewers = array();
@@ -39,15 +39,5 @@ class ReviewersControlReport
             $reviewers[] = $reviewer;
         }
         return $reviewers;
-    }
-
-    private function getReviewerInterests($userId)
-    {
-        $reviewerInterestsResult = $this->reportDAO->getUserInterestsById($userId);
-        $interests = array();
-        foreach ($reviewerInterestsResult as $interest) {
-            $interests[] = get_object_vars($interest)['interest'];
-        }
-        return $interests;
     }
 }
