@@ -7,7 +7,7 @@ class ReviewersControlReport
 {
     private $contextId;
 
-    private ReviewersControlReportDAO $reportDAO;
+    private $reportDAO;
 
     public function __construct(int $contextId)
     {
