@@ -34,7 +34,11 @@ class ReviewersControlReportDAO extends DAO
         foreach ($reviewAssignments as $reviewAssignment) {
             $qualityRatings[] = $reviewAssignment->getQuality();
         }
-        $qualityAverage = array_sum($qualityRatings) / count($qualityRatings);
+        $qualityRatings = array_filter($qualityRatings, function ($value) {
+            return $value != null;
+        });
+        $ratingsCount = count($qualityRatings);
+        $qualityAverage = ($ratingsCount != 0) ? (array_sum(array_values($qualityRatings)) / $ratingsCount) : 0;
         return $qualityAverage;
     }
 
