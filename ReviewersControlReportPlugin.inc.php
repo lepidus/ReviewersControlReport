@@ -13,7 +13,7 @@
  */
 
 import('lib.pkp.classes.plugins.ReportPlugin');
-require_once('ReviewersControlReport.inc.php');
+import('plugins.reports.reviewersControlReport.classes.ReviewersControlReport');
 
 class ReviewersControlReportPlugin extends ReportPlugin
 {
@@ -66,7 +66,8 @@ class ReviewersControlReportPlugin extends ReportPlugin
 
     public function getReport($request)
     {
-        $reviewersControlReport = new ReviewersControlReport($request);
+        $contextId = $request->getContext() ? $request->getContext()->getId() : CONTEXT_SITE;
+        $reviewersControlReport = new ReviewersControlReport($contextId);
         return $reviewersControlReport->assembleReport();
     }
 }

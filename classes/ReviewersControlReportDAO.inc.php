@@ -56,6 +56,7 @@ class ReviewersControlReportDAO extends DAO
             $submission = Services::get('submission')->get($reviewAssignment->getSubmissionId());
             $submissionTitle = $submission->getLocalizedTitle();
             $dateCompleted = $reviewAssignment->getDateCompleted();
+            $dateCompleted = date("Y-m-d", strtotime($dateCompleted));
             $reviewedSubmissions[] = [$submissionTitle, $dateCompleted];
         }
         return $reviewedSubmissions;

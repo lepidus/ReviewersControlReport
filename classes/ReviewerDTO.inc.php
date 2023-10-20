@@ -8,9 +8,9 @@ class ReviewerDTO
     private $interests;
     private $qualityAverage;
     private $totalReviewedSubmissions;
-    private $reviewedSubmissions;
+    private $reviewedSubmissionsTitleAndDate;
 
-    public function __construct($email, $fullName, $affiliation, $interests, $qualityAverage, $totalReviewedSubmissions, $reviewedSubmissions)
+    public function __construct($email, $fullName, $affiliation, $interests, $qualityAverage, $totalReviewedSubmissions, $reviewedSubmissionsTitleAndDate)
     {
         $this->fullName = $fullName;
         $this->email = $email;
@@ -18,7 +18,7 @@ class ReviewerDTO
         $this->interests = $interests;
         $this->qualityAverage = $qualityAverage;
         $this->totalReviewedSubmissions = $totalReviewedSubmissions;
-        $this->reviewedSubmissions = $reviewedSubmissions;
+        $this->reviewedSubmissionsTitleAndDate = $reviewedSubmissionsTitleAndDate;
     }
 
     public function getFullName()
@@ -51,11 +51,11 @@ class ReviewerDTO
         return $this->totalReviewedSubmissions;
     }
 
-    public function getReviewedSubmissions()
+    public function getReviewedSubmissionsTitleAndDate()
     {
         $output = "";
-        foreach($this->reviewedSubmissions as $reviewedSubmission) {
-            $output .= "<p>" . $reviewedSubmission[0] . ", " . date("Y-m-d", strtotime($reviewedSubmission[1])) . "</p>";
+        foreach ($this->reviewedSubmissionsTitleAndDate as $reviewedSubmission) {
+            $output .= "<p>" . $reviewedSubmission[0] . ", " . $reviewedSubmission[1] . "</p>";
         }
         return $output;
     }

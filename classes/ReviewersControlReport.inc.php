@@ -1,7 +1,7 @@
 <?php
 
-require_once('ReviewersControlReportDAO.inc.php');
-require_once('ReviewerDTO.inc.php');
+import('plugins.reports.reviewersControlReport.classes.ReviewersControlReportDAO');
+import('plugins.reports.reviewersControlReport.classes.ReviewerDTO');
 
 class ReviewersControlReport
 {
@@ -9,9 +9,9 @@ class ReviewersControlReport
 
     private ReviewersControlReportDAO $reportDAO;
 
-    public function __construct($request)
+    public function __construct($contextId)
     {
-        $this->contextId = $request->getContext() ? $request->getContext()->getId() : CONTEXT_SITE;
+        $this->contextId = $contextId;
         $this->reportDAO = new ReviewersControlReportDAO();
     }
 

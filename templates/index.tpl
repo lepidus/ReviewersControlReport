@@ -35,7 +35,7 @@
                                 <td>{$reviewer->getInterests()}</td>
                                 <td>{$reviewer->getQualityAverage()}</td>
                                 <td>{$reviewer->getTotalReviewedSubmissions()}</td>
-                                <td>{$reviewer->getReviewedSubmissions()}</td>
+                                <td>{$reviewer->getReviewedSubmissionsTitleAndDate()}</td>
                             </tr>
                         {/foreach}
                     </tbody>
