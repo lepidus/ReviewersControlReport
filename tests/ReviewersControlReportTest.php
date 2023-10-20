@@ -36,6 +36,7 @@ class ReviewersControlReportTest extends PKPTestCase
             $this->assertNotNull($reviewer->getFullName());
             $this->assertNotNull($reviewer->getEmail());
             $this->assertNotNull($reviewer->getAffiliation());
+            $this->assertNotNull($reviewer->getInterests());
         }
     }
 
@@ -45,13 +46,6 @@ class ReviewersControlReportTest extends PKPTestCase
             $this->assertNotNull($reviewer->getQualityAverage());
             $this->assertNotNull($reviewer->getTotalReviewedSubmissions());
             $this->assertNotNull($reviewer->getReviewedSubmissionsTitleAndDate());
-        }
-    }
-
-    public function testAssembledReportShouldHaveReviewersInterests()
-    {
-        foreach ($this->report as $reviewer) {
-            $this->assertNotNull($reviewer->getInterests());
         }
     }
 }
