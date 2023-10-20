@@ -33,6 +33,7 @@ class ReviewersControlReport
                 $reviewerUser->getLocalizedAffiliation(),
                 $reviewerUser->getInterestString(),
                 $this->reportDAO->getQualityAverage($reviewerId),
+                $this->reportDAO->getTotalReviewedSubmissions($reviewerId),
                 $this->reportDAO->getReviewedSubmissionsTitleAndDate($reviewerId)
             );
             $reviewers[] = $reviewer;

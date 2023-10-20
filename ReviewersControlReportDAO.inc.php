@@ -38,6 +38,14 @@ class ReviewersControlReportDAO extends DAO
         return $qualityAverage;
     }
 
+    public function getTotalReviewedSubmissions($reviewerId)
+    {
+        $reviewAssignmentDao = DAORegistry::getDAO('ReviewAssignmentDAO');
+        $reviewAssignments = $reviewAssignmentDao->getByUserId($reviewerId);
+
+        return count($reviewAssignments);
+    }
+
     public function getReviewedSubmissionsTitleAndDate($reviewerId)
     {
         $reviewAssignmentDao = DAORegistry::getDAO('ReviewAssignmentDAO');
