@@ -21,37 +21,37 @@ class ReviewerDTO
         $this->reviewedSubmissionsTitleAndDate = $reviewedSubmissionsTitleAndDate;
     }
 
-    public function getFullName()
+    public function getFullName(): string
     {
         return $this->fullName;
     }
 
-    public function getEmail()
+    public function getEmail(): string
     {
         return $this->email;
     }
 
-    public function getAffiliation()
+    public function getAffiliation(): string
     {
         return $this->affiliation;
     }
 
-    public function getInterests()
+    public function getInterests(): string
     {
         return $this->interests;
     }
 
-    public function getQualityAverage()
+    public function getQualityAverage(): float
     {
         return number_format($this->qualityAverage, 2, '.', '');
     }
 
-    public function getTotalReviewedSubmissions()
+    public function getTotalReviewedSubmissions(): int
     {
         return $this->totalReviewedSubmissions;
     }
 
-    public function getReviewedSubmissionsTitleAndDate()
+    public function getReviewedSubmissionsTitleAndDate(): string
     {
         $output = "";
         foreach ($this->reviewedSubmissionsTitleAndDate as $reviewedSubmission) {

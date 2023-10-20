@@ -17,7 +17,7 @@ import('plugins.reports.reviewersControlReport.classes.ReviewersControlReport');
 
 class ReviewersControlReportPlugin extends ReportPlugin
 {
-    public function register($category, $path, $mainContextId = null)
+    public function register($category, $path, $mainContextId = null): ?bool
     {
         $success = parent::register($category, $path, $mainContextId);
         if ($success && Config::getVar('general', 'installed')) {
@@ -27,22 +27,22 @@ class ReviewersControlReportPlugin extends ReportPlugin
         return $success;
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'ReviewersControlReportPlugin';
     }
 
-    public function getDisplayName()
+    public function getDisplayName(): string
     {
         return __('plugins.reports.reviewersControlReport.displayName');
     }
 
-    public function getDescription()
+    public function getDescription(): string
     {
         return __('plugins.reports.reviewersControlReport.description');
     }
 
-    public function display($args, $request)
+    public function display($args, $request): void
     {
         $templateManager = TemplateManager::getManager();
         $templateManager->assign([
@@ -64,7 +64,7 @@ class ReviewersControlReportPlugin extends ReportPlugin
         $templateManager->display($this->getTemplateResource('index.tpl'));
     }
 
-    public function getReport($request)
+    public function getReport($request): array
     {
         $contextId = $request->getContext() ? $request->getContext()->getId() : CONTEXT_SITE;
         $reviewersControlReport = new ReviewersControlReport($contextId);
