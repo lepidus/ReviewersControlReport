@@ -8,11 +8,12 @@
 {extends file="layouts/backend.tpl"}
 
 {block name="page"}
-	<div class="pkpStats">
-		<div class="pkpStats__panel">
-			<pkp-header>
-				<h1 id="usersTableLabel" class="pkpHeader__title">{translate key="plugins.reports.reviewersControlReport.displayName"}</h1>
-			</pkp-header>
+    <div class="pkpStats">
+        <div class="pkpStats__panel">
+            <pkp-header>
+                <h1 id="usersTableLabel" class="pkpHeader__title">
+                    {translate key="plugins.reports.reviewersControlReport.displayName"}</h1>
+            </pkp-header>
             {if $report}
                 <table class="pkpTable" labelled-by="usersTableLabel">
                     <thead>
@@ -35,7 +36,21 @@
                                 <td>{$reviewer->getInterests()}</td>
                                 <td>{$reviewer->getQualityAverage()}</td>
                                 <td>{$reviewer->getTotalReviewedSubmissions()}</td>
-                                <td>{$reviewer->getReviewedSubmissionsTitleAndDate()}</td>
+                                {if $reviewer->getReviewedSubmissionsTitleAndDate() == []}
+                                    <td>No reviewed submissions</td>
+                                {else}
+                                    <td>
+                                        <ul>
+                                            {foreach from=$reviewer->getReviewedSubmissionsTitleAndDate() item=submission}
+                                                <li>{$submission[0]}
+                                                    <ul>
+                                                        <li style="color: grey; font-style: italic;">{$submission[1]}</li>
+                                                    </ul>
+                                                </li>
+                                            {/foreach}
+                                        </ul>
+                                    </td>
+                                {/if}
                             </tr>
                         {/foreach}
                     </tbody>
@@ -43,6 +58,6 @@
             {else}
                 <p>No reviewers found.</p>
             {/if}
-		</div>
-	</div>
+        </div>
+    </div>
 {/block}

@@ -51,12 +51,8 @@ class ReviewerDTO
         return $this->totalReviewedSubmissions;
     }
 
-    public function getReviewedSubmissionsTitleAndDate(): string
+    public function getReviewedSubmissionsTitleAndDate(): array
     {
-        $output = "";
-        foreach ($this->reviewedSubmissionsTitleAndDate as $reviewedSubmission) {
-            $output .= "<p>" . $reviewedSubmission[0] . ", " . $reviewedSubmission[1] . "</p>";
-        }
-        return $output;
+        return $this->reviewedSubmissionsTitleAndDate;
     }
 }
