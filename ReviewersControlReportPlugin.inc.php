@@ -21,10 +21,18 @@ class ReviewersControlReportPlugin extends ReportPlugin
     {
         $success = parent::register($category, $path, $mainContextId);
         if ($success && Config::getVar('general', 'installed')) {
+            HookRegistry::register('User::getProperties::reviewerSummaryProperties', [$this, 'addReviewerEmailProp']);
             $this->addLocaleData();
             return true;
         }
         return $success;
+    }
+    public function addReviewerEmailProp($hookName, $args)
+    {
+        $props = &$args[0];
+        $props[] = 'email';
+
+        return false;
     }
 
     public function getName(): string
@@ -44,7 +52,26 @@ class ReviewersControlReportPlugin extends ReportPlugin
 
     public function display($args, $request): void
     {
-        $templateManager = TemplateManager::getManager();
+        AppLocale::requireComponents(LOCALE_COMPONENT_PKP_EDITOR);
+        $templateManager = TemplateManager::getManager($request);
+        $templateManager->addJavaScript(
+            'ReviewersListItem',
+            $request->getBaseUrl() . '/' . $this->getPluginPath() . '/js/components/ReviewersListItem.js',
+            [
+                'priority' => STYLE_SEQUENCE_LAST,
+                'contexts' => ['backend']
+            ]
+        );
+
+        $templateManager->addJavaScript(
+            'ReviewersListPanel',
+            $request->getBaseUrl() . '/' . $this->getPluginPath() . '/js/components/ReviewersListPanel.js',
+            [
+                'priority' => STYLE_SEQUENCE_LAST,
+                'contexts' => ['backend']
+            ]
+        );
+
         $templateManager->assign([
             'breadcrumbs' => [
                 [
@@ -60,6 +87,32 @@ class ReviewersControlReportPlugin extends ReportPlugin
             'pageTitle', __('plugins.reports.reviewersControlReport.displayName')
         ]);
         $templateManager->assign('report', $this->getReport($request));
+
+        $context = $request->getContext();
+        $reviewerListPanel = new \PKP\components\listPanels\PKPSelectReviewerListPanel(
+            'reviewers',
+            __('user.role.reviewers'),
+            [
+                'apiUrl' => $request->getDispatcher()->url(
+                    $request,
+                    ROUTE_API,
+                    $context->getPath(),
+                    'users/reviewers'
+                ),
+                'getParams' => [
+                    'contextId' => $context->getId(),
+                ],
+                'selectorName' => 'reviewerId',
+            ]
+        );
+        $reviewerListPanel->set([
+            'items' => $reviewerListPanel->getItems($request),
+            'itemsMax' => $reviewerListPanel->getItemsMax(),
+        ]);
+
+        $components = $templateManager->getState('components');
+        $components['reviewers'] = $reviewerListPanel->getConfig();
+        $templateManager->setState(['components' => $components]);
 
         $templateManager->display($this->getTemplateResource('index.tpl'));
     }

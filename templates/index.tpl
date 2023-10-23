@@ -10,54 +10,26 @@
 {block name="page"}
     <div class="pkpStats">
         <div class="pkpStats__panel">
-            <pkp-header>
-                <h1 id="usersTableLabel" class="pkpHeader__title">
-                    {translate key="plugins.reports.reviewersControlReport.displayName"}</h1>
-            </pkp-header>
-            {if $report}
-                <table class="pkpTable" labelled-by="usersTableLabel">
-                    <thead>
-                        <tr>
-                            <th>Email</th>
-                            <th>Full Name</th>
-                            <th>Affiliation</th>
-                            <th>Interests</th>
-                            <th>Quality Average</th>
-                            <th>Reviewed Submissions(Total)</th>
-                            <th>Reviewed Submissions(Title and Completed Date)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+            <reviewers-list-panel
+                v-bind="components.reviewers"
+                @set="set"
+            >
+                <template v-slot:reviews="{ldelim}item{rdelim}">
+                    <div class="listPanel__item--reviewer__detailHeading">
+                        Avaliações
+                    </div>
+                    <ul class="list">
                         {foreach from=$report item=reviewer}
-                            <tr>
-                                <td>{$reviewer->getEmail()}</td>
-                                <td>{$reviewer->getFullName()}</td>
-                                <td>{$reviewer->getAffiliation()}</td>
-                                <td>{$reviewer->getInterests()}</td>
-                                <td>{$reviewer->getQualityAverage()}</td>
-                                <td>{$reviewer->getTotalReviewedSubmissions()}</td>
-                                {if $reviewer->getReviewedSubmissionsTitleAndDate() == []}
-                                    <td>No reviewed submissions</td>
-                                {else}
-                                    <td>
-                                        <ul>
-                                            {foreach from=$reviewer->getReviewedSubmissionsTitleAndDate() item=submission}
-                                                <li>{$submission[0]}
-                                                    <ul>
-                                                        <li style="color: grey; font-style: italic;">{$submission[1]}</li>
-                                                    </ul>
-                                                </li>
-                                            {/foreach}
-                                        </ul>
-                                    </td>
-                                {/if}
-                            </tr>
+                            {foreach from=$reviewer->getReviewedSubmissionsTitleAndDate() item=submission}
+                                <li class="listItem">
+                                    <p>{$submission[0]}, <span style="color: grey; font-style: italic;">{$submission[1]}</span></p>
+                                </li>
+                            {/foreach}
                         {/foreach}
-                    </tbody>
-                </table>
-            {else}
-                <p>No reviewers found.</p>
-            {/if}
-        </div>
+                    </ul>
+                </template>
+            </reviewers-list-panel>
+        </div> 
     </div>
+
 {/block}
