@@ -18,13 +18,13 @@
                 <table class="pkpTable" labelled-by="usersTableLabel">
                     <thead>
                         <tr>
-                            <th>Email</th>
-                            <th>Full Name</th>
-                            <th>Affiliation</th>
-                            <th>Interests</th>
-                            <th>Quality Average</th>
-                            <th>Reviewed Submissions(Total)</th>
-                            <th>Reviewed Submissions(Title and Completed Date)</th>
+                            <th>{translate key="plugins.reports.reviewersControlReport.field.email"}</th>
+                            <th>{translate key="plugins.reports.reviewersControlReport.field.fullName"}</th>
+                            <th>{translate key="plugins.reports.reviewersControlReport.field.affiliation"}</th>
+                            <th>{translate key="plugins.reports.reviewersControlReport.field.interests"}</th>
+                            <th>{translate key="plugins.reports.reviewersControlReport.field.qualityAverage"}</th>
+                            <th>{translate key="plugins.reports.reviewersControlReport.field.reviewedSubmissionsTotal"}</th>
+                            <th>{translate key="plugins.reports.reviewersControlReport.field.reviewedSubmissionsTitleAndCompletedDate"}</th>
                         </tr>
                     </thead>
                     <tbody>

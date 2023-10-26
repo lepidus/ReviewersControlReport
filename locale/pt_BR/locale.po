@@ -19,3 +19,24 @@ msgstr "Relatório de Controle de Avaliadores"
 
 msgid "plugins.reports.reviewersControlReport.description"
 msgstr "Gera um relatório de controle para editores gerenciarem os avaliadores."
+
+msgid "plugins.reports.reviewersControlReport.field.email"
+msgstr "E-mail"
+
+msgid "plugins.reports.reviewersControlReport.field.fullName"
+msgstr "Nome Completo"
+
+msgid "plugins.reports.reviewersControlReport.field.affiliation"
+msgstr "Instituição/Afiliação"
+
+msgid "plugins.reports.reviewersControlReport.field.interests"
+msgstr "Áreas de Interesse"
+
+msgid "plugins.reports.reviewersControlReport.field.qualityAverage"
+msgstr "Média de Notas"
+
+msgid "plugins.reports.reviewersControlReport.field.reviewedSubmissionsTotal"
+msgstr "Submissões Revisadas(Total)"
+
+msgid "plugins.reports.reviewersControlReport.field.reviewedSubmissionsTitleAndCompletedDate"
+msgstr "Submissões Revisadas(Título e Data de Conclusão)"

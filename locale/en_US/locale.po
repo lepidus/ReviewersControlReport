@@ -19,3 +19,24 @@ msgstr "Reviewers Control Report"
 
 msgid "plugins.reports.reviewersControlReport.description"
 msgstr "Generates a control report for editors to manage reviewers."
+
+msgid "plugins.reports.reviewersControlReport.field.email"
+msgstr "Email"
+
+msgid "plugins.reports.reviewersControlReport.field.fullName"
+msgstr "Full Name"
+
+msgid "plugins.reports.reviewersControlReport.field.affiliation"
+msgstr "Affiliation"
+
+msgid "plugins.reports.reviewersControlReport.field.interests"
+msgstr "Interests"
+
+msgid "plugins.reports.reviewersControlReport.field.qualityAverage"
+msgstr "Quality Average"
+
+msgid "plugins.reports.reviewersControlReport.field.reviewedSubmissionsTotal"
+msgstr "Reviewed Submissions(Total)"
+
+msgid "plugins.reports.reviewersControlReport.field.reviewedSubmissionsTitleAndCompletedDate"
+msgstr "Reviewed Submissions(Title and Completed Date)"
