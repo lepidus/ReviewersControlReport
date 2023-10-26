@@ -16,7 +16,7 @@
             >
                 <template v-slot:reviews="{ldelim}item{rdelim}">
                     <div class="listPanel__item--reviewer__detailHeading">
-                        Avaliações
+                        {translate key="plugins.reports.reviewersControlReport.list.reports"}
                     </div>
                     <ul class="list">
                         {foreach from=$report item=reviewer}

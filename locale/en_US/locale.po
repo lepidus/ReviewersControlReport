@@ -19,3 +19,6 @@ msgstr "Reviewers Control Report"
 
 msgid "plugins.reports.reviewersControlReport.description"
 msgstr "Generates a control report for editors to manage reviewers."
+
+msgid "plugins.reports.reviewersControlReport.list.reports"
+msgstr "Reports"
