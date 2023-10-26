@@ -68,12 +68,6 @@ let listItemTemplate = pkp.Vue.compile(`
             </div>
 
             <div class="listPanel__itemActions">
-                <pkp-button @click="showHistory">
-                    <span aria-hidden="true">{{ reviewerHistoryLabel }}</span>
-                    <span class="-screenReader">
-                        {{ __('common.selectWithName', {name: item.fullName}) }}
-                    </span>
-				</pkp-button>
                 <expander
                     :isExpanded="isExpanded"
                     :itemName="item.fullName"
