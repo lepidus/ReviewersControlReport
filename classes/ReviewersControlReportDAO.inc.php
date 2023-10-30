@@ -60,7 +60,7 @@ class ReviewersControlReportDAO extends DAO
         $reviewAssignmentDao = DAORegistry::getDAO('ReviewAssignmentDAO');
         $reviewAssignments = $reviewAssignmentDao->getByUserId($reviewerId);
         $reviewedSubmissions = [];
-        
+
         foreach ($reviewAssignments as $reviewAssignment) {
             if ($reviewAssignment->getStatus() == REVIEW_ASSIGNMENT_STATUS_COMPLETE) {
                 $submission = Services::get('submission')->get($reviewAssignment->getSubmissionId());
