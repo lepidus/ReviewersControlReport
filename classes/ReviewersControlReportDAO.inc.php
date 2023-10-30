@@ -46,8 +46,13 @@ class ReviewersControlReportDAO extends DAO
     {
         $reviewAssignmentDao = DAORegistry::getDAO('ReviewAssignmentDAO');
         $reviewAssignments = $reviewAssignmentDao->getByUserId($reviewerId);
-
-        return count($reviewAssignments);
+        $completedReviewAssignments = array();
+        foreach ($reviewAssignments as $reviewAssignment) {
+            if ($reviewAssignment->getStatus() == REVIEW_ASSIGNMENT_STATUS_COMPLETE) {
+                $completedReviewAssignments[] = $reviewAssignment;
+            }
+        }
+        return count($completedReviewAssignments);
     }
 
     public function getReviewedSubmissionsTitleAndDate($reviewerId)
@@ -55,13 +60,15 @@ class ReviewersControlReportDAO extends DAO
         $reviewAssignmentDao = DAORegistry::getDAO('ReviewAssignmentDAO');
         $reviewAssignments = $reviewAssignmentDao->getByUserId($reviewerId);
         $reviewedSubmissions = [];
-
+        
         foreach ($reviewAssignments as $reviewAssignment) {
-            $submission = Services::get('submission')->get($reviewAssignment->getSubmissionId());
-            $submissionTitle = $submission->getLocalizedTitle();
-            $dateCompleted = $reviewAssignment->getDateCompleted();
-            $dateCompleted = date("Y-m-d", strtotime($dateCompleted));
-            $reviewedSubmissions[] = [$submissionTitle, $dateCompleted];
+            if ($reviewAssignment->getStatus() == REVIEW_ASSIGNMENT_STATUS_COMPLETE) {
+                $submission = Services::get('submission')->get($reviewAssignment->getSubmissionId());
+                $submissionTitle = $submission->getLocalizedTitle();
+                $dateCompleted = $reviewAssignment->getDateCompleted();
+                $dateCompleted = date("Y-m-d", strtotime($dateCompleted));
+                $reviewedSubmissions[] = [$submissionTitle, $dateCompleted];
+            }
         }
         return $reviewedSubmissions;
     }
