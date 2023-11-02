@@ -5,6 +5,7 @@ import('lib.pkp.classes.db.DAO');
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Support\Collection;
 
+/** @class */
 class ReviewersControlReportDAO extends DAO
 {
     public function getReviewersIds($journalId)
@@ -34,9 +35,12 @@ class ReviewersControlReportDAO extends DAO
         foreach ($reviewAssignments as $reviewAssignment) {
             $qualityRatings[] = $reviewAssignment->getQuality();
         }
-        $qualityRatings = array_filter($qualityRatings, function ($value) {
-            return $value != null;
-        });
+        $qualityRatings = array_filter(
+            $qualityRatings,
+            function ($value) {
+                return $value != null;
+            }
+        );
         $ratingsCount = count($qualityRatings);
         $qualityAverage = ($ratingsCount != 0) ? (array_sum(array_values($qualityRatings)) / $ratingsCount) : 0;
         return $qualityAverage;
@@ -48,10 +52,11 @@ class ReviewersControlReportDAO extends DAO
         $reviewAssignments = $reviewAssignmentDao->getByUserId($reviewerId);
         $completedReviewAssignments = array();
         foreach ($reviewAssignments as $reviewAssignment) {
-            if ($reviewAssignment->getStatus() == REVIEW_ASSIGNMENT_STATUS_COMPLETE) {
+            if (in_array($reviewAssignment->getStatus(), [REVIEW_ASSIGNMENT_STATUS_RECEIVED, REVIEW_ASSIGNMENT_STATUS_COMPLETE, REVIEW_ASSIGNMENT_STATUS_THANKED])) {
                 $completedReviewAssignments[] = $reviewAssignment;
             }
         }
+
         return count($completedReviewAssignments);
     }
 
@@ -62,7 +67,7 @@ class ReviewersControlReportDAO extends DAO
         $reviewedSubmissions = [];
 
         foreach ($reviewAssignments as $reviewAssignment) {
-            if ($reviewAssignment->getStatus() == REVIEW_ASSIGNMENT_STATUS_COMPLETE) {
+            if (in_array($reviewAssignment->getStatus(), [REVIEW_ASSIGNMENT_STATUS_RECEIVED, REVIEW_ASSIGNMENT_STATUS_COMPLETE, REVIEW_ASSIGNMENT_STATUS_THANKED])) {
                 $submission = Services::get('submission')->get($reviewAssignment->getSubmissionId());
                 $submissionTitle = $submission->getLocalizedTitle();
                 $dateCompleted = $reviewAssignment->getDateCompleted();
