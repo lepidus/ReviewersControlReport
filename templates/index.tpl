@@ -38,7 +38,7 @@
                                 <td>{$reviewer->getQualityAverage()}</td>
                                 <td>{$reviewer->getTotalReviewedSubmissions()}</td>
                                 {if $reviewer->getReviewedSubmissionsTitleAndDate() == []}
-                                    <td>No reviewed submissions</td>
+                                    <td>{translate key="plugins.reports.reviewersControlReport.field.reviewedSubmissionsTitleAndCompletedDate.empty"}</td>
                                 {else}
                                     <td>
                                         <ul>
@@ -58,7 +58,7 @@
                     </tbody>
                 </table>
             {else}
-                <p>No reviewers found.</p>
+                <p>{translate key="plugins.reports.reviewersControlReport.NoReviewers"}</p>
             {/if}
         </div>
     </div>

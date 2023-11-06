@@ -40,7 +40,7 @@ class ReviewerDTO
         return $this->email;
     }
 
-    public function getAffiliation(): string
+    public function getAffiliation()
     {
         return $this->affiliation;
     }

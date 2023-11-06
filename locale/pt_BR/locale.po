@@ -20,6 +20,9 @@ msgstr "Relatório de Controle de Avaliadores"
 msgid "plugins.reports.reviewersControlReport.description"
 msgstr "Gera um relatório de controle para editores gerenciarem os avaliadores."
 
+msgid "plugins.reports.reviewersControlReport.NoReviewers"
+msgstr "Avaliadores não encontrados."
+
 msgid "plugins.reports.reviewersControlReport.field.email"
 msgstr "E-mail"
 
@@ -40,3 +43,6 @@ msgstr "Submissões Revisadas(Total)"
 
 msgid "plugins.reports.reviewersControlReport.field.reviewedSubmissionsTitleAndCompletedDate"
 msgstr "Submissões Revisadas(Título e Data de Conclusão)"
+
+msgid "plugins.reports.reviewersControlReport.field.reviewedSubmissionsTitleAndCompletedDate.empty"
+msgstr "Não possui submissões revisadas"
