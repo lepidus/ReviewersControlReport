@@ -28,6 +28,7 @@ class ReviewersControlReport
         foreach ($reviewersIds as $reviewerId) {
             $reviewerUser = $this->reportDAO->getReviewerUser($reviewerId);
             $reviewer = new ReviewerDTO(
+                $reviewerUser->getId(),
                 $reviewerUser->getEmail(),
                 $reviewerUser->getFullName(),
                 $reviewerUser->getLocalizedAffiliation(),

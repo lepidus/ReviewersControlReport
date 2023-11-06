@@ -25,6 +25,7 @@
                             <th>{translate key="plugins.reports.reviewersControlReport.field.qualityAverage"}</th>
                             <th>{translate key="plugins.reports.reviewersControlReport.field.reviewedSubmissionsTotal"}</th>
                             <th>{translate key="plugins.reports.reviewersControlReport.field.reviewedSubmissionsTitleAndCompletedDate"}</th>
+                            <th>{translate key="grid.user.edit"}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -37,7 +38,7 @@
                                 <td>{$reviewer->getQualityAverage()}</td>
                                 <td>{$reviewer->getTotalReviewedSubmissions()}</td>
                                 {if $reviewer->getReviewedSubmissionsTitleAndDate() == []}
-                                    <td>No reviewed submissions</td>
+                                    <td>{translate key="plugins.reports.reviewersControlReport.field.reviewedSubmissionsTitleAndCompletedDate.empty"}</td>
                                 {else}
                                     <td>
                                         <ul>
@@ -51,12 +52,13 @@
                                         </ul>
                                     </td>
                                 {/if}
+                                <td>{include file="linkAction/linkAction.tpl" action=$reviewer->getLinkActionByReviewerId()}</td>
                             </tr>
                         {/foreach}
                     </tbody>
                 </table>
             {else}
-                <p>No reviewers found.</p>
+                <p>{translate key="plugins.reports.reviewersControlReport.NoReviewers"}</p>
             {/if}
         </div>
     </div>

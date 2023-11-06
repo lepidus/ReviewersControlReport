@@ -20,6 +20,9 @@ msgstr "Reviewers Control Report"
 msgid "plugins.reports.reviewersControlReport.description"
 msgstr "Generates a control report for editors to manage reviewers."
 
+msgid "plugins.reports.reviewersControlReport.NoReviewers"
+msgstr "No reviewers found."
+
 msgid "plugins.reports.reviewersControlReport.field.email"
 msgstr "Email"
 
@@ -40,3 +43,6 @@ msgstr "Reviewed Submissions(Total)"
 
 msgid "plugins.reports.reviewersControlReport.field.reviewedSubmissionsTitleAndCompletedDate"
 msgstr "Reviewed Submissions(Title and Completed Date)"
+
+msgid "plugins.reports.reviewersControlReport.field.reviewedSubmissionsTitleAndCompletedDate.empty"
+msgstr "No reviewed submissions"
