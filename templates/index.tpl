@@ -33,7 +33,9 @@
                                 <td>{$reviewer->getEmail()}</td>
                                 <td>{$reviewer->getFullName()}</td>
                                 <td>{$reviewer->getAffiliation()}</td>
-                                <td>{$reviewer->getInterests()}</td>
+                                <td>{$reviewer->getInterests()}
+                                    {include file="linkAction/linkAction.tpl" action=$reviewer->getLinkActionByReviewerId()}
+                                </td>
                                 <td>{$reviewer->getQualityAverage()}</td>
                                 <td>{$reviewer->getTotalReviewedSubmissions()}</td>
                                 {if $reviewer->getReviewedSubmissionsTitleAndDate() == []}

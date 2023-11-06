@@ -44,6 +44,10 @@ class ReviewersControlReportPlugin extends ReportPlugin
 
     public function display($args, $request): void
     {
+        AppLocale::requireComponents(
+            LOCALE_COMPONENT_PKP_GRID
+        );
+        $dispatcher = $request->getDispatcher();
         $templateManager = TemplateManager::getManager();
         $templateManager->assign([
             'breadcrumbs' => [
