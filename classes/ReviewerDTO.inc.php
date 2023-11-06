@@ -1,4 +1,5 @@
 <?php
+
 import('lib.pkp.classes.linkAction.request.AjaxModal');
 
 class ReviewerDTO
