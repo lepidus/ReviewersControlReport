@@ -25,6 +25,7 @@
                             <th>{translate key="plugins.reports.reviewersControlReport.field.qualityAverage"}</th>
                             <th>{translate key="plugins.reports.reviewersControlReport.field.reviewedSubmissionsTotal"}</th>
                             <th>{translate key="plugins.reports.reviewersControlReport.field.reviewedSubmissionsTitleAndCompletedDate"}</th>
+                            <th>{translate key="grid.user.edit"}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -33,9 +34,7 @@
                                 <td>{$reviewer->getEmail()}</td>
                                 <td>{$reviewer->getFullName()}</td>
                                 <td>{$reviewer->getAffiliation()}</td>
-                                <td>{$reviewer->getInterests()}
-                                    {include file="linkAction/linkAction.tpl" action=$reviewer->getLinkActionByReviewerId()}
-                                </td>
+                                <td>{$reviewer->getInterests()}</td>
                                 <td>{$reviewer->getQualityAverage()}</td>
                                 <td>{$reviewer->getTotalReviewedSubmissions()}</td>
                                 {if $reviewer->getReviewedSubmissionsTitleAndDate() == []}
@@ -53,6 +52,7 @@
                                         </ul>
                                     </td>
                                 {/if}
+                                <td>{include file="linkAction/linkAction.tpl" action=$reviewer->getLinkActionByReviewerId()}</td>
                             </tr>
                         {/foreach}
                     </tbody>
