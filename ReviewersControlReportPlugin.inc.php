@@ -65,6 +65,11 @@ class ReviewersControlReportPlugin extends ReportPlugin
         ]);
         $templateManager->assign('report', $this->getReport($request));
 
+        $pluginPath = $request->getBaseUrl() . '/' . $this->getPluginPath();
+
+        $templateManager->addStyleSheet('table', $pluginPath . '/styles/tablesort.css', ['contexts' => 'backend']);
+        $templateManager->addJavaScript("tablesort", $pluginPath . '/js/tablesort.js', ['contexts' => 'backend']);
+
         $templateManager->display($this->getTemplateResource('index.tpl'));
     }
 

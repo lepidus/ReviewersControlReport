@@ -15,7 +15,7 @@
                     {translate key="plugins.reports.reviewersControlReport.displayName"}</h1>
             </pkp-header>
             {if $report}
-                <table class="pkpTable" labelled-by="usersTableLabel">
+                <table class="pkpTable table-sortable" labelled-by="usersTableLabel">
                     <thead>
                         <tr>
                             <th>{translate key="plugins.reports.reviewersControlReport.field.email"}</th>
