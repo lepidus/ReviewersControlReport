@@ -52,7 +52,7 @@
                                         </ul>
                                     </td>
                                 {/if}
-                                <td><p class="pkpButton">{include file="linkAction/linkAction.tpl" action=$reviewer->getLinkActionByReviewerId()}</p></td>
+                                <td><p class="pkpButton">{include file="linkAction/linkAction.tpl" action=$reviewer->getEditUserReviewerLinkAction()}</p></td>
                             </tr>
                         {/foreach}
                     </tbody>
