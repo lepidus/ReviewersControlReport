@@ -35,7 +35,12 @@
                                 <td>{$reviewer->getFullName()}</td>
                                 <td>{$reviewer->getAffiliation()}</td>
                                 <td>{$reviewer->getInterests()}</td>
-                                <td>{$reviewer->getQualityAverage()}</td>
+                                <td>{if $reviewer->getQualityAverage() > 0}
+                                        {$reviewer->getQualityAverage()}
+                                    {else}
+                                        ---
+                                    {/if}
+                                </td>
                                 <td>{$reviewer->getTotalReviewedSubmissions()}</td>
                                 {if $reviewer->getReviewedSubmissionsTitleAndDate() == []}
                                     <td>{translate key="plugins.reports.reviewersControlReport.field.reviewedSubmissionsTitleAndCompletedDate.empty"}</td>
@@ -43,7 +48,7 @@
                                     <td>
                                         <ul>
                                             {foreach from=$reviewer->getReviewedSubmissionsTitleAndDate() item=submission}
-                                                <li>{$submission[0]}
+                                                <li><a href="{$submission[2]}">{$submission[0]}</a>
                                                     <ul>
                                                         <li style="color: grey; font-style: italic;">{$submission[1]}</li>
                                                     </ul>
