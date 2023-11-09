@@ -20,8 +20,8 @@ class ReviewerDTO
     public function __construct($id, $email, $fullName, $affiliation, $interests, $qualityAverage, $totalReviewedSubmissions, $reviewedSubmissionsTitleAndDate)
     {
         $this->id = (int) $id;
-        $this->fullName = $this->formatStringLength($fullName);
-        $this->email = $this->formatStringLength($email);
+        $this->fullName = $this->formatStringLength($fullName, 16);
+        $this->email = $this->formatStringLength($email, 25);
         $this->affiliation = $this->formatStringLength((string)$affiliation);
         $this->interests = $this->formatStringLength($interests);
         $this->qualityAverage = $qualityAverage;
