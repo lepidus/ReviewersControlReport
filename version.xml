@@ -13,6 +13,6 @@
 <version>
 	<application>reviewersControlReport</application>
 	<type>plugins.reports</type>
-	<release>1.3.3.0</release>
-	<date>2023-11-08</date>
+	<release>1.3.4.0</release>
+	<date>2023-11-09</date>
 </version>
