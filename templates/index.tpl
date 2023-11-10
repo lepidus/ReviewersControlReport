@@ -9,7 +9,7 @@
 
 {block name="page"}
     <div class="pkpStats">
-        <div class="pkpStats__panel">
+        <div class="pkpStats__panel" style="width: 800pt;">
             <pkp-header>
                 <h1 id="usersTableLabel" class="pkpHeader__title">
                     {translate key="plugins.reports.reviewersControlReport.displayName"}</h1>

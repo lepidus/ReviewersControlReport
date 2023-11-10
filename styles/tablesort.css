@@ -6,7 +6,6 @@
 	background-color: #ddd;
 }
 
-
 .table-sortable .th-sort-asc::after {
 	content: "\25b4";
 }
