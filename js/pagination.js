@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const startIndex = page * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
         items.forEach((item, index) => {
-            item.classList.toggle('hidden', index < startIndex || index >= endIndex);
+            item.classList.toggle('hiddenReviewerReport', index < startIndex || index >= endIndex);
         });
         updateActiveButtonStates();
     }
