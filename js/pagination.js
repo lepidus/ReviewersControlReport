@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
     const content = document.querySelector('.pkpStats__panel'); 
-    const itemsPerPage = 5;
+    const itemsPerPage = 25;
     let currentPage = 0;
     const items = Array.from(content.getElementsByTagName('tr')).slice(1);
 
