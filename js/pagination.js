@@ -47,3 +47,19 @@ document.addEventListener('DOMContentLoaded', function () {
     createPageButtons();
     showPage(currentPage);
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    var expandButtons = document.querySelectorAll('.expand-button');
+
+    expandButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+            var expandable = this.closest('tr'); // Procura a linha (tr) mais próxima
+            var expandContent = expandable.querySelector('.expand-content');
+
+            if (expandContent) {
+                expandContent.style.display = (expandContent.style.display === 'none' || !expandContent.style.display) ? 'table-row' : 'none';
+            }
+        });
+    });
+});
+
