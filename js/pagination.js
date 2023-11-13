@@ -53,13 +53,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     expandButtons.forEach(function (button) {
         button.addEventListener('click', function () {
-            var expandable = this.closest('tr'); // Procura a linha (tr) mais próxima
-            var expandContent = expandable.querySelector('.expand-content');
+            var expandable = this.closest('tr');
+            var expandContent = expandable.nextElementSibling;
 
-            if (expandContent) {
-                expandContent.style.display = (expandContent.style.display === 'none' || !expandContent.style.display) ? 'table-row' : 'none';
+            if (expandContent && expandContent.classList.contains('expand-content')) {
+                expandContent.style.display = (expandContent.style.display === 'none' || !expandContent.style.display) ? 'block' : 'none';
             }
         });
     });
 });
-
