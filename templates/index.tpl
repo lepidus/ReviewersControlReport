@@ -50,9 +50,9 @@
                                  <td><p class="pkpButton">{include file="linkAction/linkAction.tpl" action=$reviewer->getEditUserReviewerLinkAction()}</p></td>
                              </tr>
                              <tr class="expand-content">
-                                 <td>
+                                 <td class="reviewedSubmissionsDescription">
                                     {if $reviewer->getReviewedSubmissionsTitleAndDate() == []}
-                                        {translate key="plugins.reports.reviewersControlReport.field.reviewedSubmissionsTitleAndCompletedDate.empty"}
+                                        <p style="font-weight: 700;font-size: .75rem;">{translate key="plugins.reports.reviewersControlReport.field.reviewedSubmissionsTitleAndCompletedDate.empty"}</p>
                                     {else}
                                         <div class="pkpStats__panel reviewedSubmissionsPanel">
                                             <table class="pkpTable reviewedSubmissionsTable">

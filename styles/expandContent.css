@@ -1,6 +1,8 @@
 .expand-content {
     display: none;
     transition: display 0.3s ease;
+    width: 719pt;
+    margin-right: -800pt;
 }
 
 .expand-content ul {
@@ -16,6 +18,19 @@
     flex-wrap: wrap;
 }
 
+.reviewedSubmissionsDescription td {
+    width: inherit;
+}
+
+.reviewedSubmissionsTable td {
+    display: flex;
+    flex-wrap: wrap;
+}
+
 .reviewedSubmissionsTable {
-    width: max-content;
+    width: -webkit-fill-available;
+}
+
+.reviewedSubmissionsPanel {
+    width: 700pt;
 }

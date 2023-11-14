@@ -74,7 +74,7 @@ class ReviewersControlReportDAO extends DAO
         foreach ($reviewAssignments as $reviewAssignment) {
             if (in_array($reviewAssignment->getStatus(), [REVIEW_ASSIGNMENT_STATUS_RECEIVED, REVIEW_ASSIGNMENT_STATUS_COMPLETE, REVIEW_ASSIGNMENT_STATUS_THANKED])) {
                 $submission = Services::get('submission')->get($reviewAssignment->getSubmissionId());
-                $submissionTitle = $this->formatStringLength($submission->getLocalizedTitle(), 40);
+                $submissionTitle = $this->formatStringLength($submission->getLocalizedTitle(), 100);
                 $dateCompleted = $reviewAssignment->getDateCompleted();
                 $dateCompleted = date("Y-m-d", strtotime($dateCompleted));
                 $submissionUrl = $this->getSubmissionWorkflowUrl($submission->getId(), $submission->getStageId());
