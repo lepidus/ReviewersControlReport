@@ -8,7 +8,7 @@
 
  {block name="page"}
      <div class="pkpStats">
-         <div class="pkpStats__panel" style="width: 800pt;">
+         <div class="pkpStats__panel" style="width: fit-content;">
              <pkp-header>
                  <h1 id="usersTableLabel" class="pkpHeader__title">
                      {translate key="plugins.reports.reviewersControlReport.displayName"}</h1>
@@ -42,7 +42,11 @@
                                     {/if}
                                     </td>
                                  <td>{$reviewer->getTotalReviewedSubmissions()}</td>
-                                 <td><button class="pkpButton expand-button">{translate key="user.login.registrationComplete.manageSubmissions"}</button></td>
+                                 <td>
+                                    <button class="pkpButton expand-button">
+                                        <span class="button-text">▼</span>
+                                    </button>
+                                </td>
                                  <td><p class="pkpButton">{include file="linkAction/linkAction.tpl" action=$reviewer->getEditUserReviewerLinkAction()}</p></td>
                              </tr>
                              <tr class="expand-content">
