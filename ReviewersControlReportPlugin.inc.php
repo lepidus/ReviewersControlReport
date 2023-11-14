@@ -71,6 +71,8 @@ class ReviewersControlReportPlugin extends ReportPlugin
         $templateManager->addJavaScript("tablesort", $pluginPath . '/js/tablesort.js', ['contexts' => 'backend']);
         $templateManager->addStyleSheet('paginationStyle', $pluginPath . '/styles/pagination.css', ['contexts' => 'backend']);
         $templateManager->addJavaScript("pagination", $pluginPath . '/js/pagination.js', ['contexts' => 'backend']);
+        $templateManager->addStyleSheet('expandContentStyle', $pluginPath . '/styles/expandContent.css', ['contexts' => 'backend']);
+        $templateManager->addJavaScript("expandContent", $pluginPath . '/js/expandContent.js', ['contexts' => 'backend']);
 
         $templateManager->display($this->getTemplateResource('index.tpl'));
     }

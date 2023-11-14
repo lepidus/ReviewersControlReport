@@ -26,22 +26,3 @@
     background-color: #007bff;
     color: white;
 }
-
-.expand-content {
-    display: none;
-    transition: display 0.3s ease;
-}
-
-
-.expand-content ul {
-    list-style: none;
-}
-
-.expand-content a {
-    text-decoration: none;
-}
-
-.reviewedSubmissionsTable tr {
-    display: flex;
-    flex-wrap: wrap;
-}
