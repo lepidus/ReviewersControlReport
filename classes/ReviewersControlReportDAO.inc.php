@@ -1,8 +1,8 @@
 <?php
 
 import('lib.pkp.classes.db.DAO');
-import('plugins.reports.reviewersControlReport.classes.traits.SubmissionUrl');
-import('plugins.reports.reviewersControlReport.classes.traits.StringLength');
+import('plugins.generic.reviewersControlReport.classes.traits.SubmissionUrl');
+import('plugins.generic.reviewersControlReport.classes.traits.StringLength');
 
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Support\Collection;

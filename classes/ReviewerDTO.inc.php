@@ -1,8 +1,8 @@
 <?php
 
 import('lib.pkp.classes.linkAction.request.AjaxModal');
-import('plugins.reports.reviewersControlReport.classes.traits.StringLength');
-import('plugins.reports.reviewersControlReport.classes.traits.ReviewerGridHandlerLinkAction');
+import('plugins.generic.reviewersControlReport.classes.traits.StringLength');
+import('plugins.generic.reviewersControlReport.classes.traits.ReviewerGridHandlerLinkAction');
 
 class ReviewerDTO
 {

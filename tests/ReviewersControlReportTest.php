@@ -1,6 +1,6 @@
 <?php
 
-import('plugins.reports.reviewersControlReport.classes.ReviewersControlReport');
+import('plugins.generic.reviewersControlReport.classes.ReviewersControlReport');
 import('lib.pkp.tests.PKPTestCase');
 
 class ReviewersControlReportTest extends PKPTestCase

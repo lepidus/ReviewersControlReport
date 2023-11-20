@@ -1,7 +1,7 @@
 <?php
 
-import('plugins.reports.reviewersControlReport.classes.ReviewersControlReportDAO');
-import('plugins.reports.reviewersControlReport.classes.ReviewerDTO');
+import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportDAO');
+import('plugins.generic.reviewersControlReport.classes.ReviewerDTO');
 
 class ReviewersControlReport
 {
