@@ -1,13 +1,12 @@
 <?php
 
 import('lib.pkp.classes.linkAction.request.AjaxModal');
-import('plugins.reports.reviewersControlReport.classes.traits.StringLength');
-import('plugins.reports.reviewersControlReport.classes.traits.ReviewerGridHandlerLinkAction');
+import('plugins.generic.reviewersControlReport.classes.traits.StringLength');
 
-class ReviewerDTO
+class ReviewerDTO extends DataObject
 {
     use StringLength;
-    use ReviewerGridHandlerLinkAction;
+
     private $id;
     private $fullName;
     private $email;
@@ -20,6 +19,7 @@ class ReviewerDTO
     public function __construct($id, $email, $fullName, $affiliation, $interests, $qualityAverage, $totalReviewedSubmissions, $reviewedSubmissionsTitleAndDate)
     {
         $this->id = (int) $id;
+        $this->setData('id', $id);
         $this->fullName = $this->formatStringLength($fullName, 16);
         $this->email = $this->formatStringLength($email, 25);
         $this->affiliation = $this->formatStringLength((string)$affiliation);
@@ -29,7 +29,7 @@ class ReviewerDTO
         $this->reviewedSubmissionsTitleAndDate = $reviewedSubmissionsTitleAndDate;
     }
 
-    private function getId(): int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -54,9 +54,12 @@ class ReviewerDTO
         return $this->interests;
     }
 
-    public function getQualityAverage(): float
+    public function getQualityAverage()
     {
-        return number_format($this->qualityAverage, 2, '.', '');
+        if ($this->qualityAverage > 0) {
+            return number_format($this->qualityAverage, 0, '.', '');
+        }
+        return "---";
     }
 
     public function getTotalReviewedSubmissions(): int

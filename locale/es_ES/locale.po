@@ -1,0 +1,48 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-11-19T11:06:13+00:00\n"
+"PO-Revision-Date: 2020-06-06 02:30+0000\n"
+"Last-Translator: Diego José Macêdo <diegojmacedo@gmail.com>\n"
+"Language-Team: Portuguese (Brazil) <http://translate.pkp.sfu.ca/projects/"
+"plugins/review-report-plugin/pt_BR/>\n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Generator: Weblate 3.9.1\n"
+
+msgid "plugins.reports.reviewersControlReport.displayName"
+msgstr "Informe de Control del Revisor"
+
+msgid "plugins.reports.reviewersControlReport.description"
+msgstr "Genera un informe de seguimiento para que los editores administren a los revisores."
+
+msgid "plugins.reports.reviewersControlReport.NoReviewers"
+msgstr "Revisores no encontrados."
+
+msgid "plugins.reports.reviewersControlReport.field.email"
+msgstr "Correo electrónico"
+
+msgid "plugins.reports.reviewersControlReport.field.fullName"
+msgstr "Nombre completo"
+
+msgid "plugins.reports.reviewersControlReport.field.affiliation"
+msgstr "Afiliación"
+
+msgid "plugins.reports.reviewersControlReport.field.interests"
+msgstr "Intereses de revisión"
+
+msgid "plugins.reports.reviewersControlReport.field.qualityAverage"
+msgstr "Puntuación del revisor/a"
+
+msgid "plugins.reports.reviewersControlReport.field.reviewedSubmissionsTotal"
+msgstr "Envíos evaluados (total)"
+
+msgid "plugins.reports.reviewersControlReport.field.reviewedSubmissionsTitleAndCompletedDate"
+msgstr "Envíos evaluados (título y fecha de finalización)"
+
+msgid "plugins.reports.reviewersControlReport.field.reviewedSubmissionsTitleAndCompletedDate.empty"
+msgstr "No se evaluaron envíos"
