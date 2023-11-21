@@ -54,8 +54,7 @@ class ReviewersGridHandler extends GridHandler
             3 => ['id' => 'affiliation', 'title' => 'plugins.reports.reviewersControlReport.field.affiliation', 'template' => null],
             4 => ['id' => 'interests', 'title' => 'plugins.reports.reviewersControlReport.field.interests', 'template' => null],
             5 => ['id' => 'score', 'title' => 'plugins.reports.reviewersControlReport.field.qualityAverage', 'template' => null],
-            6 => ['id' => 'totalReviews', 'title' => 'plugins.reports.reviewersControlReport.field.reviewedSubmissionsTotal', 'template' => null],
-            7 => ['id' => 'reviews', 'title' => 'plugins.reports.reviewersControlReport.field.reviewedSubmissionsTitleAndCompletedDate', 'template' => null],
+            6 => ['id' => 'totalReviews', 'title' => 'plugins.reports.reviewersControlReport.field.reviewedSubmissionsTotal', 'template' => null]
         ];
 
         foreach ($columnsInfo as $columnInfo) {

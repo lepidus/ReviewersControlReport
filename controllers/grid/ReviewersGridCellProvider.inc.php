@@ -22,8 +22,6 @@ class ReviewersGridCellProvider extends GridCellProvider
                 return array('label' => $reviewer->getQualityAverage());
             case 'totalReviews':
                 return array('label' => $reviewer->getTotalReviewedSubmissions());
-            case 'reviews':
-                return array('label' => $reviewer->getReviewedSubmissionsTitleAndDate());
             default:
                 break;
         }
