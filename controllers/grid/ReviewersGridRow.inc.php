@@ -36,7 +36,6 @@ class ReviewersGridRow extends GridRow
 
     public function getReviews()
     {
-        error_log(print_r($this->getData()->getReviewedSubmissionsTitleAndDate(), true));
         return $this->getData()->getReviewedSubmissionsTitleAndDate();
     }
 }
