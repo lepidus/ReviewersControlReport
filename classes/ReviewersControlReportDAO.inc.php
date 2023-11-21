@@ -174,7 +174,7 @@ class ReviewersControlReportDAO extends DAO
                 $dateCompleted = $reviewAssignment->getDateCompleted();
                 $dateCompleted = date("Y-m-d", strtotime($dateCompleted));
                 $submissionUrl = $this->getSubmissionWorkflowUrl($submission->getId(), $submission->getStageId());
-                $reviewedSubmissions[] = [$submissionTitle, $dateCompleted, $submissionUrl];
+                $reviewedSubmissions[] = ["<td style='width: 200pt;' colspan='2'><a href=" . $submissionUrl . ">" . $submissionTitle . "</a></td><td colspan='2'>" . __('common.completed.date', ['dateCompleted' => $dateCompleted]) . "</td>"];
             }
         }
         return $reviewedSubmissions;

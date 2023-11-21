@@ -16,7 +16,7 @@
     $(function() {ldelim}
         $('#{$row_id}').find('a.show_extras').on('click',
 			function() {ldelim}
-                var $reviewsRow = $('#{$row_id}').siblings('.row_review');
+                var $reviewsRow = $('#{$row_id}').siblings('.row_review-{$row_id}');
                 $reviewsRow.toggle();
             {rdelim})
 	{rdelim});
@@ -72,11 +72,11 @@
 	</tr>
 {/if}
 {if $row->getReviews()}
-	<tr id="{$rowId|escape|replace:" ":"_"}-control-row" class="row_review">
-		<td colspan="{$grid->getColumnsCount('indent')}">
-			{foreach from=$row->getReviews() item=reviews}
-				{$reviews}
+	{foreach from=$row->getReviews() item=review}
+		<tr class="row_controls row_review-{$row_id}">
+			{foreach from=$review item=reviewData}
+					{$reviewData}
 			{/foreach}
-		</td>
-	</tr>
+		</tr>
+	{/foreach}
 {/if}
