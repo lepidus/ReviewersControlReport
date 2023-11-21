@@ -40,7 +40,7 @@ class ReviewersControlReportPlugin extends GenericPlugin
     public function setupGridHandler($hookName, $params)
     {
         $component = &$params[0];
-        if ($component == 'plugins.generic.ReviewersControlReportPlugin.controllers.grid.ReviewersGridHandler') {
+        if ($component == 'plugins.generic.reviewersControlReport.controllers.grid.ReviewersGridHandler') {
             return true;
         }
         return false;

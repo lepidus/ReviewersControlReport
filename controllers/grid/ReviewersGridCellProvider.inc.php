@@ -17,15 +17,13 @@ class ReviewersGridCellProvider extends GridCellProvider
             case 'affiliation':
                 return array('label' => $reviewer->getAffiliation());
             case 'interests':
-                return array('label' => $reviewer->getAffiliation());
+                return array('label' => $reviewer->getInterests());
             case 'score':
                 return array('label' => $reviewer->getQualityAverage());
             case 'totalReviews':
                 return array('label' => $reviewer->getTotalReviewedSubmissions());
             case 'reviews':
                 return array('label' => $reviewer->getReviewedSubmissionsTitleAndDate());
-            case 'edit':
-                return array('label' => $reviewer->getFullName());
             default:
                 break;
         }

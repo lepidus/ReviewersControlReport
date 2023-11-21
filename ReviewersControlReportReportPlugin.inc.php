@@ -13,7 +13,6 @@
  */
 
 import('lib.pkp.classes.plugins.ReportPlugin');
-import('plugins.generic.reviewersControlReport.classes.ReviewersControlReport');
 
 class ReviewersControlReportReportPlugin extends ReportPlugin
 {
@@ -63,22 +62,6 @@ class ReviewersControlReportReportPlugin extends ReportPlugin
             ],
             'pageTitle', __('plugins.reports.reviewersControlReport.displayName')
         ]);
-        $templateManager->assign('report', $this->getReport($request));
-
-        $pluginPath = $request->getBaseUrl() . '/' . $this->getPluginPath();
-
-        $templateManager->addStyleSheet('table', $pluginPath . '/styles/tablesort.css', ['contexts' => 'backend']);
-        $templateManager->addJavaScript("tablesort", $pluginPath . '/js/tablesort.js', ['contexts' => 'backend']);
-        $templateManager->addStyleSheet('paginationStyle', $pluginPath . '/styles/pagination.css', ['contexts' => 'backend']);
-        $templateManager->addJavaScript("pagination", $pluginPath . '/js/pagination.js', ['contexts' => 'backend']);
-
         $templateManager->display($this->getTemplateResource('index_component.tpl'));
-    }
-
-    public function getReport($request): array
-    {
-        $contextId = $request->getContext() ? $request->getContext()->getId() : CONTEXT_SITE;
-        $reviewersControlReport = new ReviewersControlReport($contextId);
-        return $reviewersControlReport->assembleReport();
     }
 }
