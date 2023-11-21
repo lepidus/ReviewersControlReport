@@ -7,7 +7,8 @@ class ReviewersGridRow extends GridRow
 {
     public function initialize($request, $template = null)
     {
-        parent::initialize($request, $template);
+        $plugin = PluginRegistry::getPlugin('generic', 'ReviewersControlReportPlugin');
+        parent::initialize($request, $plugin->getTemplateResource('gridRow.tpl'));
 
         $rowId = $this->getId();
         $dispatcher = $request->getDispatcher();
@@ -31,16 +32,11 @@ class ReviewersGridRow extends GridRow
             __('grid.action.edit'),
             'edit'
         ));
+    }
 
-        $this->addAction(new LinkAction(
-            'reviews',
-            new AjaxModal(
-                $request->getRouter()->url($request, null, null, 'reviews', null, $this->getRequestArgs()),
-                __('plugins.reports.reviewersControlReport.reviews'),
-                'modal_add_item'
-            ),
-            __('grid.action.addGalley'),
-            'add_item'
-        ));
+    public function getReviews()
+    {
+        error_log(print_r($this->getData()->getReviewedSubmissionsTitleAndDate(), true));
+        return $this->getData()->getReviewedSubmissionsTitleAndDate();
     }
 }
