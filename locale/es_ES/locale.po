@@ -46,3 +46,6 @@ msgstr "Envíos evaluados (título y fecha de finalización)"
 
 msgid "plugins.reports.reviewersControlReport.field.reviewedSubmissionsTitleAndCompletedDate.empty"
 msgstr "No se evaluaron envíos"
+
+msgid "plugins.reports.reviewersControlReport.validate.utf8"
+msgstr "El texto UTF-8 no es válido"

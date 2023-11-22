@@ -46,3 +46,6 @@ msgstr "Reviewed Submissions(Title and Completed Date)"
 
 msgid "plugins.reports.reviewersControlReport.field.reviewedSubmissionsTitleAndCompletedDate.empty"
 msgstr "No reviewed submissions"
+
+msgid "plugins.reports.reviewersControlReport.validate.utf8"
+msgstr "Invalid UTF-8 String"
