@@ -49,8 +49,8 @@ class ReviewersGridHandler extends GridHandler
         $cellProvider = new ReviewersGridCellProvider();
 
         $columnsInfo = [
-            1 => ['id' => 'email', 'title' => 'plugins.reports.reviewersControlReport.field.email', 'template' => null],
-            2 => ['id' => 'fullName', 'title' => 'plugins.reports.reviewersControlReport.field.fullName', 'template' => null],
+            1 => ['id' => 'fullName', 'title' => 'plugins.reports.reviewersControlReport.field.fullName', 'template' => null],
+            2 => ['id' => 'email', 'title' => 'plugins.reports.reviewersControlReport.field.email', 'template' => null],
             3 => ['id' => 'affiliation', 'title' => 'plugins.reports.reviewersControlReport.field.affiliation', 'template' => null],
             4 => ['id' => 'interests', 'title' => 'plugins.reports.reviewersControlReport.field.interests', 'template' => null],
             5 => ['id' => 'score', 'title' => 'plugins.reports.reviewersControlReport.field.qualityAverage', 'template' => null],

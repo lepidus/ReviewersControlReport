@@ -39,7 +39,7 @@ msgid "plugins.reports.reviewersControlReport.field.qualityAverage"
 msgstr "Puntuación del revisor/a"
 
 msgid "plugins.reports.reviewersControlReport.field.reviewedSubmissionsTotal"
-msgstr "Envíos evaluados (total)"
+msgstr "Revisiones Completadas"
 
 msgid "plugins.reports.reviewersControlReport.field.reviewedSubmissionsTitleAndCompletedDate"
 msgstr "Envíos evaluados (título y fecha de finalización)"

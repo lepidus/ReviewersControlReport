@@ -39,7 +39,7 @@ msgid "plugins.reports.reviewersControlReport.field.qualityAverage"
 msgstr "Média de Notas"
 
 msgid "plugins.reports.reviewersControlReport.field.reviewedSubmissionsTotal"
-msgstr "Submissões Avaliadas(Total)"
+msgstr "Avaliações Completas"
 
 msgid "plugins.reports.reviewersControlReport.field.reviewedSubmissionsTitleAndCompletedDate"
 msgstr "Submissões Avaliadas(Título e Data de Conclusão)"

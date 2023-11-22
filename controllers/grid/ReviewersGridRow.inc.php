@@ -29,7 +29,7 @@ class ReviewersGridRow extends GridRow
                 'modal_edit',
                 true
             ),
-            __('grid.action.edit'),
+            __('grid.user.edit'),
             'edit'
         ));
     }

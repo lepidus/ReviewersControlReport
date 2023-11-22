@@ -39,7 +39,7 @@ msgid "plugins.reports.reviewersControlReport.field.qualityAverage"
 msgstr "Quality Average"
 
 msgid "plugins.reports.reviewersControlReport.field.reviewedSubmissionsTotal"
-msgstr "Reviewed Submissions(Total)"
+msgstr "Completed Reviews"
 
 msgid "plugins.reports.reviewersControlReport.field.reviewedSubmissionsTitleAndCompletedDate"
 msgstr "Reviewed Submissions(Title and Completed Date)"

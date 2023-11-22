@@ -65,7 +65,9 @@
 		<td colspan="{$grid->getColumnsCount('indent')}">
 			{if $row->getActions($smarty.const.GRID_ACTION_POSITION_DEFAULT)}
 				{foreach from=$row->getActions($smarty.const.GRID_ACTION_POSITION_DEFAULT) item=action}
-					{include file="linkAction/linkAction.tpl" action=$action contextId=$rowId|replace:" ":"_"}
+					<p class="pkpButton">
+						{include file="linkAction/linkAction.tpl" action=$action contextId=$rowId|replace:" ":"_"}
+					</p>
 				{/foreach}
 			{/if}
 		</td>
