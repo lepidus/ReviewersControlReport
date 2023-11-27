@@ -55,7 +55,8 @@ class ReviewersControlReportReportPlugin extends ReportPlugin
             $context = $request->getContext();
             $dao = new ReviewersControlReportDAO();
             $reviewersId = $dao->getReviewersIds($context->getId());
-            $form->execute($reviewersId);
+            $form->generateReport($reviewersId);
+            return;
         }
         $dispatcher = $request->getDispatcher();
         $templateManager = TemplateManager::getManager();

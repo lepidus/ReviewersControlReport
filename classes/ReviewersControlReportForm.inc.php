@@ -5,10 +5,10 @@ import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportDAO
 
 class ReviewersControlReportForm extends Form
 {
-    public function execute($reviewersId)
+    public function generateReport($reviewersId)
     {
         header('content-type: text/comma-separated-values');
-        header("content-disposition: attachment; filename=reviewers-$type-" . date('Ymd') . '.csv');
+        header("content-disposition: attachment; filename=reviewersControlReport-" . date('Ymd') . '.csv');
 
         $columns = array(
             __('plugins.reports.reviewersControlReport.field.fullName'),
