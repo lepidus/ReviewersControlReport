@@ -49,3 +49,6 @@ msgstr "Não possui submissões avaliadas"
 
 msgid "plugins.reports.reviewersControlReport.validate.utf8"
 msgstr "Texto UTF-8 inválido"
+
+msgid "plugins.reports.reviewersControlReport.toCsv"
+msgstr "Gerar CSV dos Avaliadores"

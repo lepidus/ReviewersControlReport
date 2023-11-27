@@ -161,7 +161,7 @@ class ReviewersControlReportDAO extends DAO
         return count($completedReviewAssignments);
     }
 
-    public function getReviewedSubmissionsTitleAndDate($reviewerId)
+    public function getReviewedSubmissionsTitleAndDate($reviewerId, $isCsv = false)
     {
         $reviewAssignmentDao = DAORegistry::getDAO('ReviewAssignmentDAO');
         $reviewAssignments = $reviewAssignmentDao->getByUserId($reviewerId);
@@ -170,11 +170,16 @@ class ReviewersControlReportDAO extends DAO
         foreach ($reviewAssignments as $reviewAssignment) {
             if (in_array($reviewAssignment->getStatus(), [REVIEW_ASSIGNMENT_STATUS_RECEIVED, REVIEW_ASSIGNMENT_STATUS_COMPLETE, REVIEW_ASSIGNMENT_STATUS_THANKED])) {
                 $submission = Services::get('submission')->get($reviewAssignment->getSubmissionId());
-                $submissionTitle = $this->formatStringLength($submission->getLocalizedTitle(), 40);
                 $dateCompleted = $reviewAssignment->getDateCompleted();
                 $dateCompleted = date("Y-m-d", strtotime($dateCompleted));
                 $submissionUrl = $this->getSubmissionWorkflowUrl($submission->getId(), $submission->getStageId());
-                $reviewedSubmissions[] = ["<td style='width: 200pt;' colspan='2'><a href=" . $submissionUrl . ">" . $submissionTitle . "</a></td><td colspan='2'>" . __('common.completed.date', ['dateCompleted' => $dateCompleted]) . "</td>"];
+                if ($isCsv) {
+                    $submissionTitle = $submission->getLocalizedTitle();
+                    $reviewedSubmissions[] = [$submissionTitle, __('common.completed.date', ['dateCompleted' => $dateCompleted])];
+                } else {
+                    $submissionTitle = $this->formatStringLength($submission->getLocalizedTitle(), 40);
+                    $reviewedSubmissions[] = ["<td style='width: 200pt;' colspan='2'><a href=" . $submissionUrl . ">" . $submissionTitle . "</a></td><td colspan='2'>" . __('common.completed.date', ['dateCompleted' => $dateCompleted]) . "</td>"];
+                }
             }
         }
         return $reviewedSubmissions;

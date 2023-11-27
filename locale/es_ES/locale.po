@@ -49,3 +49,6 @@ msgstr "No se evaluaron envíos"
 
 msgid "plugins.reports.reviewersControlReport.validate.utf8"
 msgstr "El texto UTF-8 no es válido"
+
+msgid "plugins.reports.reviewersControlReport.toCsv"
+msgstr "Generar CSV de revisores"

@@ -49,3 +49,6 @@ msgstr "No reviewed submissions"
 
 msgid "plugins.reports.reviewersControlReport.validate.utf8"
 msgstr "Invalid UTF-8 String"
+
+msgid "plugins.reports.reviewersControlReport.toCsv"
+msgstr "Generate CSV of Reviewers"

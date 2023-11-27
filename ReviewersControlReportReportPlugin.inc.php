@@ -13,6 +13,8 @@
  */
 
 import('lib.pkp.classes.plugins.ReportPlugin');
+import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportForm');
+import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportDAO');
 
 class ReviewersControlReportReportPlugin extends ReportPlugin
 {
@@ -46,6 +48,16 @@ class ReviewersControlReportReportPlugin extends ReportPlugin
         AppLocale::requireComponents(
             LOCALE_COMPONENT_PKP_GRID
         );
+        $requestHandler = new PKPRequest();
+        $form = new ReviewersControlReportForm();
+
+        if ($requestHandler->isPost($request)) {
+            $context = $request->getContext();
+            $dao = new ReviewersControlReportDAO();
+            $reviewersId = $dao->getReviewersIds($context->getId());
+            $form->generateReport($reviewersId);
+            return;
+        }
         $dispatcher = $request->getDispatcher();
         $templateManager = TemplateManager::getManager();
         $templateManager->assign([
