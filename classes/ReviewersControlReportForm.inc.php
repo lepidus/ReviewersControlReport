@@ -17,6 +17,7 @@ class ReviewersControlReportForm extends Form
             __('plugins.reports.reviewersControlReport.field.interests'),
             __('plugins.reports.reviewersControlReport.field.qualityAverage'),
             __('plugins.reports.reviewersControlReport.field.reviewedSubmissionsTotal'),
+            __('plugins.reports.reviewersControlReport.field.reviewedSubmissionsTitleAndCompletedDate')
         );
 
         $fp = fopen('php://output', 'wt');
@@ -37,6 +38,15 @@ class ReviewersControlReportForm extends Form
             $completedSubmissions = $reviewersDao->getTotalReviewedSubmissions($user->getId());
             $reviewersData[] = $rating > 0 ? $rating : "";
             $reviewersData[] = $completedSubmissions > 0 ? $completedSubmissions : "";
+            $isCsv = true;
+            $reviewedSubmissionsTitleAndDate = $reviewersDao->getReviewedSubmissionsTitleAndDate($user->getId(), $isCsv);
+            $fullSubmissionsText = "";
+
+            foreach ($reviewedSubmissionsTitleAndDate as $submission) {
+                $fullSubmissionsText .= $submission[0] . ". " . $submission[1] . "\n";
+            }
+
+            $reviewersData[] = $fullSubmissionsText;
 
             fputcsv($fp, $reviewersData);
         }
