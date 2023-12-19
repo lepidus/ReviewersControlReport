@@ -2,9 +2,12 @@
 
 import('lib.pkp.classes.form.Form');
 import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportDAO');
+import('plugins.generic.reviewersControlReport.classes.traits.ReviewerData');
 
 class ReviewersControlReportForm extends Form
 {
+    use ReviewerData;
+
     public function generateReport($reviewersId)
     {
         header('content-type: text/comma-separated-values');
@@ -26,27 +29,7 @@ class ReviewersControlReportForm extends Form
         $reviewersDao = new ReviewersControlReportDAO();
 
         foreach ($reviewersId as $id) {
-            $reviewersData = [];
-            $userDao = DAORegistry::getDAO('UserDAO');
-            $user = $userDao->getById($id);
-
-            $reviewersData[] = $user->getLocalizedGivenName() . $user->getLocalizedFamilyName();
-            $reviewersData[] = $user->getEmail();
-            $reviewersData[] = $user->getLocalizedAffiliation();
-            $reviewersData[] = $user->getInterestString();
-            $rating = $reviewersDao->getQualityAverage($user->getId());
-            $completedSubmissions = $reviewersDao->getTotalReviewedSubmissions($user->getId());
-            $reviewersData[] = $rating > 0 ? $rating : "";
-            $reviewersData[] = $completedSubmissions > 0 ? $completedSubmissions : "";
-            $isCsv = true;
-            $reviewedSubmissionsTitleAndDate = $reviewersDao->getReviewedSubmissionsTitleAndDate($user->getId(), $isCsv);
-            $fullSubmissionsText = "";
-
-            foreach ($reviewedSubmissionsTitleAndDate as $submission) {
-                $fullSubmissionsText .= $submission[0] . ". " . $submission[1] . "\n";
-            }
-
-            $reviewersData[] = $fullSubmissionsText;
+            $reviewersData = $this->getReviewerData($id, $reviewersDao);
 
             fputcsv($fp, $reviewersData);
         }
