@@ -17,4 +17,4 @@ After activating the plugin, a new page will be available under *Reports > Revie
 This project is licensed under the GNU General Public License v3. See the [LICENSE](LICENSE) file for details.
 ***
 
-Developed by [Lepidus Technologia](https://github.com/lepidus)
+Developed by [Lepidus Tecnologia](https://github.com/lepidus)
