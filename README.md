@@ -2,6 +2,12 @@
 
 This plugin provides a web page with a reviewers control report for the journal, under *Statistics > Reports*.
 
+## Compatibility
+
+The latest release of this plugin is compatible with the following PKP applications:
+
+* OJS 3.3.0
+
 ## Installation
 
 1. Install the plugin using the latest Package available for the application you are using.
