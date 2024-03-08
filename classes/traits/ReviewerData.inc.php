@@ -2,30 +2,45 @@
 
 trait ReviewerData
 {
-    public function getReviewerData($id, $reviewersDao): array
+    public function getReviewerData($reviewerId, $reviewersDao): array
     {
-        $reviewersData = [];
+        $reviewerData = array_merge(
+            $this->getReviewerPersonalData($reviewerId),
+            $this->getReviewerReviewsData($reviewerId, $reviewersDao)
+        );
+
+        return $reviewerData;
+    }
+
+    public function getReviewerPersonalData($reviewerId): array
+    {
         $userDao = DAORegistry::getDAO('UserDAO');
-        $user = $userDao->getById($id);
+        $reviewer = $userDao->getById($reviewerId);
 
-        $reviewersData[] = $user->getLocalizedGivenName() . $user->getLocalizedFamilyName();
-        $reviewersData[] = $user->getEmail();
-        $reviewersData[] = $user->getLocalizedAffiliation();
-        $reviewersData[] = $user->getInterestString();
-        $rating = $reviewersDao->getQualityAverage($user->getId());
-        $completedSubmissions = $reviewersDao->getTotalReviewedSubmissions($user->getId());
-        $reviewersData[] = $rating > 0 ? $rating : "";
-        $reviewersData[] = $completedSubmissions > 0 ? $completedSubmissions : "";
+        return [
+            $reviewer->getLocalizedGivenName() . ' ' . $reviewer->getLocalizedFamilyName(),
+            $reviewer->getEmail(),
+            $reviewer->getLocalizedAffiliation(),
+            $reviewer->getInterestString()
+        ];
+    }
+
+    private function getReviewerReviewsData($reviewerId, $reviewersDao): array
+    {
+        $rating = $reviewersDao->getQualityAverage($reviewerId);
+        $completedSubmissions = $reviewersDao->getTotalReviewedSubmissions($reviewerId);
         $isCsv = true;
-        $reviewedSubmissionsTitleAndDate = $reviewersDao->getReviewedSubmissionsTitleAndDate($user->getId(), $isCsv);
-        $fullSubmissionsText = "";
+        $reviewedSubmissionsTitleAndDate = $reviewersDao->getReviewedSubmissionsTitleAndDate($reviewerId, $isCsv);
 
-        foreach ($reviewedSubmissionsTitleAndDate as $submission) {
-            $fullSubmissionsText .= $submission[0] . ". " . $submission[1] . "\n";
+        $fullSubmissionsText = "";
+        foreach ($reviewedSubmissionsTitleAndDate as [$title, $dateCompleted]) {
+            $fullSubmissionsText .= "{$title}. {$dateCompleted}\n";
         }
 
-        $reviewersData[] = $fullSubmissionsText;
-
-        return $reviewersData;
+        return [
+            $rating > 0 ? $rating : "",
+            $completedSubmissions > 0 ? $completedSubmissions : "",
+            $fullSubmissionsText
+        ];
     }
 }
