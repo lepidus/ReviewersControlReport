@@ -6,7 +6,7 @@ trait ReviewerData
     {
         $reviewerData = array_merge(
             $this->getReviewerPersonalData($reviewerId),
-            $this->getReviewerReviewsData($reviewerId)
+            $this->getReviewerReviewsData($reviewerId, $reviewersDao)
         );
 
         return $reviewerData;
