@@ -7,7 +7,7 @@ import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportFor
 class ReviewersControlReportFormTest extends DatabaseTestCase
 {
     private $reviewerId;
-    private $locale = 'pt_BR';
+    private $locale = 'en_US';
     private $givenName = 'Walter';
     private $familyName = 'Salles';
     private $username = 'walter.salles';
@@ -42,7 +42,7 @@ class ReviewersControlReportFormTest extends DatabaseTestCase
     {
         $form = new ReviewersControlReportForm();
 
-        $reviewerPersonalData = $form->getReviewerPersonalData();
+        $reviewerPersonalData = $form->getReviewerPersonalData($this->reviewerId);
         $emptyInterests = '';
         $expectedPersonalData = [
             $this->givenName . ' ' . $this->familyName,
