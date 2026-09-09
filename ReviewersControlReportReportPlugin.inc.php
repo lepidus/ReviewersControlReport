@@ -14,7 +14,6 @@
 
 import('lib.pkp.classes.plugins.ReportPlugin');
 import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportForm');
-import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportDAO');
 
 class ReviewersControlReportReportPlugin extends ReportPlugin
 {
@@ -52,10 +51,7 @@ class ReviewersControlReportReportPlugin extends ReportPlugin
         $form = new ReviewersControlReportForm();
 
         if ($requestHandler->isPost($request)) {
-            $context = $request->getContext();
-            $dao = new ReviewersControlReportDAO();
-            $reviewersId = $dao->getReviewersIds($context->getId());
-            $form->generateReport($reviewersId);
+            $form->generateReport($request);
             return;
         }
         $dispatcher = $request->getDispatcher();

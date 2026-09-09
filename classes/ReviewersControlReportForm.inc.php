@@ -2,14 +2,17 @@
 
 import('lib.pkp.classes.form.Form');
 import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportDAO');
+import('plugins.generic.reviewersControlReport.classes.ReviewsSummary');
 import('plugins.generic.reviewersControlReport.classes.traits.ReviewerData');
 
 class ReviewersControlReportForm extends Form
 {
     use ReviewerData;
 
-    public function generateReport($reviewersId)
+    public function generateReport($request)
     {
+        $contextId = $request->getContext()->getId();
+
         header('content-type: text/comma-separated-values');
         header("content-disposition: attachment; filename=reviewersControlReport-" . date('Ymd') . '.csv');
 
@@ -28,10 +31,10 @@ class ReviewersControlReportForm extends Form
 
         $reviewersDao = new ReviewersControlReportDAO();
 
-        foreach ($reviewersId as $id) {
-            $reviewersData = $this->getReviewerData($id, $reviewersDao);
+        foreach ($reviewersDao->getReviewersIds($contextId) as $reviewerId) {
+            $completedReviews = $reviewersDao->getCompletedReviews($contextId, $reviewerId);
 
-            fputcsv($fp, $reviewersData);
+            fputcsv($fp, $this->getReviewerData($reviewerId, $completedReviews));
         }
 
         fclose($fp);

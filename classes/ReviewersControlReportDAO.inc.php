@@ -4,6 +4,8 @@ import('lib.pkp.classes.db.DAO');
 import('plugins.generic.reviewersControlReport.classes.traits.SubmissionUrl');
 import('plugins.generic.reviewersControlReport.classes.traits.StringLength');
 import('plugins.generic.reviewersControlReport.classes.ReviewerDTO');
+import('plugins.generic.reviewersControlReport.classes.CompletedReview');
+import('plugins.generic.reviewersControlReport.classes.ReviewsSummary');
 
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Support\Collection;
@@ -15,6 +17,7 @@ class ReviewersControlReportDAO extends DAO
     use StringLength;
 
     public $userDao;
+    private $contextId;
 
     public function __construct()
     {
@@ -36,6 +39,7 @@ class ReviewersControlReportDAO extends DAO
 
     public function getReviewers($contextId = null, $searchType = null, $search = null, $searchMatch = null, $dbResultRange = null)
     {
+        $this->contextId = $contextId;
         $paramArray = array(ASSOC_TYPE_USER, 'interest', IDENTITY_SETTING_GIVENNAME, IDENTITY_SETTING_FAMILYNAME);
         $paramArray = array_merge($paramArray, $this->userDao->getFetchParameters());
         $roleId = ROLE_ID_REVIEWER;
@@ -115,73 +119,134 @@ class ReviewersControlReportDAO extends DAO
     public function returnReviewerFromRow($row)
     {
         $reviewerUser = $this->getReviewerUser($row['user_id']);
+        $completedReviews = $this->getCompletedReviews($this->contextId, $row['user_id']);
+        $reviewsSummary = new ReviewsSummary($completedReviews);
+
         $reviewer = new ReviewerDTO(
             $reviewerUser->getId(),
             $reviewerUser->getEmail(),
             $reviewerUser->getFullName(),
             $reviewerUser->getLocalizedAffiliation(),
             $reviewerUser->getInterestString(),
-            $this->getQualityAverage($row['user_id']),
-            $this->getTotalReviewedSubmissions($row['user_id']),
-            $this->getReviewedSubmissionsTitleAndDate($row['user_id'])
+            $reviewsSummary->getQualityAverage(),
+            $reviewsSummary->getTotal(),
+            $this->getReviewsGridCells($completedReviews)
         );
         return $reviewer;
     }
 
-    public function getQualityAverage($reviewerId)
+    /**
+     * The expandable rows the grid shows under a reviewer: one submission
+     * title, linked to its workflow, plus the date the review was completed.
+     */
+    private function getReviewsGridCells(array $completedReviews): array
     {
-        $reviewAssignmentDao = DAORegistry::getDAO('ReviewAssignmentDAO');
-        $reviewAssignments = $reviewAssignmentDao->getByUserId($reviewerId);
-        $qualityRatings = array();
-        foreach ($reviewAssignments as $reviewAssignment) {
-            $qualityRatings[] = $reviewAssignment->getQuality();
+        $gridCells = [];
+
+        foreach ($completedReviews as $completedReview) {
+            $submissionUrl = $this->getSubmissionWorkflowUrl(
+                $completedReview->getSubmissionId(),
+                $completedReview->getSubmissionStageId()
+            );
+            $submissionTitle = $this->formatStringLength($completedReview->getSubmissionTitle(), 40);
+            $dateCompleted = date('Y-m-d', strtotime($completedReview->getDateCompleted()));
+
+            $gridCells[] = ["<td style='width: 200pt;' colspan='2'><a href=" . $submissionUrl . ">" . $submissionTitle . "</a></td><td colspan='2'>" . __('common.completed.date', ['dateCompleted' => $dateCompleted]) . "</td>"];
         }
-        $qualityRatings = array_filter(
-            $qualityRatings,
-            function ($value) {
-                return $value != null;
-            }
+
+        return $gridCells;
+    }
+
+    /**
+     * Completed reviews of a context: everything the reports and the grid
+     * summarize. Equivalent to filtering review assignments by the statuses
+     * RECEIVED, COMPLETE and THANKED, but without going through
+     * ReviewAssignment::getStatus(), whose isRead() check costs several
+     * queries per assignment.
+     */
+    public function getCompletedReviews($contextId, $reviewerId = null): array
+    {
+        $params = [(int) $contextId];
+        $sql = 'SELECT ra.reviewer_id, ra.submission_id, ra.round,
+                    ra.date_assigned, ra.date_due, ra.date_completed,
+                    ra.recommendation, ra.quality, s.stage_id AS submission_stage_id
+                FROM review_assignments ra
+                    JOIN submissions s ON (s.submission_id = ra.submission_id)
+                WHERE s.context_id = ?
+                    AND ra.date_completed IS NOT NULL
+                    AND ra.declined = 0
+                    AND ra.cancelled = 0';
+
+        if (!is_null($reviewerId)) {
+            $sql .= ' AND ra.reviewer_id = ?';
+            $params[] = (int) $reviewerId;
+        }
+
+        $sql .= ' ORDER BY ra.date_completed, ra.review_id';
+
+        $rows = [];
+        foreach ($this->retrieve($sql, $params) as $row) {
+            $rows[] = (array) $row;
+        }
+
+        $titles = $this->getSubmissionTitles(array_column($rows, 'submission_id'));
+
+        $completedReviews = [];
+        foreach ($rows as $row) {
+            $completedReviews[] = new CompletedReview(
+                $row['reviewer_id'],
+                $row['submission_id'],
+                $titles[$row['submission_id']] ?? '',
+                $row['round'],
+                $row['date_assigned'],
+                $row['date_due'],
+                $row['date_completed'],
+                $row['recommendation'],
+                $row['quality'],
+                $row['submission_stage_id']
+            );
+        }
+
+        return $completedReviews;
+    }
+
+    /**
+     * Titles of the current publication of each submission, in one query
+     * instead of one submission fetch per review.
+     */
+    private function getSubmissionTitles(array $submissionIds): array
+    {
+        $submissionIds = array_unique(array_map('intval', $submissionIds));
+        if (empty($submissionIds)) {
+            return [];
+        }
+
+        $placeholders = substr(str_repeat('?,', count($submissionIds)), 0, -1);
+        $result = $this->retrieve(
+            'SELECT s.submission_id, s.locale AS submission_locale, ps.locale, ps.setting_value
+            FROM submissions s
+                JOIN publications p ON (p.publication_id = s.current_publication_id)
+                JOIN publication_settings ps ON (ps.publication_id = p.publication_id AND ps.setting_name = ?)
+            WHERE s.submission_id IN (' . $placeholders . ')',
+            array_merge(['title'], array_values($submissionIds))
         );
-        $ratingsCount = count($qualityRatings);
-        $qualityAverage = ($ratingsCount != 0) ? (array_sum(array_values($qualityRatings)) / $ratingsCount) : 0;
-        return $qualityAverage;
-    }
 
-    public function getTotalReviewedSubmissions($reviewerId)
-    {
-        $reviewAssignmentDao = DAORegistry::getDAO('ReviewAssignmentDAO');
-        $reviewAssignments = $reviewAssignmentDao->getByUserId($reviewerId);
-        $completedReviewAssignments = array();
-        foreach ($reviewAssignments as $reviewAssignment) {
-            if (in_array($reviewAssignment->getStatus(), [REVIEW_ASSIGNMENT_STATUS_RECEIVED, REVIEW_ASSIGNMENT_STATUS_COMPLETE, REVIEW_ASSIGNMENT_STATUS_THANKED])) {
-                $completedReviewAssignments[] = $reviewAssignment;
-            }
+        $titlesByLocale = [];
+        $submissionLocales = [];
+        foreach ($result as $row) {
+            $row = (array) $row;
+            $titlesByLocale[$row['submission_id']][$row['locale']] = $row['setting_value'];
+            $submissionLocales[$row['submission_id']] = $row['submission_locale'];
         }
 
-        return count($completedReviewAssignments);
-    }
-
-    public function getReviewedSubmissionsTitleAndDate($reviewerId, $isCsv = false)
-    {
-        $reviewAssignmentDao = DAORegistry::getDAO('ReviewAssignmentDAO');
-        $reviewAssignments = $reviewAssignmentDao->getByUserId($reviewerId);
-        $reviewedSubmissions = [];
-
-        foreach ($reviewAssignments as $reviewAssignment) {
-            if (in_array($reviewAssignment->getStatus(), [REVIEW_ASSIGNMENT_STATUS_RECEIVED, REVIEW_ASSIGNMENT_STATUS_COMPLETE, REVIEW_ASSIGNMENT_STATUS_THANKED])) {
-                $submission = Services::get('submission')->get($reviewAssignment->getSubmissionId());
-                $dateCompleted = $reviewAssignment->getDateCompleted();
-                $dateCompleted = date("Y-m-d", strtotime($dateCompleted));
-                $submissionUrl = $this->getSubmissionWorkflowUrl($submission->getId(), $submission->getStageId());
-                if ($isCsv) {
-                    $submissionTitle = $submission->getLocalizedTitle();
-                    $reviewedSubmissions[] = [$submissionTitle, __('common.completed.date', ['dateCompleted' => $dateCompleted])];
-                } else {
-                    $submissionTitle = $this->formatStringLength($submission->getLocalizedTitle(), 40);
-                    $reviewedSubmissions[] = ["<td style='width: 200pt;' colspan='2'><a href=" . $submissionUrl . ">" . $submissionTitle . "</a></td><td colspan='2'>" . __('common.completed.date', ['dateCompleted' => $dateCompleted]) . "</td>"];
-                }
-            }
+        $currentLocale = AppLocale::getLocale();
+        $titles = [];
+        foreach ($titlesByLocale as $submissionId => $localizedTitles) {
+            $titles[$submissionId] = $localizedTitles[$currentLocale]
+                ?? $localizedTitles[$submissionLocales[$submissionId]]
+                ?? reset($localizedTitles);
         }
-        return $reviewedSubmissions;
+
+        return $titles;
     }
 }

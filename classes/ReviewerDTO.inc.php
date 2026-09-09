@@ -56,10 +56,10 @@ class ReviewerDTO extends DataObject
 
     public function getQualityAverage()
     {
-        if ($this->qualityAverage > 0) {
-            return number_format($this->qualityAverage, 0, '.', '');
+        if ($this->qualityAverage === '' || is_null($this->qualityAverage)) {
+            return "---";
         }
-        return "---";
+        return $this->qualityAverage;
     }
 
     public function getTotalReviewedSubmissions(): int

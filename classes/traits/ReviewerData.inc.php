@@ -2,11 +2,11 @@
 
 trait ReviewerData
 {
-    public function getReviewerData($reviewerId, $reviewersDao): array
+    public function getReviewerData($reviewerId, $completedReviews): array
     {
         $reviewerData = array_merge(
             $this->getReviewerPersonalData($reviewerId),
-            $this->getReviewerReviewsData($reviewerId, $reviewersDao)
+            $this->getReviewerReviewsData($completedReviews)
         );
 
         return $reviewerData;
@@ -25,21 +25,20 @@ trait ReviewerData
         ];
     }
 
-    private function getReviewerReviewsData($reviewerId, $reviewersDao): array
+    private function getReviewerReviewsData($completedReviews): array
     {
-        $rating = $reviewersDao->getQualityAverage($reviewerId);
-        $completedSubmissions = $reviewersDao->getTotalReviewedSubmissions($reviewerId);
-        $isCsv = true;
-        $reviewedSubmissionsTitleAndDate = $reviewersDao->getReviewedSubmissionsTitleAndDate($reviewerId, $isCsv);
+        $reviewsSummary = new ReviewsSummary($completedReviews);
 
         $fullSubmissionsText = "";
-        foreach ($reviewedSubmissionsTitleAndDate as [$title, $dateCompleted]) {
-            $fullSubmissionsText .= "{$title}. {$dateCompleted}\n";
+        foreach ($completedReviews as $completedReview) {
+            $submissionTitle = $completedReview->getSubmissionTitle();
+            $dateCompleted = date("Y-m-d", strtotime($completedReview->getDateCompleted()));
+            $fullSubmissionsText .= "{$submissionTitle}. " . __('common.completed.date', ['dateCompleted' => $dateCompleted]) . "\n";
         }
 
         return [
-            $rating > 0 ? $rating : "",
-            $completedSubmissions > 0 ? $completedSubmissions : "",
+            $reviewsSummary->getQualityAverage(),
+            $reviewsSummary->getTotal() > 0 ? $reviewsSummary->getTotal() : "",
             $fullSubmissionsText
         ];
     }

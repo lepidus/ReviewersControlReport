@@ -6,7 +6,7 @@ trait SubmissionUrl
     {
         $request = \Application::get()->getRequest();
         $dispatcher = $request->getDispatcher();
-        if($dispatcher) {
+        if ($dispatcher) {
             return $dispatcher->url($request, ROUTE_PAGE, null, 'workflow', 'index', array($submissionId, $submissionStageId));
         }
         return "";
