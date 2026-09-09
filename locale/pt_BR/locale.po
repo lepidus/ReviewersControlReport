@@ -20,9 +20,6 @@ msgstr "Relatório de Controle de Avaliadores"
 msgid "plugins.reports.reviewersControlReport.description"
 msgstr "Gera um relatório de controle para editores gerenciarem os avaliadores."
 
-msgid "plugins.reports.reviewersControlReport.NoReviewers"
-msgstr "Avaliadores não encontrados."
-
 msgid "plugins.reports.reviewersControlReport.field.email"
 msgstr "E-mail"
 

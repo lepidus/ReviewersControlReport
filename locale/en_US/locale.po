@@ -13,15 +13,11 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
 "X-Generator: Weblate 3.9.1\n"
 
-
 msgid "plugins.reports.reviewersControlReport.displayName"
 msgstr "Reviewers Control Report"
 
 msgid "plugins.reports.reviewersControlReport.description"
 msgstr "Generates a control report for editors to manage reviewers."
-
-msgid "plugins.reports.reviewersControlReport.NoReviewers"
-msgstr "No reviewers found."
 
 msgid "plugins.reports.reviewersControlReport.field.email"
 msgstr "Email"
