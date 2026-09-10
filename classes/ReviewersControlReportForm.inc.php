@@ -79,7 +79,9 @@ class ReviewersControlReportForm extends Form
         $reviewersDao = new ReviewersControlReportDAO();
 
         $completedReviews = $reviewersDao->getCompletedReviews($contextId, $this->getDateInterval());
-        $reviewersPersonalData = $this->getReviewersPersonalData($reviewersDao->getReviewersIds($contextId));
+        $reviewersPersonalData = $this->isReviewsReport()
+            ? $this->getReviewersPersonalDataOfReviews($completedReviews)
+            : $this->getReviewersPersonalData($reviewersDao->getReviewersIds($contextId));
         $reportBuilder = $this->getReportBuilder();
 
         $this->emitHttpHeaders();

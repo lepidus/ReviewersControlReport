@@ -2,6 +2,7 @@
 
 import('lib.pkp.tests.DatabaseTestCase');
 import('lib.pkp.classes.user.User');
+import('plugins.generic.reviewersControlReport.classes.CompletedReview');
 import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportForm');
 
 class ReviewersControlReportFormTest extends DatabaseTestCase
@@ -36,6 +37,37 @@ class ReviewersControlReportFormTest extends DatabaseTestCase
         $user->setData('password', $this->username);
 
         return DAORegistry::getDAO('UserDAO')->insertObject($user);
+    }
+
+    public function testGetsPersonalDataOfTheReviewersOfTheGivenReviews()
+    {
+        $form = new ReviewersControlReportForm();
+        $completedReview = new CompletedReview(
+            $this->reviewerId,
+            100,
+            'Central do Brasil',
+            1,
+            '2026-01-02 10:00:00',
+            '2026-01-20 00:00:00',
+            '2026-01-15 14:32:00',
+            SUBMISSION_REVIEWER_RECOMMENDATION_ACCEPT,
+            4
+        );
+
+        $reviewersPersonalData = $form->getReviewersPersonalDataOfReviews([$completedReview, $completedReview]);
+
+        $this->assertCount(1, $reviewersPersonalData);
+        $this->assertEquals(
+            $this->givenName . ' ' . $this->familyName,
+            $reviewersPersonalData[$this->reviewerId][0]
+        );
+    }
+
+    public function testGetsEmptyPersonalDataWhenTheReviewerNoLongerExists()
+    {
+        $form = new ReviewersControlReportForm();
+
+        $this->assertEquals(['', '', '', ''], $form->getReviewerPersonalData(999999));
     }
 
     public function testGetsReviewerPersonalData()
