@@ -4,6 +4,7 @@ import('lib.pkp.classes.db.DAO');
 import('plugins.generic.reviewersControlReport.classes.traits.SubmissionUrl');
 import('plugins.generic.reviewersControlReport.classes.traits.StringLength');
 import('plugins.generic.reviewersControlReport.classes.ReviewerDTO');
+import('plugins.generic.reviewersControlReport.classes.ClosedDateInterval');
 import('plugins.generic.reviewersControlReport.classes.CompletedReview');
 import('plugins.generic.reviewersControlReport.classes.ReviewsSummary');
 
@@ -119,7 +120,7 @@ class ReviewersControlReportDAO extends DAO
     public function returnReviewerFromRow($row)
     {
         $reviewerUser = $this->getReviewerUser($row['user_id']);
-        $completedReviews = $this->getCompletedReviews($this->contextId, $row['user_id']);
+        $completedReviews = $this->getCompletedReviews($this->contextId, null, $row['user_id']);
         $reviewsSummary = new ReviewsSummary($completedReviews);
 
         $reviewer = new ReviewerDTO(
@@ -164,7 +165,7 @@ class ReviewersControlReportDAO extends DAO
      * ReviewAssignment::getStatus(), whose isRead() check costs several
      * queries per assignment.
      */
-    public function getCompletedReviews($contextId, $reviewerId = null): array
+    public function getCompletedReviews($contextId, $interval = null, $reviewerId = null): array
     {
         $params = [(int) $contextId];
         $sql = 'SELECT ra.reviewer_id, ra.submission_id, ra.round,
@@ -180,6 +181,12 @@ class ReviewersControlReportDAO extends DAO
         if (!is_null($reviewerId)) {
             $sql .= ' AND ra.reviewer_id = ?';
             $params[] = (int) $reviewerId;
+        }
+
+        if (!is_null($interval)) {
+            $sql .= ' AND ra.date_completed BETWEEN ? AND ?';
+            $params[] = $interval->getBeginningDate();
+            $params[] = $interval->getEndDate();
         }
 
         $sql .= ' ORDER BY ra.date_completed, ra.review_id';

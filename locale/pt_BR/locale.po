@@ -20,6 +20,9 @@ msgstr "Relatório de Controle de Avaliadores"
 msgid "plugins.reports.reviewersControlReport.description"
 msgstr "Gera um relatório de controle para editores gerenciarem os avaliadores."
 
+msgid "plugins.reports.reviewersControlReport.NoReviewers"
+msgstr "Avaliadores não encontrados."
+
 msgid "plugins.reports.reviewersControlReport.field.email"
 msgstr "E-mail"
 
@@ -38,14 +41,65 @@ msgstr "Média de Notas"
 msgid "plugins.reports.reviewersControlReport.field.reviewedSubmissionsTotal"
 msgstr "Avaliações Completas"
 
-msgid "plugins.reports.reviewersControlReport.field.reviewedSubmissionsTitleAndCompletedDate"
-msgstr "Submissões Avaliadas(Título e Data de Conclusão)"
-
-msgid "plugins.reports.reviewersControlReport.field.reviewedSubmissionsTitleAndCompletedDate.empty"
-msgstr "Não possui submissões avaliadas"
-
 msgid "plugins.reports.reviewersControlReport.validate.utf8"
 msgstr "Texto UTF-8 inválido"
 
 msgid "plugins.reports.reviewersControlReport.toCsv"
-msgstr "Gerar CSV dos Avaliadores"
+msgstr "Gerar CSV"
+
+msgid "plugins.reports.reviewersControlReport.reportType"
+msgstr "Tipo de Relatório"
+
+msgid "plugins.reports.reviewersControlReport.reportType.description"
+msgstr "Escolha qual relatório gerar:"
+
+msgid "plugins.reports.reviewersControlReport.reportType.reviewers"
+msgstr "Relatório por avaliadores (uma linha por avaliador)"
+
+msgid "plugins.reports.reviewersControlReport.reportType.reviews"
+msgstr "Relatório por avaliações (uma linha por avaliação)"
+
+msgid "plugins.reports.reviewersControlReport.dateCompletedInterval.description"
+msgstr "Deixe as duas datas em branco para incluir todas as avaliações concluídas."
+
+msgid "plugins.reports.reviewersControlReport.dateCompletedInterval"
+msgstr "Intervalo da data de conclusão do parecer"
+
+msgid "plugins.reports.reviewersControlReport.warning.invalidDateInterval"
+msgstr "A data inicial não pode ser posterior à data final."
+
+msgid "plugins.reports.reviewersControlReport.field.firstReviewDate"
+msgstr "Primeira Avaliação"
+
+msgid "plugins.reports.reviewersControlReport.field.lastReviewDate"
+msgstr "Última Avaliação"
+
+msgid "plugins.reports.reviewersControlReport.field.reviewedSubmissionsTitles"
+msgstr "Submissões Avaliadas (Títulos)"
+
+msgid "plugins.reports.reviewersControlReport.field.submissionId"
+msgstr "ID da Submissão"
+
+msgid "plugins.reports.reviewersControlReport.field.submissionTitle"
+msgstr "Título da Submissão"
+
+msgid "plugins.reports.reviewersControlReport.field.reviewRound"
+msgstr "Rodada de Avaliação"
+
+msgid "plugins.reports.reviewersControlReport.field.dateAssigned"
+msgstr "Data de Designação"
+
+msgid "plugins.reports.reviewersControlReport.field.dateDue"
+msgstr "Prazo do Parecer"
+
+msgid "plugins.reports.reviewersControlReport.field.dateCompleted"
+msgstr "Data de Conclusão"
+
+msgid "plugins.reports.reviewersControlReport.field.recommendation"
+msgstr "Recomendação"
+
+msgid "plugins.reports.reviewersControlReport.field.qualityRating"
+msgstr "Nota de Qualidade"
+
+msgid "plugins.reports.reviewersControlReport.field.reviewerName"
+msgstr "Avaliador"

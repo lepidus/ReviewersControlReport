@@ -2,14 +2,14 @@
 
 trait ReviewerData
 {
-    public function getReviewerData($reviewerId, $completedReviews): array
+    public function getReviewersPersonalData(array $reviewerIds): array
     {
-        $reviewerData = array_merge(
-            $this->getReviewerPersonalData($reviewerId),
-            $this->getReviewerReviewsData($completedReviews)
-        );
+        $reviewersPersonalData = [];
+        foreach ($reviewerIds as $reviewerId) {
+            $reviewersPersonalData[$reviewerId] = $this->getReviewerPersonalData($reviewerId);
+        }
 
-        return $reviewerData;
+        return $reviewersPersonalData;
     }
 
     public function getReviewerPersonalData($reviewerId): array
@@ -22,24 +22,6 @@ trait ReviewerData
             $reviewer->getEmail(),
             $reviewer->getLocalizedAffiliation(),
             $reviewer->getInterestString()
-        ];
-    }
-
-    private function getReviewerReviewsData($completedReviews): array
-    {
-        $reviewsSummary = new ReviewsSummary($completedReviews);
-
-        $fullSubmissionsText = "";
-        foreach ($completedReviews as $completedReview) {
-            $submissionTitle = $completedReview->getSubmissionTitle();
-            $dateCompleted = date("Y-m-d", strtotime($completedReview->getDateCompleted()));
-            $fullSubmissionsText .= "{$submissionTitle}. " . __('common.completed.date', ['dateCompleted' => $dateCompleted]) . "\n";
-        }
-
-        return [
-            $reviewsSummary->getQualityAverage(),
-            $reviewsSummary->getTotal() > 0 ? $reviewsSummary->getTotal() : "",
-            $fullSubmissionsText
         ];
     }
 }

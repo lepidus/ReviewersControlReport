@@ -1,42 +1,112 @@
 <?php
 
 import('lib.pkp.classes.form.Form');
+import('plugins.generic.reviewersControlReport.classes.ClosedDateInterval');
 import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportDAO');
-import('plugins.generic.reviewersControlReport.classes.ReviewsSummary');
+import('plugins.generic.reviewersControlReport.classes.ReviewersReportBuilder');
+import('plugins.generic.reviewersControlReport.classes.ReviewsReportBuilder');
 import('plugins.generic.reviewersControlReport.classes.traits.ReviewerData');
 
 class ReviewersControlReportForm extends Form
 {
     use ReviewerData;
 
+    public const REPORT_TYPE_REVIEWERS = 'reviewers';
+    public const REPORT_TYPE_REVIEWS = 'reviews';
+
+    // An interval open on one side is still expressed as a closed one, so that
+    // filling in a single date does not require a second kind of interval
+    private const EARLIEST_DATE = '1000-01-01';
+    private const LATEST_DATE = '9999-12-31';
+
+    public function __construct($plugin = null)
+    {
+        $template = is_null($plugin) ? null : $plugin->getTemplateResource('index_component.tpl');
+        parent::__construct($template);
+
+        $this->addCheck(new FormValidatorPost($this));
+        $this->addCheck(new FormValidatorCSRF($this));
+    }
+
+    public function initData()
+    {
+        $this->setData('reportType', self::REPORT_TYPE_REVIEWERS);
+        $this->setData('startDateInterval', '');
+        $this->setData('endDateInterval', '');
+    }
+
+    public function readInputData()
+    {
+        $this->readUserVars(['reportType', 'startDateInterval', 'endDateInterval']);
+    }
+
+    public function validate($callHooks = true)
+    {
+        $isValid = parent::validate($callHooks);
+
+        $dateInterval = $this->getDateInterval();
+        if (!is_null($dateInterval) && !$dateInterval->isValid()) {
+            $this->addError('startDateInterval', __('plugins.reports.reviewersControlReport.warning.invalidDateInterval'));
+            $this->addErrorField('startDateInterval');
+            $isValid = false;
+        }
+
+        return $isValid;
+    }
+
+    /**
+     * The period chosen by the user, or null when no date was filled in and
+     * the report should cover every completed review.
+     */
+    public function getDateInterval()
+    {
+        $startDate = trim((string) $this->getData('startDateInterval'));
+        $endDate = trim((string) $this->getData('endDateInterval'));
+
+        if ($startDate === '' && $endDate === '') {
+            return null;
+        }
+
+        return new ClosedDateInterval(
+            $startDate === '' ? self::EARLIEST_DATE : $startDate,
+            $endDate === '' ? self::LATEST_DATE : $endDate
+        );
+    }
+
     public function generateReport($request)
     {
         $contextId = $request->getContext()->getId();
-
-        header('content-type: text/comma-separated-values');
-        header("content-disposition: attachment; filename=reviewersControlReport-" . date('Ymd') . '.csv');
-
-        $columns = array(
-            __('plugins.reports.reviewersControlReport.field.fullName'),
-            __('plugins.reports.reviewersControlReport.field.email'),
-            __('plugins.reports.reviewersControlReport.field.affiliation'),
-            __('plugins.reports.reviewersControlReport.field.interests'),
-            __('plugins.reports.reviewersControlReport.field.qualityAverage'),
-            __('plugins.reports.reviewersControlReport.field.reviewedSubmissionsTotal'),
-            __('plugins.reports.reviewersControlReport.field.reviewedSubmissionsTitleAndCompletedDate')
-        );
-
-        $fp = fopen('php://output', 'wt');
-        fputcsv($fp, $columns);
-
         $reviewersDao = new ReviewersControlReportDAO();
 
-        foreach ($reviewersDao->getReviewersIds($contextId) as $reviewerId) {
-            $completedReviews = $reviewersDao->getCompletedReviews($contextId, $reviewerId);
+        $completedReviews = $reviewersDao->getCompletedReviews($contextId, $this->getDateInterval());
+        $reviewersPersonalData = $this->getReviewersPersonalData($reviewersDao->getReviewersIds($contextId));
+        $reportBuilder = $this->getReportBuilder();
 
-            fputcsv($fp, $this->getReviewerData($reviewerId, $completedReviews));
+        $this->emitHttpHeaders();
+
+        $csvFile = fopen('php://output', 'wt');
+        fputcsv($csvFile, $reportBuilder->getColumns());
+        foreach ($reportBuilder->getRows($reviewersPersonalData, $completedReviews) as $row) {
+            fputcsv($csvFile, $row);
         }
+        fclose($csvFile);
+    }
 
-        fclose($fp);
+    private function isReviewsReport(): bool
+    {
+        return $this->getData('reportType') === self::REPORT_TYPE_REVIEWS;
+    }
+
+    private function getReportBuilder()
+    {
+        return $this->isReviewsReport() ? new ReviewsReportBuilder() : new ReviewersReportBuilder();
+    }
+
+    private function emitHttpHeaders(): void
+    {
+        $fileName = $this->isReviewsReport() ? 'reviewsControlReport' : 'reviewersControlReport';
+
+        header('content-type: text/comma-separated-values');
+        header('content-disposition: attachment; filename=' . $fileName . '-' . date('Ymd') . '.csv');
     }
 }

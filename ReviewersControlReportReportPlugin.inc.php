@@ -47,15 +47,20 @@ class ReviewersControlReportReportPlugin extends ReportPlugin
         AppLocale::requireComponents(
             LOCALE_COMPONENT_PKP_GRID
         );
-        $requestHandler = new PKPRequest();
-        $form = new ReviewersControlReportForm();
 
-        if ($requestHandler->isPost($request)) {
-            $form->generateReport($request);
-            return;
+        $form = new ReviewersControlReportForm($this);
+
+        if ($request->isPost()) {
+            $form->readInputData();
+            if ($form->validate()) {
+                $form->generateReport($request);
+                return;
+            }
+        } else {
+            $form->initData();
         }
-        $dispatcher = $request->getDispatcher();
-        $templateManager = TemplateManager::getManager();
+
+        $templateManager = TemplateManager::getManager($request);
         $templateManager->assign([
             'breadcrumbs' => [
                 [
@@ -68,8 +73,12 @@ class ReviewersControlReportReportPlugin extends ReportPlugin
                     'name' => __('plugins.reports.reviewersControlReport.displayName')
                 ],
             ],
-            'pageTitle', __('plugins.reports.reviewersControlReport.displayName')
+            'pageTitle' => __('plugins.reports.reviewersControlReport.displayName'),
+            'reportTypes' => [
+                ReviewersControlReportForm::REPORT_TYPE_REVIEWERS => __('plugins.reports.reviewersControlReport.reportType.reviewers'),
+                ReviewersControlReportForm::REPORT_TYPE_REVIEWS => __('plugins.reports.reviewersControlReport.reportType.reviews'),
+            ],
         ]);
-        $templateManager->display($this->getTemplateResource('index_component.tpl'));
+        $form->display($request);
     }
 }
