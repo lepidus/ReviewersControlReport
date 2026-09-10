@@ -13,8 +13,6 @@ class ReviewersReportBuilder
             __('plugins.reports.reviewersControlReport.field.interests'),
             __('plugins.reports.reviewersControlReport.field.qualityAverage'),
             __('plugins.reports.reviewersControlReport.field.reviewedSubmissionsTotal'),
-            __('plugins.reports.reviewersControlReport.field.firstReviewDate'),
-            __('plugins.reports.reviewersControlReport.field.lastReviewDate'),
             __('plugins.reports.reviewersControlReport.field.reviewedSubmissionsTitles'),
         ];
     }
@@ -35,14 +33,12 @@ class ReviewersReportBuilder
     private function getReviewsCells(ReviewsSummary $summary): array
     {
         if ($summary->isEmpty()) {
-            return ['', '', '', '', ''];
+            return ['', '', ''];
         }
 
         return [
             $summary->getQualityAverage(),
             $summary->getTotal(),
-            $summary->getFirstReviewDate(),
-            $summary->getLastReviewDate(),
             implode("\n", $summary->getSubmissionTitles()),
         ];
     }

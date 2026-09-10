@@ -21,8 +21,7 @@ After activating the plugin, a new page will be available under *Reports > Revie
 The page lists the journal's reviewers on screen and generates two CSV reports:
 
 * **Report by reviewers** — one row per reviewer, with the quality average, the
-  number of completed reviews, the dates of the first and last review, and the
-  titles of the submissions they reviewed.
+  number of completed reviews and the titles of the submissions they reviewed.
 * **Report by reviews** — one row per completed review, with the submission,
   the review round, the assignment, due and completion dates, the
   recommendation and the quality rating, each in its own column.

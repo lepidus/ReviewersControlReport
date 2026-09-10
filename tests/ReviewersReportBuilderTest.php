@@ -33,7 +33,7 @@ class ReviewersReportBuilderTest extends PKPTestCase
         );
     }
 
-    public function testColumnsKeepTheReviewerFieldsAndAddTheReviewPeriodDates()
+    public function testColumnsKeepTheReviewerFields()
     {
         $expectedColumns = [
             __('plugins.reports.reviewersControlReport.field.fullName'),
@@ -42,8 +42,6 @@ class ReviewersReportBuilderTest extends PKPTestCase
             __('plugins.reports.reviewersControlReport.field.interests'),
             __('plugins.reports.reviewersControlReport.field.qualityAverage'),
             __('plugins.reports.reviewersControlReport.field.reviewedSubmissionsTotal'),
-            __('plugins.reports.reviewersControlReport.field.firstReviewDate'),
-            __('plugins.reports.reviewersControlReport.field.lastReviewDate'),
             __('plugins.reports.reviewersControlReport.field.reviewedSubmissionsTitles'),
         ];
 
@@ -85,19 +83,6 @@ class ReviewersReportBuilderTest extends PKPTestCase
         $this->assertEquals(2, $row[5]);
     }
 
-    public function testFirstAndLastReviewDatesComeFromTheReviewsGivenToTheBuilder()
-    {
-        $completedReviews = [
-            $this->createCompletedReview(11, 101, 'Central do Brasil', '2026-03-20 09:00:00', 4),
-            $this->createCompletedReview(11, 102, 'Terra Estrangeira', '2026-01-15 14:32:00', 2),
-        ];
-
-        $row = $this->builder->getRows($this->reviewersPersonalData, $completedReviews)[0];
-
-        $this->assertEquals('2026-01-15', $row[6]);
-        $this->assertEquals('2026-03-20', $row[7]);
-    }
-
     public function testTitlesColumnListsTitlesWithoutTheCompletionDate()
     {
         $completedReviews = [
@@ -107,8 +92,8 @@ class ReviewersReportBuilderTest extends PKPTestCase
 
         $row = $this->builder->getRows($this->reviewersPersonalData, $completedReviews)[0];
 
-        $this->assertEquals("Central do Brasil\nTerra Estrangeira", $row[8]);
-        $this->assertStringNotContainsString('2026-01-15', $row[8]);
+        $this->assertEquals("Central do Brasil\nTerra Estrangeira", $row[6]);
+        $this->assertStringNotContainsString('2026-01-15', $row[6]);
     }
 
     public function testReviewerWithoutReviewsInThePeriodIsStillListedWithEmptyReviewFields()
@@ -123,7 +108,5 @@ class ReviewersReportBuilderTest extends PKPTestCase
         $this->assertEquals('', $row[4]);
         $this->assertEquals('', $row[5]);
         $this->assertEquals('', $row[6]);
-        $this->assertEquals('', $row[7]);
-        $this->assertEquals('', $row[8]);
     }
 }

@@ -68,12 +68,6 @@ msgstr "Intervalo de la fecha de finalización de la revisión"
 msgid "plugins.reports.reviewersControlReport.warning.invalidDateInterval"
 msgstr "La fecha inicial no puede ser posterior a la fecha final."
 
-msgid "plugins.reports.reviewersControlReport.field.firstReviewDate"
-msgstr "Primera Revisión"
-
-msgid "plugins.reports.reviewersControlReport.field.lastReviewDate"
-msgstr "Última Revisión"
-
 msgid "plugins.reports.reviewersControlReport.field.reviewedSubmissionsTitles"
 msgstr "Envíos Revisados (Títulos)"
 

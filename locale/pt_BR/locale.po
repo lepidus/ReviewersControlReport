@@ -68,12 +68,6 @@ msgstr "Intervalo da data de conclusão do parecer"
 msgid "plugins.reports.reviewersControlReport.warning.invalidDateInterval"
 msgstr "A data inicial não pode ser posterior à data final."
 
-msgid "plugins.reports.reviewersControlReport.field.firstReviewDate"
-msgstr "Primeira Avaliação"
-
-msgid "plugins.reports.reviewersControlReport.field.lastReviewDate"
-msgstr "Última Avaliação"
-
 msgid "plugins.reports.reviewersControlReport.field.reviewedSubmissionsTitles"
 msgstr "Submissões Avaliadas (Títulos)"
 

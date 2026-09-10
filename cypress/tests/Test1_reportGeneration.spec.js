@@ -10,7 +10,7 @@ import '../support/commands';
 // cannot be read back.
 describe('Reviewers Control Report - Report generation', function() {
 	const reviewsHeader = '"Submission ID","Submission Title","Review Round",Reviewer,Email,Affiliation,"Date Assigned","Date Due","Date Completed",Recommendation,"Quality Rating"';
-	const reviewersHeader = '"Quality Average","Completed Reviews","First Review","Last Review","Reviewed Submissions (Titles)"';
+	const reviewersHeader = '"Quality Average","Completed Reviews","Reviewed Submissions (Titles)"';
 	const reviewedSubmission = 'Developing efficacy beliefs in the classroom';
 
 	beforeEach(function() {
@@ -34,7 +34,7 @@ describe('Reviewers Control Report - Report generation', function() {
 		cy.get('#reviewersReportGridContainer').should('be.visible');
 	});
 
-	it('Generates the reviewers report with the completion dates in columns of their own', function() {
+	it('Generates the reviewers report with no date left inside the titles cell', function() {
 		cy.get('#reportType').select('Report by reviewers (one row per reviewer)');
 		cy.get('#reportType').should('have.value', 'reviewers');
 
@@ -80,7 +80,7 @@ describe('Reviewers Control Report - Report generation', function() {
 	it('Keeps every reviewer listed when the period has no reviews, with empty totals', function() {
 		cy.requestReport('reviewers', '2000-01-01', '2000-12-31').then((response) => {
 			expect(response.body).to.contain(reviewersHeader);
-			cy.wrap(response.body).should('match', /Paul Hudson[^\n]*,,,,,/);
+			cy.wrap(response.body).should('match', /Paul Hudson[^\n]*,,,,\n/);
 		});
 	});
 
