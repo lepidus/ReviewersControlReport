@@ -101,5 +101,17 @@ msgstr "Recomendación"
 msgid "plugins.reports.reviewersControlReport.field.qualityRating"
 msgstr "Calificación de Calidad"
 
+msgid "plugins.reports.reviewersControlReport.generateReport"
+msgstr "Generar Informe en CSV"
+
+msgid "plugins.reports.reviewersControlReport.generateReport.description"
+msgstr "Exporte la actividad de revisión de esta revista como una hoja de cálculo."
+
+msgid "plugins.reports.reviewersControlReport.reviewersList"
+msgstr "Revisores"
+
+msgid "plugins.reports.reviewersControlReport.reviewersList.description"
+msgstr "Los revisores de esta revista y las revisiones que han completado."
+
 msgid "plugins.reports.reviewersControlReport.field.reviewerName"
 msgstr "Revisor"

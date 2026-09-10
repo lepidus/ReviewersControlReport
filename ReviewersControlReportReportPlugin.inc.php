@@ -61,6 +61,11 @@ class ReviewersControlReportReportPlugin extends ReportPlugin
         }
 
         $templateManager = TemplateManager::getManager($request);
+        $templateManager->addStyleSheet(
+            'reviewersControlReport',
+            $request->getBaseUrl() . '/' . $this->getPluginPath() . '/styles/reviewersControlReport.css',
+            ['contexts' => 'backend']
+        );
         $templateManager->assign([
             'breadcrumbs' => [
                 [
