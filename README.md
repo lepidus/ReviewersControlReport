@@ -18,6 +18,23 @@ The latest release of this plugin is compatible with the following PKP applicati
 
 After activating the plugin, a new page will be available under *Reports > Reviewers Control Report*.
 
+The page lists the journal's reviewers on screen and generates two CSV reports:
+
+* **Report by reviewers** — one row per reviewer, with the quality average, the
+  number of completed reviews, the dates of the first and last review, and the
+  titles of the submissions they reviewed.
+* **Report by reviews** — one row per completed review, with the submission,
+  the review round, the assignment, due and completion dates, the
+  recommendation and the quality rating, each in its own column.
+
+Both reports can be restricted to a period, filtered by the date the review was
+completed. Leaving both dates empty includes every completed review. In the
+report by reviewers the quality average and the review counts cover only the
+chosen period, and reviewers with no review in it are still listed, with those
+columns empty.
+
+Only reviews of the current journal are reported.
+
 ## Credits
 This plugin was sponsored by the journals [Encontros Bibli](https://periodicos.ufsc.br/index.php/eb/), from Universidade Federal de Santa Catarina (UFSC) and [Revista Evidência](https://periodicos.unoesc.edu.br/evidencia), from Universidade do Oeste de Santa Catarina (Unoesc).
 
