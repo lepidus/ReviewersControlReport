@@ -32,6 +32,9 @@ report by reviewers the quality average and the review counts cover only the
 chosen period, and reviewers with no review in it are still listed, with those
 columns empty.
 
+The file is named after the report and the period it covers, for example
+`reviewsControlReport-20260101-20260331.csv`.
+
 Only reviews of the current journal are reported.
 
 ## Credits

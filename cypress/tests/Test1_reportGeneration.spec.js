@@ -84,6 +84,20 @@ describe('Reviewers Control Report - Report generation', function() {
 		});
 	});
 
+	it('Names the file after the report and the period', function() {
+		cy.requestReport('reviews', '2026-01-01', '2026-03-31').then((response) => {
+			expect(response.headers['content-disposition']).to.contain('reviewsControlReport-20260101-20260331.csv');
+		});
+
+		cy.requestReport('reviewers', '2026-01-01', '').then((response) => {
+			expect(response.headers['content-disposition']).to.contain('reviewersControlReport-from-20260101.csv');
+		});
+
+		cy.requestReport('reviewers', '', '2026-03-31').then((response) => {
+			expect(response.headers['content-disposition']).to.contain('reviewersControlReport-until-20260331.csv');
+		});
+	});
+
 	it('Refuses a period that ends before it starts', function() {
 		cy.get('#startDateInterval').type('2026-12-31');
 		cy.get('#endDateInterval').type('2026-01-01');

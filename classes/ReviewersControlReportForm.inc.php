@@ -106,9 +106,37 @@ class ReviewersControlReportForm extends Form
 
     private function emitHttpHeaders(): void
     {
-        $fileName = $this->isReviewsReport() ? 'reviewsControlReport' : 'reviewersControlReport';
-
         header('content-type: text/comma-separated-values');
-        header('content-disposition: attachment; filename=' . $fileName . '-' . date('Ymd') . '.csv');
+        header('content-disposition: attachment; filename=' . $this->getFileName());
+    }
+
+    /**
+     * Names the file after what is inside it: which report, and which period.
+     * Without a period there is nothing to state but the day it was taken.
+     */
+    private function getFileName(): string
+    {
+        $report = $this->isReviewsReport() ? 'reviewsControlReport' : 'reviewersControlReport';
+        $startDate = $this->getFileNameDate($this->getData('startDateInterval'));
+        $endDate = $this->getFileNameDate($this->getData('endDateInterval'));
+
+        if ($startDate && $endDate) {
+            return $report . '-' . $startDate . '-' . $endDate . '.csv';
+        }
+        if ($startDate) {
+            return $report . '-from-' . $startDate . '.csv';
+        }
+        if ($endDate) {
+            return $report . '-until-' . $endDate . '.csv';
+        }
+
+        return $report . '-' . date('Ymd') . '.csv';
+    }
+
+    private function getFileNameDate($date): string
+    {
+        $date = trim((string) $date);
+
+        return $date === '' ? '' : date('Ymd', strtotime($date));
     }
 }
