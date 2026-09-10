@@ -1,5 +1,7 @@
 # Reviewers Control Report Plugin
 
+**English** · [Português (Brasil)](README.pt_BR.md) · [Español](README.es.md)
+
 This plugin provides a web page with a reviewers control report for the journal, under *Statistics > Reports*.
 
 ## Compatibility
@@ -45,4 +47,3 @@ Developed by [Lepidus Tecnologia](https://github.com/lepidus).
 ## License
 
 This project is licensed under the GNU General Public License v3. See the [LICENSE](LICENSE) file for details.
-***
