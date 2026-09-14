@@ -1,11 +1,12 @@
 <?php
 
-import('lib.pkp.classes.form.Form');
-import('plugins.generic.reviewersControlReport.classes.RCRClosedDateInterval');
-import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportDAO');
-import('plugins.generic.reviewersControlReport.classes.ReviewersReportBuilder');
-import('plugins.generic.reviewersControlReport.classes.ReviewsReportBuilder');
-import('plugins.generic.reviewersControlReport.classes.traits.RCRReviewerData');
+namespace APP\plugins\generic\reviewersControlReport\classes;
+
+use APP\plugins\generic\reviewersControlReport\classes\traits\RCRReviewerData;
+use InvalidArgumentException;
+use PKP\form\Form;
+use PKP\form\validation\FormValidatorCSRF;
+use PKP\form\validation\FormValidatorPost;
 
 class ReviewersControlReportForm extends Form
 {
@@ -118,16 +119,7 @@ class ReviewersControlReportForm extends Form
 
     private function writeCsvRow($csvFile, array $row): void
     {
-        $fields = array_map(function ($cell) {
-            $cell = (string) $cell;
-            if (strpbrk($cell, ",\"\r\n\t ") !== false) {
-                return '"' . str_replace('"', '""', $cell) . '"';
-            }
-
-            return $cell;
-        }, $this->prepareCsvRow($row));
-
-        fwrite($csvFile, implode(',', $fields) . "\n");
+        fputcsv($csvFile, $this->prepareCsvRow($row), ',', '"', '');
     }
 
     private function prepareCsvRow(array $row): array

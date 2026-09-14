@@ -1,6 +1,6 @@
 <?php
 
-import('plugins.generic.reviewersControlReport.classes.RCRReviewsSummary');
+namespace APP\plugins\generic\reviewersControlReport\classes;
 
 class ReviewersReportBuilder
 {

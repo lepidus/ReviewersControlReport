@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file plugins/reports/reviewersControlReport/ReviewersControlReportReportPlugin.inc.php
+ * @file plugins/reports/reviewersControlReport/ReviewersControlReportReportPlugin.php
  *
  * Copyright (c) 2019-2023 Lepidus Tecnologia
  * Distributed under the GNU GPL v3. For full terms see the file LICENSE.
@@ -12,8 +12,13 @@
  * @brief reviewersControlReport plugin class
  */
 
-import('lib.pkp.classes.plugins.ReportPlugin');
-import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportForm');
+namespace APP\plugins\generic\reviewersControlReport;
+
+use APP\plugins\generic\reviewersControlReport\classes\ReviewersControlReportForm;
+use APP\template\TemplateManager;
+use PKP\config\Config;
+use PKP\i18n\PKPLocale;
+use PKP\plugins\ReportPlugin;
 
 class ReviewersControlReportReportPlugin extends ReportPlugin
 {
@@ -44,7 +49,7 @@ class ReviewersControlReportReportPlugin extends ReportPlugin
 
     public function display($args, $request): void
     {
-        AppLocale::requireComponents(
+        PKPLocale::requireComponents(
             LOCALE_COMPONENT_PKP_GRID
         );
 

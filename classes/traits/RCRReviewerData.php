@@ -1,5 +1,9 @@
 <?php
 
+namespace APP\plugins\generic\reviewersControlReport\classes\traits;
+
+use APP\facades\Repo;
+
 trait RCRReviewerData
 {
     public function getReviewersPersonalData(array $reviewerIds): array
@@ -29,8 +33,7 @@ trait RCRReviewerData
 
     public function getReviewerPersonalData($reviewerId): array
     {
-        $userDao = DAORegistry::getDAO('UserDAO');
-        $reviewer = $userDao->getById($reviewerId);
+        $reviewer = Repo::user()->get((int) $reviewerId);
 
         if (is_null($reviewer)) {
             return ['', '', '', ''];

@@ -1,5 +1,7 @@
 <?php
 
+namespace APP\plugins\generic\reviewersControlReport\classes\traits;
+
 trait RCRStringLength
 {
     public function formatStringLength(string $string, int $length = 30): string

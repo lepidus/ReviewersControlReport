@@ -1,10 +1,17 @@
 <?php
 
-import('lib.pkp.tests.PKPTestCase');
-import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportForm');
+use APP\plugins\generic\reviewersControlReport\classes\ReviewersControlReportForm;
+use PKP\facades\Locale;
+use PKP\tests\PKPTestCase;
 
 class ReviewersControlReportDateValidationTest extends PKPTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Locale::registerPath(dirname(__DIR__) . '/locale');
+    }
+
     /**
      * @dataProvider invalidDateProvider
      */

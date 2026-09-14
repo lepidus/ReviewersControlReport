@@ -53,7 +53,7 @@
         <h2>{translate key="plugins.reports.reviewersControlReport.reviewersList"}</h2>
         <p>{translate key="plugins.reports.reviewersControlReport.reviewersList.description"}</p>
 
-        {capture assign=reviewersUrl}{url router=$smarty.const.ROUTE_COMPONENT component="plugins.generic.reviewersControlReport.controllers.grid.ReviewersGridHandler" op="fetchGrid" escape=false}{/capture}
+        {capture assign=reviewersUrl}{url router=\PKP\core\PKPApplication::ROUTE_COMPONENT component="plugins.generic.reviewersControlReport.controllers.grid.ReviewersGridHandler" op="fetchGrid" escape=false}{/capture}
         {load_url_in_div id="reviewersReportGridContainer" url=$reviewersUrl}
     </div>
 {/block}

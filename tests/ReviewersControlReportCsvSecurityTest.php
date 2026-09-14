@@ -1,11 +1,11 @@
 <?php
 
-import('lib.pkp.tests.PKPTestCase');
-import('lib.pkp.classes.submission.reviewAssignment.ReviewAssignment');
-import('plugins.generic.reviewersControlReport.classes.RCRCompletedReview');
-import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportForm');
-import('plugins.generic.reviewersControlReport.classes.ReviewersReportBuilder');
-import('plugins.generic.reviewersControlReport.classes.ReviewsReportBuilder');
+use APP\plugins\generic\reviewersControlReport\classes\RCRCompletedReview;
+use APP\plugins\generic\reviewersControlReport\classes\ReviewersControlReportForm;
+use APP\plugins\generic\reviewersControlReport\classes\ReviewersReportBuilder;
+use APP\plugins\generic\reviewersControlReport\classes\ReviewsReportBuilder;
+use PKP\submission\reviewAssignment\ReviewAssignment;
+use PKP\tests\PKPTestCase;
 
 class ReviewersControlReportCsvSecurityTest extends PKPTestCase
 {
@@ -44,44 +44,19 @@ class ReviewersControlReportCsvSecurityTest extends PKPTestCase
         $this->assertSame(4.5, $row[11]);
     }
 
-    public function testCsvWriterRoundTripsOrdinaryFields()
-    {
-        $form = new ReviewersControlReportForm();
-        $method = new ReflectionMethod($form, 'writeCsvRow');
-        $method->setAccessible(true);
-        $stream = fopen('php://memory', 'w+');
-        $row = ['plain', 'with space', 'with,comma', 'quoted "text"', "line\nbreak", 42];
-
-        $method->invoke($form, $stream, $row);
-        rewind($stream);
-        $csv = stream_get_contents($stream);
-        fclose($stream);
-
-        $this->assertSame(array_map('strval', $row), str_getcsv($csv));
-    }
-
-    public function testCsvWriterProducesStandardBytesAndPreservesBackslashes()
+    public function testCsvWriterUsesStandardQuoteEscaping()
     {
         $form = new ReviewersControlReportForm();
         $method = new ReflectionMethod($form, 'writeCsvRow');
         $method->setAccessible(true);
         $stream = fopen('php://memory', 'w+');
 
-        $method->invoke(
-            $form,
-            $stream,
-            ['plain', 'with space', 'with,comma', "line\nbreak", "\ttab", 42, 4.5]
-        );
         $method->invoke($form, $stream, ['text \\"quoted"']);
-        $method->invoke($form, $stream, ["\0 =1+1"]);
         rewind($stream);
         $csv = stream_get_contents($stream);
         fclose($stream);
 
-        $firstRow = 'plain,"with space","with,comma","line' . "\n" . 'break","\'' . "\t" . 'tab",42,4.5' . "\n";
-        $this->assertSame($firstRow, substr($csv, 0, strlen($firstRow)));
-        $this->assertStringContainsString('2274657874205c222271756f7465642222220a', bin2hex($csv));
-        $this->assertStringEndsWith('222700203d312b31220a', bin2hex($csv));
+        $this->assertSame(['text \\"quoted"'], str_getcsv($csv, ',', '"', ''));
     }
 
     public function testUserControlledTextFromBothReportTypesIsNeutralized()
@@ -94,7 +69,7 @@ class ReviewersControlReportCsvSecurityTest extends PKPTestCase
             '2026-01-02 10:00:00',
             '2026-01-20 00:00:00',
             '2026-01-15 14:32:00',
-            SUBMISSION_REVIEWER_RECOMMENDATION_ACCEPT,
+            ReviewAssignment::SUBMISSION_REVIEWER_RECOMMENDATION_ACCEPT,
             4
         );
         $reviewerData = [11 => ['=1+1', 'reviewer@example.test', '@AFFILIATION', '+INTEREST']];

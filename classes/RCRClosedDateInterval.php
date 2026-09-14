@@ -1,5 +1,10 @@
 <?php
 
+namespace APP\plugins\generic\reviewersControlReport\classes;
+
+use DateTime;
+use InvalidArgumentException;
+
 class RCRClosedDateInterval
 {
     private $beginningDate;

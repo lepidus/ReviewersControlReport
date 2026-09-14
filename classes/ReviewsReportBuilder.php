@@ -1,7 +1,9 @@
 <?php
 
-import('lib.pkp.classes.submission.reviewAssignment.ReviewAssignment');
-import('plugins.generic.reviewersControlReport.classes.traits.RCRReportDate');
+namespace APP\plugins\generic\reviewersControlReport\classes;
+
+use APP\plugins\generic\reviewersControlReport\classes\traits\RCRReportDate;
+use PKP\submission\reviewAssignment\ReviewAssignment;
 
 class ReviewsReportBuilder
 {

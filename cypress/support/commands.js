@@ -6,11 +6,10 @@ Cypress.Commands.add('loginAsManager', () => {
 });
 
 Cypress.Commands.add('goToPluginsGrid', () => {
-	cy.server();
-	cy.route('GET', '**/grid/settings/plugins/settings-plugin-grid/fetch-grid*').as('pluginsGrid');
+	cy.intercept('GET', '**/settings-plugin-grid/fetch-grid**').as('fetchPluginsGrid');
 	cy.visit('index.php/publicknowledge/management/settings/website');
 	cy.get('#plugins-button').should('be.visible').click();
-	cy.wait('@pluginsGrid').its('status').should('eq', 200);
+	cy.wait('@fetchPluginsGrid').its('response.statusCode').should('eq', 200);
 });
 
 Cypress.Commands.add('goToReviewersControlReport', () => {
