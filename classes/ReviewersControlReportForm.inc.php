@@ -118,7 +118,16 @@ class ReviewersControlReportForm extends Form
 
     private function writeCsvRow($csvFile, array $row): void
     {
-        fputcsv($csvFile, $this->prepareCsvRow($row), ',', '"', '');
+        $fields = array_map(function ($cell) {
+            $cell = (string) $cell;
+            if (strpbrk($cell, ",\"\r\n\t ") !== false) {
+                return '"' . str_replace('"', '""', $cell) . '"';
+            }
+
+            return $cell;
+        }, $this->prepareCsvRow($row));
+
+        fwrite($csvFile, implode(',', $fields) . "\n");
     }
 
     private function prepareCsvRow(array $row): array

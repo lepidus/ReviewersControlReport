@@ -44,19 +44,44 @@ class ReviewersControlReportCsvSecurityTest extends PKPTestCase
         $this->assertSame(4.5, $row[11]);
     }
 
-    public function testCsvWriterUsesStandardQuoteEscaping()
+    public function testCsvWriterRoundTripsOrdinaryFields()
+    {
+        $form = new ReviewersControlReportForm();
+        $method = new ReflectionMethod($form, 'writeCsvRow');
+        $method->setAccessible(true);
+        $stream = fopen('php://memory', 'w+');
+        $row = ['plain', 'with space', 'with,comma', 'quoted "text"', "line\nbreak", 42];
+
+        $method->invoke($form, $stream, $row);
+        rewind($stream);
+        $csv = stream_get_contents($stream);
+        fclose($stream);
+
+        $this->assertSame(array_map('strval', $row), str_getcsv($csv));
+    }
+
+    public function testCsvWriterProducesStandardBytesAndPreservesBackslashes()
     {
         $form = new ReviewersControlReportForm();
         $method = new ReflectionMethod($form, 'writeCsvRow');
         $method->setAccessible(true);
         $stream = fopen('php://memory', 'w+');
 
+        $method->invoke(
+            $form,
+            $stream,
+            ['plain', 'with space', 'with,comma', "line\nbreak", "\ttab", 42, 4.5]
+        );
         $method->invoke($form, $stream, ['text \\"quoted"']);
+        $method->invoke($form, $stream, ["\0 =1+1"]);
         rewind($stream);
         $csv = stream_get_contents($stream);
         fclose($stream);
 
-        $this->assertSame(['text \\"quoted"'], str_getcsv($csv, ',', '"', ''));
+        $firstRow = 'plain,"with space","with,comma","line' . "\n" . 'break","\'' . "\t" . 'tab",42,4.5' . "\n";
+        $this->assertSame($firstRow, substr($csv, 0, strlen($firstRow)));
+        $this->assertStringContainsString('2274657874205c222271756f7465642222220a', bin2hex($csv));
+        $this->assertStringEndsWith('222700203d312b31220a', bin2hex($csv));
     }
 
     public function testUserControlledTextFromBothReportTypesIsNeutralized()
