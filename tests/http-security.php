@@ -91,6 +91,26 @@ foreach (['dbarnes' => true, 'dbuskins' => true, 'admin' => true, 'phudson' => f
             }
         }
         if ($actor === 'dbarnes') {
+            // Share the selector with Cypress: catch core markup drift without a browser.
+            $browserContract = json_decode(file_get_contents(__DIR__ . '/browser-contract.json'), true);
+            $pluginsGrid = requestPage('$$$call$$$/grid/settings/plugins/settings-plugin-grid/fetch-grid', $cookie);
+            $pluginsResponse = json_decode($pluginsGrid['body'], true);
+            $pluginsHtml = $pluginsResponse['content'] ?? '';
+            $document = new DOMDocument();
+            @$document->loadHTML($pluginsHtml === '' ? '<html></html>' : $pluginsHtml);
+            $inputs = $document->getElementsByTagName('input');
+            $matchingInputs = [];
+            foreach ($inputs as $input) {
+                if (strpos($input->getAttribute('id'), $browserContract['pluginEnabledInputIdPrefix']) === 0) {
+                    $matchingInputs[] = $input;
+                }
+            }
+            check(count($matchingInputs) === 1, 'Cypress activation selector matches exactly one real grid input');
+            check(
+                count($matchingInputs) === 1 && $matchingInputs[0]->hasAttribute('checked'),
+                'Plugin activation is persisted in the real settings grid'
+            );
+            check(strpos($core['body'], 'ReviewersControlReportReportPlugin') !== false, 'Report is listed by the core');
             check(strpos($gridHtml, '&lt;img') !== false, 'Stored title is escaped in grid');
             check(strpos($gridHtml, '<img src=x') === false, 'Stored title cannot create an element');
             foreach (['2026-02-31', 'not-a-date', ['2026-01-01']] as $date) {
