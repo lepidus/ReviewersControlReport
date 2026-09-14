@@ -4,7 +4,7 @@ describe('Reviewers Control Report - Plugin enabling', function() {
 	it('Enables the plugin', function() {
 		cy.loginAsManager();
 		cy.goToPluginsGrid();
-		cy.route('POST', '**/grid/plugins/plugin-grid/enable*').as('pluginEnabled');
+		cy.route('POST', '**/grid/settings/plugins/settings-plugin-grid/enable*').as('pluginEnabled');
 
 		cy.get('input[id^=select-cell-ReviewersControlReportPlugin]').check();
 		cy.wait('@pluginEnabled').its('status').should('eq', 200);

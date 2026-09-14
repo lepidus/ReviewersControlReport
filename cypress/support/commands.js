@@ -6,9 +6,9 @@ Cypress.Commands.add('loginAsManager', () => {
 });
 
 Cypress.Commands.add('goToPluginsGrid', () => {
-	cy.visit('index.php/publicknowledge/management/settings/website');
 	cy.server();
-	cy.route('GET', '**/grid/plugins/plugin-grid/fetch-grid*').as('pluginsGrid');
+	cy.route('GET', '**/grid/settings/plugins/settings-plugin-grid/fetch-grid*').as('pluginsGrid');
+	cy.visit('index.php/publicknowledge/management/settings/website');
 	cy.get('#plugins-button').should('be.visible').click();
 	cy.wait('@pluginsGrid').its('status').should('eq', 200);
 });
