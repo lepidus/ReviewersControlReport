@@ -39,7 +39,7 @@ class ReviewersReportBuilder
         return [
             $summary->getQualityAverage(),
             $summary->getTotal(),
-            implode("\n", $summary->getSubmissionTitles()),
+            implode("\n", $summary->getSubmissionTitlesWithIds()),
         ];
     }
 

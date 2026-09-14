@@ -83,7 +83,7 @@ class ReviewersReportBuilderTest extends PKPTestCase
         $this->assertEquals(2, $row[5]);
     }
 
-    public function testTitlesColumnListsTitlesWithoutTheCompletionDate()
+    public function testTitlesColumnListsEachTitleAfterItsSubmissionIdWithoutTheCompletionDate()
     {
         $completedReviews = [
             $this->createCompletedReview(11, 101, 'Central do Brasil', '2026-01-15 14:32:00', 4),
@@ -92,7 +92,7 @@ class ReviewersReportBuilderTest extends PKPTestCase
 
         $row = $this->builder->getRows($this->reviewersPersonalData, $completedReviews)[0];
 
-        $this->assertEquals("Central do Brasil\nTerra Estrangeira", $row[6]);
+        $this->assertEquals("[101] Central do Brasil\n[102] Terra Estrangeira", $row[6]);
         $this->assertStringNotContainsString('2026-01-15', $row[6]);
     }
 

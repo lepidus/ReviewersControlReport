@@ -35,11 +35,11 @@ class ReviewsSummary
         return number_format(array_sum($ratings) / count($ratings), 2, '.', '');
     }
 
-    public function getSubmissionTitles(): array
+    public function getSubmissionTitlesWithIds(): array
     {
         $titles = [];
         foreach ($this->completedReviews as $completedReview) {
-            $titles[] = $completedReview->getSubmissionTitle();
+            $titles[] = '[' . $completedReview->getSubmissionId() . '] ' . $completedReview->getSubmissionTitle();
         }
 
         return $titles;

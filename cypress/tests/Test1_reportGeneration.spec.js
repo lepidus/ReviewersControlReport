@@ -45,7 +45,8 @@ describe('Reviewers Control Report - Report generation', function() {
 			// The completion date now has a column of its own, instead of
 			// riding along inside the submission titles cell
 			expect(response.body).not.to.contain('Completed:');
-			expect(response.body).to.contain(reviewedSubmission);
+			// Each title comes after the ID of its submission
+			cy.wrap(response.body).should('match', /\[\d+\] Developing efficacy beliefs in the classroom/);
 		});
 	});
 
