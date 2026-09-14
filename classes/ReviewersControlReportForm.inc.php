@@ -87,11 +87,27 @@ class ReviewersControlReportForm extends Form
         $this->emitHttpHeaders();
 
         $csvFile = fopen('php://output', 'wt');
-        fputcsv($csvFile, $reportBuilder->getColumns());
+        $this->writeCsvRow($csvFile, $reportBuilder->getColumns());
         foreach ($reportBuilder->getRows($reviewersPersonalData, $completedReviews) as $row) {
-            fputcsv($csvFile, $row);
+            $this->writeCsvRow($csvFile, $row);
         }
         fclose($csvFile);
+    }
+
+    private function writeCsvRow($csvFile, array $row): void
+    {
+        fputcsv($csvFile, $this->prepareCsvRow($row), ',', '"', '');
+    }
+
+    private function prepareCsvRow(array $row): array
+    {
+        return array_map(function ($cell) {
+            if (is_string($cell) && preg_match('/^(?:[\\x00-\\x20]*[=+\\-@]|[\\t\\r\\n])/', $cell)) {
+                return "'" . $cell;
+            }
+
+            return $cell;
+        }, $row);
     }
 
     private function isReviewsReport(): bool
