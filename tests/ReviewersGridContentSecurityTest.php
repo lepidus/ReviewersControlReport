@@ -1,11 +1,12 @@
 <?php
 
-import('lib.pkp.tests.PKPTestCase');
-import('lib.pkp.classes.submission.reviewAssignment.ReviewAssignment');
-import('plugins.generic.reviewersControlReport.classes.RCRCompletedReview');
-import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportDAO');
+use APP\plugins\generic\reviewersControlReport\classes\RCRCompletedReview;
+use APP\plugins\generic\reviewersControlReport\classes\ReviewersControlReportDAO;
+use PKP\submission\reviewAssignment\ReviewAssignment;
 
-class ReviewersGridContentSecurityTest extends PKPTestCase
+require_once __DIR__ . '/ReviewersControlReportTestCase.php';
+
+class ReviewersGridContentSecurityTest extends ReviewersControlReportTestCase
 {
     public function testSubmissionTitleAndWorkflowUrlAreEscapedInGridHtml()
     {
@@ -19,7 +20,7 @@ class ReviewersGridContentSecurityTest extends PKPTestCase
             '2026-01-02 10:00:00',
             '2026-01-20 00:00:00',
             '2026-01-15 14:32:00',
-            SUBMISSION_REVIEWER_RECOMMENDATION_ACCEPT,
+            ReviewAssignment::SUBMISSION_REVIEWER_RECOMMENDATION_ACCEPT,
             4
         );
 
@@ -39,9 +40,9 @@ class ReviewersGridContentSecurityTest extends PKPTestCase
 
 class TestableReviewersControlReportDAO extends ReviewersControlReportDAO
 {
-    public $workflowUrl;
+    public string $workflowUrl = '';
 
-    public function getSubmissionWorkflowUrl($submissionId, $submissionStageId)
+    protected function getSubmissionWorkflowUrl(int $submissionId): string
     {
         return $this->workflowUrl;
     }

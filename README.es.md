@@ -8,7 +8,7 @@ Este módulo ofrece una página con un informe de control de los revisores de la
 
 La versión más reciente de este módulo es compatible con las siguientes aplicaciones de PKP:
 
-* OJS 3.3.0
+* OJS 3.5.x
 
 ## Instalación
 

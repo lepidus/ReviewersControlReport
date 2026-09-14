@@ -1,7 +1,9 @@
 <?php
 
-import('lib.pkp.classes.linkAction.request.AjaxModal');
-import('plugins.generic.reviewersControlReport.classes.traits.RCRStringLength');
+namespace APP\plugins\generic\reviewersControlReport\classes;
+
+use APP\plugins\generic\reviewersControlReport\classes\traits\RCRStringLength;
+use PKP\core\DataObject;
 
 class RCRReviewerDTO extends DataObject
 {
@@ -22,7 +24,7 @@ class RCRReviewerDTO extends DataObject
         $this->setData('id', $id);
         $this->fullName = $this->formatStringLength($fullName, 16);
         $this->email = $this->formatStringLength($email, 25);
-        $this->affiliation = $this->formatStringLength((string)$affiliation);
+        $this->affiliation = $this->formatStringLength((string) $affiliation);
         $this->interests = $this->formatStringLength($interests);
         $this->qualityAverage = $qualityAverage;
         $this->totalReviewedSubmissions = $totalReviewedSubmissions;

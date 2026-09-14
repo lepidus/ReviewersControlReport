@@ -1,10 +1,23 @@
 <?php
 
-import('lib.pkp.classes.controllers.grid.GridCategoryRow');
-import('lib.pkp.classes.linkAction.request.AjaxModal');
+namespace APP\plugins\generic\reviewersControlReport\controllers\grid;
+
+use PKP\controllers\grid\GridRow;
+use PKP\core\PKPApplication;
+use PKP\linkAction\LinkAction;
+use PKP\linkAction\request\AjaxModal;
+use PKP\plugins\PluginRegistry;
 
 class ReviewersGridRow extends GridRow
 {
+    private bool $canEditUsers;
+
+    public function __construct(bool $canEditUsers = false)
+    {
+        parent::__construct();
+        $this->canEditUsers = $canEditUsers;
+    }
+
     public function initialize($request, $template = null)
     {
         $plugin = PluginRegistry::getPlugin('generic', 'ReviewersControlReportPlugin');
@@ -13,12 +26,16 @@ class ReviewersGridRow extends GridRow
         $rowId = $this->getId();
         $dispatcher = $request->getDispatcher();
 
+        if (!$this->canEditUsers) {
+            return;
+        }
+
         $this->addAction(new LinkAction(
             'edit',
             new AjaxModal(
                 $dispatcher->url(
                     $request,
-                    ROUTE_COMPONENT,
+                    PKPApplication::ROUTE_COMPONENT,
                     null,
                     'grid.settings.user.UserGridHandler',
                     'editUser',

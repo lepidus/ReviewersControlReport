@@ -50,19 +50,19 @@ function csrfToken(string $body): string
     return $matches[1] ?? '';
 }
 
-$reportPath = 'stats/reports/report?pluginName=ReviewersControlReportReportPlugin';
+$reportPath = 'en/stats/reports/report?pluginName=ReviewersControlReportReportPlugin';
 $gridPath = '$$$call$$$/plugins/generic/reviewers-control-report/controllers/grid/reviewers-grid/fetch-grid';
 foreach (['dbarnes' => true, 'dbuskins' => true, 'admin' => true, 'phudson' => false, 'amwandenga' => false] as $actor => $allowed) {
     $cookie = tempnam(sys_get_temp_dir(), 'rcr-http-');
     try {
-        $login = requestPage('login', $cookie);
-        $auth = requestPage('login/signIn', $cookie, [
+        $login = requestPage('en/login', $cookie);
+        $auth = requestPage('en/login/signIn', $cookie, [
             'username' => $actor,
             'password' => $actor . $actor,
             'csrfToken' => csrfToken($login['body']),
         ]);
         check($auth['status'] === 302, $actor . ': fixture login');
-        $core = requestPage('stats/reports', $cookie);
+        $core = requestPage('en/stats/reports', $cookie);
         $page = requestPage($reportPath, $cookie);
         $grid = requestPage($gridPath, $cookie);
         $gridResponse = json_decode($grid['body'], true);

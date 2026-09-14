@@ -1,13 +1,7 @@
 import '../support/commands';
 
-// The CSV is asserted as one whole string, never split or sliced: the plugin
-// has no node_modules, so any array/string method Babel wants to polyfill
-// (push, trim, match, padStart) breaks the bundling of the entire spec before
-// a single test runs.
-//
-// The report is requested rather than downloaded by clicking: the Cypress 5.6
-// that OJS 3.3 pins has no downloads folder, so a file saved by the browser
-// cannot be read back.
+// Request the report directly so its response headers and complete CSV body
+// remain observable in the test.
 describe('Reviewers Control Report - Report generation', function() {
 	const reviewsHeader = '"Submission ID","Submission Title","Review Round",Reviewer,Email,Affiliation,"Date Assigned","Date Due","Date Completed",Recommendation,"Quality Rating"';
 	const reviewersHeader = '"Quality Average","Completed Reviews","Reviewed Submissions (Titles)"';

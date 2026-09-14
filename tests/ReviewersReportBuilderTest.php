@@ -1,10 +1,12 @@
 <?php
 
-import('lib.pkp.tests.PKPTestCase');
-import('plugins.generic.reviewersControlReport.classes.RCRCompletedReview');
-import('plugins.generic.reviewersControlReport.classes.ReviewersReportBuilder');
+use APP\plugins\generic\reviewersControlReport\classes\RCRCompletedReview;
+use APP\plugins\generic\reviewersControlReport\classes\ReviewersReportBuilder;
+use PKP\submission\reviewAssignment\ReviewAssignment;
 
-class ReviewersReportBuilderTest extends PKPTestCase
+require_once __DIR__ . '/ReviewersControlReportTestCase.php';
+
+class ReviewersReportBuilderTest extends ReviewersControlReportTestCase
 {
     private $builder;
     private $reviewersPersonalData = [
@@ -28,7 +30,7 @@ class ReviewersReportBuilderTest extends PKPTestCase
             '2026-01-02 10:00:00',
             '2026-01-20 00:00:00',
             $dateCompleted,
-            SUBMISSION_REVIEWER_RECOMMENDATION_ACCEPT,
+            ReviewAssignment::SUBMISSION_REVIEWER_RECOMMENDATION_ACCEPT,
             $quality
         );
     }

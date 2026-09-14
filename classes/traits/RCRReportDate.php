@@ -1,5 +1,7 @@
 <?php
 
+namespace APP\plugins\generic\reviewersControlReport\classes\traits;
+
 trait RCRReportDate
 {
     public function formatReportDate($date): string

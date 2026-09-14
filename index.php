@@ -15,6 +15,4 @@
  *
  */
 
-require_once('ReviewersControlReportPlugin.inc.php');
-
-return new ReviewersControlReportPlugin();
+return new \APP\plugins\generic\reviewersControlReport\ReviewersControlReportPlugin();
