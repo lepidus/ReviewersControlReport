@@ -1,6 +1,6 @@
 <?php
 
-class ReviewsSummary
+class RCRReviewsSummary
 {
     private $completedReviews;
 

@@ -1,11 +1,11 @@
 <?php
 
 import('lib.pkp.classes.linkAction.request.AjaxModal');
-import('plugins.generic.reviewersControlReport.classes.traits.StringLength');
+import('plugins.generic.reviewersControlReport.classes.traits.RCRStringLength');
 
-class ReviewerDTO extends DataObject
+class RCRReviewerDTO extends DataObject
 {
-    use StringLength;
+    use RCRStringLength;
 
     private $id;
     private $fullName;

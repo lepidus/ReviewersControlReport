@@ -1,6 +1,6 @@
 <?php
 
-import('plugins.generic.reviewersControlReport.classes.ReviewsSummary');
+import('plugins.generic.reviewersControlReport.classes.RCRReviewsSummary');
 
 class ReviewersReportBuilder
 {
@@ -23,14 +23,14 @@ class ReviewersReportBuilder
         $rows = [];
 
         foreach ($reviewersPersonalData as $reviewerId => $personalData) {
-            $summary = new ReviewsSummary($reviewsByReviewer[$reviewerId] ?? []);
+            $summary = new RCRReviewsSummary($reviewsByReviewer[$reviewerId] ?? []);
             $rows[] = array_merge($personalData, $this->getReviewsCells($summary));
         }
 
         return $rows;
     }
 
-    private function getReviewsCells(ReviewsSummary $summary): array
+    private function getReviewsCells(RCRReviewsSummary $summary): array
     {
         if ($summary->isEmpty()) {
             return ['', '', ''];

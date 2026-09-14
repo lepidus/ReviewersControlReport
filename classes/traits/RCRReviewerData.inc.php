@@ -1,6 +1,6 @@
 <?php
 
-trait ReviewerData
+trait RCRReviewerData
 {
     public function getReviewersPersonalData(array $reviewerIds): array
     {

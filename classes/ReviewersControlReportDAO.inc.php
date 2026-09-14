@@ -1,12 +1,12 @@
 <?php
 
 import('lib.pkp.classes.db.DAO');
-import('plugins.generic.reviewersControlReport.classes.traits.SubmissionUrl');
-import('plugins.generic.reviewersControlReport.classes.traits.StringLength');
-import('plugins.generic.reviewersControlReport.classes.ReviewerDTO');
-import('plugins.generic.reviewersControlReport.classes.ClosedDateInterval');
-import('plugins.generic.reviewersControlReport.classes.CompletedReview');
-import('plugins.generic.reviewersControlReport.classes.ReviewsSummary');
+import('plugins.generic.reviewersControlReport.classes.traits.RCRSubmissionUrl');
+import('plugins.generic.reviewersControlReport.classes.traits.RCRStringLength');
+import('plugins.generic.reviewersControlReport.classes.RCRReviewerDTO');
+import('plugins.generic.reviewersControlReport.classes.RCRClosedDateInterval');
+import('plugins.generic.reviewersControlReport.classes.RCRCompletedReview');
+import('plugins.generic.reviewersControlReport.classes.RCRReviewsSummary');
 
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Support\Collection;
@@ -14,8 +14,8 @@ use Illuminate\Support\Collection;
 /** @class */
 class ReviewersControlReportDAO extends DAO
 {
-    use SubmissionUrl;
-    use StringLength;
+    use RCRSubmissionUrl;
+    use RCRStringLength;
 
     public $userDao;
     private $contextId;
@@ -121,9 +121,9 @@ class ReviewersControlReportDAO extends DAO
     {
         $reviewerUser = $this->getReviewerUser($row['user_id']);
         $completedReviews = $this->getCompletedReviews($this->contextId, null, $row['user_id']);
-        $reviewsSummary = new ReviewsSummary($completedReviews);
+        $reviewsSummary = new RCRReviewsSummary($completedReviews);
 
-        $reviewer = new ReviewerDTO(
+        $reviewer = new RCRReviewerDTO(
             $reviewerUser->getId(),
             $reviewerUser->getEmail(),
             $reviewerUser->getFullName(),
@@ -200,7 +200,7 @@ class ReviewersControlReportDAO extends DAO
 
         $completedReviews = [];
         foreach ($rows as $row) {
-            $completedReviews[] = new CompletedReview(
+            $completedReviews[] = new RCRCompletedReview(
                 $row['reviewer_id'],
                 $row['submission_id'],
                 $titles[$row['submission_id']] ?? '',

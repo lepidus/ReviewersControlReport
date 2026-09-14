@@ -1,7 +1,7 @@
 <?php
 
 import('lib.pkp.tests.PKPTestCase');
-import('plugins.generic.reviewersControlReport.classes.CompletedReview');
+import('plugins.generic.reviewersControlReport.classes.RCRCompletedReview');
 import('plugins.generic.reviewersControlReport.classes.ReviewsReportBuilder');
 
 class ReviewsReportBuilderTest extends PKPTestCase
@@ -31,7 +31,7 @@ class ReviewsReportBuilderTest extends PKPTestCase
             'quality' => 4,
         ], $overrides);
 
-        return new CompletedReview(
+        return new RCRCompletedReview(
             $reviewerId,
             $data['submissionId'],
             $data['submissionTitle'],

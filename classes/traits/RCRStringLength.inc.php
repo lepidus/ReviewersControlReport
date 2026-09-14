@@ -1,6 +1,6 @@
 <?php
 
-trait StringLength
+trait RCRStringLength
 {
     public function formatStringLength(string $string, int $length = 30): string
     {

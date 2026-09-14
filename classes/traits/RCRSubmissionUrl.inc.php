@@ -1,6 +1,6 @@
 <?php
 
-trait SubmissionUrl
+trait RCRSubmissionUrl
 {
     public function getSubmissionWorkflowUrl($submissionId, $submissionStageId)
     {

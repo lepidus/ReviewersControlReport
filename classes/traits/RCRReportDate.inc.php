@@ -1,6 +1,6 @@
 <?php
 
-trait ReportDate
+trait RCRReportDate
 {
     public function formatReportDate($date): string
     {

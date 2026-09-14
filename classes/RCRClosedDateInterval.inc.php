@@ -1,6 +1,6 @@
 <?php
 
-class ClosedDateInterval
+class RCRClosedDateInterval
 {
     private $beginningDate;
     private $endDate;

@@ -5,7 +5,7 @@ import('classes.submission.Submission');
 import('classes.publication.Publication');
 import('lib.pkp.classes.user.User');
 import('lib.pkp.classes.submission.reviewAssignment.ReviewAssignment');
-import('plugins.generic.reviewersControlReport.classes.ClosedDateInterval');
+import('plugins.generic.reviewersControlReport.classes.RCRClosedDateInterval');
 import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportDAO');
 
 class ReviewersControlReportDAOTest extends DatabaseTestCase
@@ -126,7 +126,7 @@ class ReviewersControlReportDAOTest extends DatabaseTestCase
         $this->createReviewAssignment($this->submissionOfContext, '2026-01-15 14:32:00');
         $this->createReviewAssignment($this->submissionOfContext, '2026-03-20 09:00:00');
 
-        $interval = new ClosedDateInterval('2026-03-01', '2026-03-31');
+        $interval = new RCRClosedDateInterval('2026-03-01', '2026-03-31');
         $completedReviews = $this->dao->getCompletedReviews($this->contextId, $interval);
 
         $this->assertCount(1, $completedReviews);
@@ -138,7 +138,7 @@ class ReviewersControlReportDAOTest extends DatabaseTestCase
         $this->createReviewAssignment($this->submissionOfContext, '2026-01-15 00:00:01');
         $this->createReviewAssignment($this->submissionOfContext, '2026-01-17 23:59:58');
 
-        $interval = new ClosedDateInterval('2026-01-15', '2026-01-17');
+        $interval = new RCRClosedDateInterval('2026-01-15', '2026-01-17');
         $completedReviews = $this->dao->getCompletedReviews($this->contextId, $interval);
 
         $this->assertCount(2, $completedReviews);

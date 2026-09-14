@@ -1,15 +1,15 @@
 <?php
 
 import('lib.pkp.classes.form.Form');
-import('plugins.generic.reviewersControlReport.classes.ClosedDateInterval');
+import('plugins.generic.reviewersControlReport.classes.RCRClosedDateInterval');
 import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportDAO');
 import('plugins.generic.reviewersControlReport.classes.ReviewersReportBuilder');
 import('plugins.generic.reviewersControlReport.classes.ReviewsReportBuilder');
-import('plugins.generic.reviewersControlReport.classes.traits.ReviewerData');
+import('plugins.generic.reviewersControlReport.classes.traits.RCRReviewerData');
 
 class ReviewersControlReportForm extends Form
 {
-    use ReviewerData;
+    use RCRReviewerData;
 
     public const REPORT_TYPE_REVIEWERS = 'reviewers';
     public const REPORT_TYPE_REVIEWS = 'reviews';
@@ -67,7 +67,7 @@ class ReviewersControlReportForm extends Form
             return null;
         }
 
-        return new ClosedDateInterval(
+        return new RCRClosedDateInterval(
             $startDate === '' ? self::EARLIEST_DATE : $startDate,
             $endDate === '' ? self::LATEST_DATE : $endDate
         );

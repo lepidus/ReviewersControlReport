@@ -1,6 +1,6 @@
 <?php
 
-class CompletedReview
+class RCRCompletedReview
 {
     private $reviewerId;
     private $submissionId;

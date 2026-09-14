@@ -1,11 +1,11 @@
 <?php
 
 import('lib.pkp.classes.submission.reviewAssignment.ReviewAssignment');
-import('plugins.generic.reviewersControlReport.classes.traits.ReportDate');
+import('plugins.generic.reviewersControlReport.classes.traits.RCRReportDate');
 
 class ReviewsReportBuilder
 {
-    use ReportDate;
+    use RCRReportDate;
 
     public function getColumns(): array
     {

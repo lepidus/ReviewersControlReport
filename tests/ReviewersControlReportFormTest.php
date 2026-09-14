@@ -2,7 +2,7 @@
 
 import('lib.pkp.tests.DatabaseTestCase');
 import('lib.pkp.classes.user.User');
-import('plugins.generic.reviewersControlReport.classes.CompletedReview');
+import('plugins.generic.reviewersControlReport.classes.RCRCompletedReview');
 import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportForm');
 
 class ReviewersControlReportFormTest extends DatabaseTestCase
@@ -42,7 +42,7 @@ class ReviewersControlReportFormTest extends DatabaseTestCase
     public function testGetsPersonalDataOfTheReviewersOfTheGivenReviews()
     {
         $form = new ReviewersControlReportForm();
-        $completedReview = new CompletedReview(
+        $completedReview = new RCRCompletedReview(
             $this->reviewerId,
             100,
             'Central do Brasil',
