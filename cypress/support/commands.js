@@ -7,8 +7,10 @@ Cypress.Commands.add('loginAsManager', () => {
 
 Cypress.Commands.add('goToPluginsGrid', () => {
 	cy.visit('index.php/publicknowledge/management/settings/website');
+	cy.server();
+	cy.route('GET', '**/grid/plugins/plugin-grid/fetch-grid*').as('pluginsGrid');
 	cy.get('#plugins-button').should('be.visible').click();
-	cy.wait(2000); // The grid reloads its rows, detaching whatever was clicked too early
+	cy.wait('@pluginsGrid').its('status').should('eq', 200);
 });
 
 Cypress.Commands.add('goToReviewersControlReport', () => {
