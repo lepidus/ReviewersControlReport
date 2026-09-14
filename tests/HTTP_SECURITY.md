@@ -21,7 +21,14 @@ RCR_TEST_URL=http://127.0.0.1:8080/index.php/publicknowledge \
 php plugins/generic/reviewersControlReport/tests/http-security.php
 ```
 
-The script requires PHP cURL. It checks allowed and denied roles, stored-title
+The script requires PHP cURL and DOM. It checks allowed and denied roles, stored-title
 escaping, formula protection in both reports, malformed dates, array input and
 CSRF. It does not prove browser JavaScript behavior or cross-context isolation;
 the DAO suite separately verifies that completed reviews stay in their context.
+
+The lightweight HTTP check also validates the activation input selector shared
+with Cypress in `tests/browser-contract.json`, persisted activation, and report
+registration in the real core page. Run it before Cypress to catch markup or
+registration drift without launching a browser. It does not toggle plugin state.
+The PHPUnit suite independently covers the four security findings and report
+calculations, without Cypress.
