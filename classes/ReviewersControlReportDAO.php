@@ -99,7 +99,7 @@ class ReviewersControlReportDAO extends DAO
                 $completedReview->getSubmissionStageId()
             ), ENT_QUOTES, 'UTF-8');
             $submissionTitle = htmlspecialchars(
-                $this->formatStringLength($completedReview->getSubmissionTitle(), 40),
+                $this->formatStringLength($this->getPlainTextTitle($completedReview->getSubmissionTitle()), 40),
                 ENT_QUOTES,
                 'UTF-8'
             );
@@ -109,6 +109,15 @@ class ReviewersControlReportDAO extends DAO
         }
 
         return $gridCells;
+    }
+
+    /**
+     * Titles may carry inline markup such as <i>, which the grid shows as
+     * plain text: truncating markup could leave a tag open.
+     */
+    private function getPlainTextTitle(string $title): string
+    {
+        return html_entity_decode(strip_tags($title), ENT_QUOTES | ENT_HTML5, 'UTF-8');
     }
 
     /**
