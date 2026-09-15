@@ -5,9 +5,8 @@ msgstr ""
 "POT-Creation-Date: 2019-11-19T11:06:13+00:00\n"
 "PO-Revision-Date: 2020-06-06 02:30+0000\n"
 "Last-Translator: Diego José Macêdo <diegojmacedo@gmail.com>\n"
-"Language-Team: Portuguese (Brazil) <http://translate.pkp.sfu.ca/projects/"
-"plugins/review-report-plugin/pt_BR/>\n"
-"Language: pt_BR\n"
+"Language-Team: \n"
+"Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -15,97 +14,100 @@ msgstr ""
 "X-Generator: Weblate 3.9.1\n"
 
 msgid "plugins.reports.reviewersControlReport.displayName"
-msgstr "Informe de Control del Revisor"
+msgstr "Reviewers Control Report"
 
 msgid "plugins.reports.reviewersControlReport.description"
-msgstr "Genera un informe de seguimiento para que los editores administren a los revisores."
+msgstr "Generates a control report for editors to manage reviewers."
 
 msgid "plugins.reports.reviewersControlReport.NoReviewers"
-msgstr "Revisores no encontrados."
+msgstr "No reviewers found."
 
 msgid "plugins.reports.reviewersControlReport.field.email"
-msgstr "Correo electrónico"
+msgstr "Email"
 
 msgid "plugins.reports.reviewersControlReport.field.fullName"
-msgstr "Nombre completo"
+msgstr "Full Name"
 
 msgid "plugins.reports.reviewersControlReport.field.affiliation"
-msgstr "Afiliación"
+msgstr "Affiliation"
 
 msgid "plugins.reports.reviewersControlReport.field.interests"
-msgstr "Intereses de revisión"
+msgstr "Interests"
 
 msgid "plugins.reports.reviewersControlReport.field.qualityAverage"
-msgstr "Puntuación del revisor/a"
+msgstr "Quality Average"
 
 msgid "plugins.reports.reviewersControlReport.field.reviewedSubmissionsTotal"
-msgstr "Revisiones Completadas"
+msgstr "Completed Reviews"
 
 msgid "plugins.reports.reviewersControlReport.validate.utf8"
-msgstr "El texto UTF-8 no es válido"
+msgstr "Invalid UTF-8 String"
 
 msgid "plugins.reports.reviewersControlReport.toCsv"
-msgstr "Generar CSV"
+msgstr "Generate CSV"
 
 msgid "plugins.reports.reviewersControlReport.reportType"
-msgstr "Tipo de Informe"
+msgstr "Report Type"
 
 msgid "plugins.reports.reviewersControlReport.reportType.description"
-msgstr "Elija qué informe generar:"
+msgstr "Choose which report to generate:"
 
 msgid "plugins.reports.reviewersControlReport.reportType.reviewers"
-msgstr "Informe por revisores (una fila por revisor)"
+msgstr "Report by reviewers (one row per reviewer)"
 
 msgid "plugins.reports.reviewersControlReport.reportType.reviews"
-msgstr "Informe por revisiones (una fila por revisión)"
+msgstr "Report by reviews (one row per review)"
 
 msgid "plugins.reports.reviewersControlReport.dateCompletedInterval.description"
-msgstr "Deje ambas fechas en blanco para incluir todas las revisiones completadas."
+msgstr "Leave both dates empty to include every completed review."
 
 msgid "plugins.reports.reviewersControlReport.dateCompletedInterval"
-msgstr "Intervalo de la fecha de finalización de la revisión"
+msgstr "Review completion date range"
 
 msgid "plugins.reports.reviewersControlReport.warning.invalidDateInterval"
-msgstr "La fecha inicial no puede ser posterior a la fecha final."
+msgstr "The start date must not be later than the end date."
+
+msgid "plugins.reports.reviewersControlReport.warning.invalidDate"
+msgstr "Enter a valid date in YYYY-MM-DD format."
 
 msgid "plugins.reports.reviewersControlReport.field.reviewedSubmissionsTitles"
-msgstr "Envíos Revisados (Títulos)"
+msgstr "Reviewed Submissions (Titles)"
 
 msgid "plugins.reports.reviewersControlReport.field.submissionId"
-msgstr "ID del Envío"
+msgstr "Submission ID"
 
 msgid "plugins.reports.reviewersControlReport.field.submissionTitle"
-msgstr "Título del Envío"
+msgstr "Submission Title"
 
 msgid "plugins.reports.reviewersControlReport.field.reviewRound"
-msgstr "Ronda de Revisión"
+msgstr "Review Round"
 
 msgid "plugins.reports.reviewersControlReport.field.dateAssigned"
-msgstr "Fecha de Asignación"
+msgstr "Date Assigned"
 
 msgid "plugins.reports.reviewersControlReport.field.dateDue"
-msgstr "Fecha Límite"
+msgstr "Date Due"
 
 msgid "plugins.reports.reviewersControlReport.field.dateCompleted"
-msgstr "Fecha de Finalización"
+msgstr "Date Completed"
 
 msgid "plugins.reports.reviewersControlReport.field.recommendation"
-msgstr "Recomendación"
+msgstr "Recommendation"
 
 msgid "plugins.reports.reviewersControlReport.field.qualityRating"
-msgstr "Calificación de Calidad"
+msgstr "Quality Rating"
 
 msgid "plugins.reports.reviewersControlReport.generateReport"
-msgstr "Generar Informe en CSV"
+msgstr "Generate CSV Report"
 
 msgid "plugins.reports.reviewersControlReport.generateReport.description"
-msgstr "Exporte la actividad de revisión de esta revista como una hoja de cálculo."
+msgstr "Export the reviewing activity of this journal as a spreadsheet."
 
 msgid "plugins.reports.reviewersControlReport.reviewersList"
-msgstr "Revisores"
+msgstr "Reviewers"
 
 msgid "plugins.reports.reviewersControlReport.reviewersList.description"
-msgstr "Los revisores de esta revista y las revisiones que han completado."
+msgstr "The reviewers of this journal and the reviews they have completed."
 
 msgid "plugins.reports.reviewersControlReport.field.reviewerName"
-msgstr "Revisor"
+msgstr "Reviewer"

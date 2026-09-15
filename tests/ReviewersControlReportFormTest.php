@@ -1,47 +1,56 @@
 <?php
 
-import('lib.pkp.tests.DatabaseTestCase');
-import('lib.pkp.classes.user.User');
-import('plugins.generic.reviewersControlReport.classes.RCRCompletedReview');
-import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportForm');
+use APP\facades\Repo;
+use APP\plugins\generic\reviewersControlReport\classes\RCRCompletedReview;
+use APP\plugins\generic\reviewersControlReport\classes\ReviewersControlReportDAO;
+use APP\plugins\generic\reviewersControlReport\classes\ReviewersControlReportForm;
+use Illuminate\Support\Facades\DB;
+use PKP\db\DBResultRange;
+use PKP\security\Role;
+use PKP\submission\reviewAssignment\ReviewAssignment;
 
-class ReviewersControlReportFormTest extends DatabaseTestCase
+require_once __DIR__ . '/ReviewersControlReportTestCase.php';
+
+class ReviewersControlReportFormTest extends ReviewersControlReportTestCase
 {
     private $reviewerId;
-    private $locale = 'en_US';
+    private $locale = 'en';
     private $givenName = 'Walter';
     private $familyName = 'Salles';
     private $username = 'walter.salles';
     private $email = 'walter.salles@ancine.com.br';
     private $affiliation = 'Agência Nacional do Cinema';
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
+        DB::beginTransaction();
         $this->reviewerId = $this->createUser();
     }
 
-    protected function getAffectedTables()
+    protected function tearDown(): void
     {
-        return ['users', 'user_settings'];
+        DB::rollBack();
+        parent::tearDown();
     }
 
     private function createUser()
     {
-        $user = new User();
+        $user = Repo::user()->newDataObject();
         $user->setData('givenName', [$this->locale => $this->givenName]);
         $user->setData('familyName', [$this->locale => $this->familyName]);
         $user->setData('affiliation', [$this->locale => $this->affiliation]);
         $user->setData('email', $this->email);
-        $user->setData('username', $this->username);
+        $user->setData('userName', $this->username);
         $user->setData('password', $this->username);
+        $user->setData('dateRegistered', '2026-01-01 00:00:00');
 
-        return DAORegistry::getDAO('UserDAO')->insertObject($user);
+        return Repo::user()->add($user);
     }
 
     public function testGetsPersonalDataOfTheReviewersOfTheGivenReviews()
     {
-        $form = new ReviewersControlReportForm();
+        $form = new ReviewersControlReportForm(null, 'en', ['en']);
         $completedReview = new RCRCompletedReview(
             $this->reviewerId,
             100,
@@ -50,11 +59,14 @@ class ReviewersControlReportFormTest extends DatabaseTestCase
             '2026-01-02 10:00:00',
             '2026-01-20 00:00:00',
             '2026-01-15 14:32:00',
-            SUBMISSION_REVIEWER_RECOMMENDATION_ACCEPT,
+            ReviewAssignment::SUBMISSION_REVIEWER_RECOMMENDATION_ACCEPT,
             4
         );
 
-        $reviewersPersonalData = $form->getReviewersPersonalDataOfReviews([$completedReview, $completedReview]);
+        $reviewersPersonalData = $form->getReviewersPersonalDataOfReviews(
+            [$completedReview, $completedReview],
+            'en'
+        );
 
         $this->assertCount(1, $reviewersPersonalData);
         $this->assertEquals(
@@ -65,16 +77,16 @@ class ReviewersControlReportFormTest extends DatabaseTestCase
 
     public function testGetsEmptyPersonalDataWhenTheReviewerNoLongerExists()
     {
-        $form = new ReviewersControlReportForm();
+        $form = new ReviewersControlReportForm(null, 'en', ['en']);
 
-        $this->assertEquals(['', '', '', ''], $form->getReviewerPersonalData(999999));
+        $this->assertEquals(['', '', '', ''], $form->getReviewerPersonalData(999999, 'en'));
     }
 
     public function testGetsReviewerPersonalData()
     {
-        $form = new ReviewersControlReportForm();
+        $form = new ReviewersControlReportForm(null, 'en', ['en']);
 
-        $reviewerPersonalData = $form->getReviewerPersonalData($this->reviewerId);
+        $reviewerPersonalData = $form->getReviewerPersonalData($this->reviewerId, 'en');
         $emptyInterests = '';
         $expectedPersonalData = [
             $this->givenName . ' ' . $this->familyName,
@@ -84,5 +96,25 @@ class ReviewersControlReportFormTest extends DatabaseTestCase
         ];
 
         $this->assertEquals($expectedPersonalData, $reviewerPersonalData);
+    }
+
+    public function testDisabledReviewerRemainsAvailableToBothReportsAndGrid()
+    {
+        $reviewer = Repo::user()->get($this->reviewerId);
+        Repo::user()->edit($reviewer, ['disabled' => true]);
+
+        $reviewerGroup = Repo::userGroup()
+            ->getByRoleIds([Role::ROLE_ID_REVIEWER], 1)
+            ->first();
+        $this->assertNotNull($reviewerGroup);
+        Repo::userGroup()->assignUserToGroup($this->reviewerId, $reviewerGroup->id);
+
+        $dao = new ReviewersControlReportDAO();
+        $this->assertContains($this->reviewerId, $dao->getReviewersIds(1));
+        $this->assertArrayHasKey($this->reviewerId, $dao->getReviewers(1));
+
+        $firstPage = $dao->getReviewers(1, new DBResultRange(1, 1));
+        $this->assertCount(1, $firstPage->toArray());
+        $this->assertGreaterThanOrEqual(1, $firstPage->getCount());
     }
 }

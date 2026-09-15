@@ -2,17 +2,19 @@ Cypress.Commands.add('loginAsManager', () => {
 	// A session surviving the previous test turns the login below into a no-op
 	cy.logout();
 	cy.login('dbarnes', null, 'publicknowledge');
-	cy.location('pathname').should('include', '/submissions');
+	cy.location('pathname').should('include', '/dashboard');
 });
 
 Cypress.Commands.add('goToPluginsGrid', () => {
-	cy.visit('index.php/publicknowledge/management/settings/website');
+	cy.intercept('GET', '**/grid/settings/plugins/settings-plugin-grid/fetch-grid*').as('pluginsGrid');
+	cy.visit('/index.php/publicknowledge/en/management/settings/website#plugins');
+	cy.wait('@pluginsGrid').its('response.statusCode').should('eq', 200);
 	cy.get('#plugins-button').should('be.visible').click();
-	cy.wait(2000); // The grid reloads its rows, detaching whatever was clicked too early
+	cy.waitJQuery();
 });
 
 Cypress.Commands.add('goToReviewersControlReport', () => {
-	cy.visit('index.php/publicknowledge/stats/reports');
+	cy.visit('/index.php/publicknowledge/en/stats/reports');
 	cy.contains('a', 'Reviewers Control Report').click();
 	cy.get('#reviewersControlReportForm').should('be.visible');
 });
@@ -25,7 +27,7 @@ Cypress.Commands.add('requestReport', (reportType, startDate, endDate) => {
 	return cy.get('input[name="csrfToken"]').invoke('val').then((csrfToken) => {
 		return cy.request({
 			method: 'POST',
-			url: 'index.php/publicknowledge/stats/reports/report?pluginName=ReviewersControlReportReportPlugin',
+			url: '/index.php/publicknowledge/en/stats/reports/report?pluginName=ReviewersControlReportReportPlugin',
 			form: true,
 			body: {
 				csrfToken: csrfToken,

@@ -1,5 +1,7 @@
 <?php
 
+namespace APP\plugins\generic\reviewersControlReport\classes;
+
 class RCRCompletedReview
 {
     private $reviewerId;

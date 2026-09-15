@@ -8,7 +8,7 @@ This plugin provides a web page with a reviewers control report for the journal,
 
 The latest release of this plugin is compatible with the following PKP applications:
 
-* OJS 3.3.0
+* OJS 3.5.x
 
 ## Installation
 

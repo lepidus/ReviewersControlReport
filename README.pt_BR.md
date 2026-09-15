@@ -8,7 +8,7 @@ Este plugin disponibiliza uma página com um relatório de controle dos avaliado
 
 A versão mais recente deste plugin é compatível com as seguintes aplicações da PKP:
 
-* OJS 3.3.0
+* OJS 3.5.x
 
 ## Instalação
 
