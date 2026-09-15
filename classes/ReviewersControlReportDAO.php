@@ -78,7 +78,12 @@ class ReviewersControlReportDAO
         return $reviewers;
     }
 
-    /** @return list<list<string>> */
+    /**
+     * The expandable rows the grid shows under a reviewer: one submission
+     * title, linked to its workflow, plus the date the review was completed.
+     *
+     * @return list<list<string>>
+     */
     private function getReviewsGridCells(array $completedReviews): array
     {
         $gridCells = [];
@@ -87,7 +92,7 @@ class ReviewersControlReportDAO
             $submissionUrl = $this->getSubmissionWorkflowUrl($completedReview->getSubmissionId());
             $escapedUrl = htmlspecialchars($submissionUrl, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
             $escapedTitle = htmlspecialchars(
-                $this->formatStringLength($completedReview->getSubmissionTitle(), 40),
+                $this->formatStringLength($this->getPlainTextTitle($completedReview->getSubmissionTitle()), 40),
                 ENT_QUOTES | ENT_SUBSTITUTE,
                 'UTF-8'
             );
@@ -99,6 +104,15 @@ class ReviewersControlReportDAO
         }
 
         return $gridCells;
+    }
+
+    /**
+     * Titles may carry inline markup such as <i>, which the grid shows as
+     * plain text: truncating markup could leave a tag open.
+     */
+    private function getPlainTextTitle(string $title): string
+    {
+        return html_entity_decode(strip_tags($title), ENT_QUOTES | ENT_HTML5, 'UTF-8');
     }
 
     /**
