@@ -1,15 +1,15 @@
 <?php
 
-import('lib.pkp.classes.db.DAO');
-import('plugins.generic.reviewersControlReport.classes.traits.RCRSubmissionUrl');
-import('plugins.generic.reviewersControlReport.classes.traits.RCRStringLength');
-import('plugins.generic.reviewersControlReport.classes.RCRReviewerDTO');
-import('plugins.generic.reviewersControlReport.classes.RCRClosedDateInterval');
-import('plugins.generic.reviewersControlReport.classes.RCRCompletedReview');
-import('plugins.generic.reviewersControlReport.classes.RCRReviewsSummary');
+namespace APP\plugins\generic\reviewersControlReport\classes;
 
-use Illuminate\Database\Capsule\Manager as Capsule;
-use Illuminate\Support\Collection;
+use APP\facades\Repo;
+use APP\plugins\generic\reviewersControlReport\classes\traits\RCRStringLength;
+use APP\plugins\generic\reviewersControlReport\classes\traits\RCRSubmissionUrl;
+use PKP\db\DAO;
+use PKP\core\VirtualArrayIterator;
+use PKP\facades\Locale;
+use PKP\security\Role;
+use PKP\user\Collector;
 
 /** @class */
 class ReviewersControlReportDAO extends DAO
@@ -17,110 +17,59 @@ class ReviewersControlReportDAO extends DAO
     use RCRSubmissionUrl;
     use RCRStringLength;
 
-    public $userDao;
     private $contextId;
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->userDao = DAORegistry::getDAO('UserDAO');
-    }
 
     public function getReviewersIds($journalId)
     {
-        $roleDao = DAORegistry::getDAO('RoleDAO'); /* @var $roleDao RoleDAO */
-
-        $reviewers = $roleDao
-            ->getUsersByRoleId(ROLE_ID_REVIEWER, $journalId)
-            ->toAssociativeArray();
-        $allUserReviewersIds = array_keys($reviewers);
-
-        return $allUserReviewersIds;
+        return Repo::user()->getCollector()
+            ->filterByStatus(Collector::STATUS_ALL)
+            ->filterByRoleIds([Role::ROLE_ID_REVIEWER])
+            ->filterByContextIds([(int) $journalId])
+            ->getIds()
+            ->all();
     }
 
-    public function getReviewers($contextId = null, $searchType = null, $search = null, $searchMatch = null, $dbResultRange = null)
+    public function getReviewers($contextId, $rangeInfo = null)
     {
-        $this->contextId = $contextId;
-        $paramArray = array(ASSOC_TYPE_USER, 'interest', IDENTITY_SETTING_GIVENNAME, IDENTITY_SETTING_FAMILYNAME);
-        $paramArray = array_merge($paramArray, $this->userDao->getFetchParameters());
-        $roleId = ROLE_ID_REVIEWER;
-        $paramArray[] = (int) $roleId;
-        if (isset($contextId)) {
-            $paramArray[] = (int) $contextId;
-        }
-        if ($contextId === null && $roleId === null) {
-            return null;
+        $this->contextId = (int) $contextId;
+        $collector = Repo::user()->getCollector()
+            ->filterByStatus(Collector::STATUS_ALL)
+            ->filterByRoleIds([Role::ROLE_ID_REVIEWER])
+            ->filterByContextIds([$this->contextId])
+            ->orderBy(Collector::ORDERBY_FAMILYNAME, Collector::ORDER_DIR_ASC, [Locale::getLocale()]);
+
+        $totalCount = $collector->getCount();
+        if ($rangeInfo) {
+            $collector
+                ->limit($rangeInfo->getCount())
+                ->offset($rangeInfo->getOffset() + max(0, $rangeInfo->getPage() - 1) * $rangeInfo->getCount());
         }
 
-        $searchSql = '';
+        $reviewers = [];
+        foreach ($collector->getMany() as $user) {
+            $reviewers[$user->getId()] = $this->createReviewer($user);
+        }
 
-        $searchTypeMap = array(
-            IDENTITY_SETTING_GIVENNAME => 'usgs.setting_value',
-            IDENTITY_SETTING_FAMILYNAME => 'usfs.setting_value',
-            USER_FIELD_USERNAME => 'u.username',
-            USER_FIELD_EMAIL => 'u.email',
-            USER_FIELD_INTERESTS => 'cves.setting_value'
+        if (!$rangeInfo) {
+            return $reviewers;
+        }
+
+        return new VirtualArrayIterator(
+            $reviewers,
+            $totalCount,
+            $rangeInfo->getPage(),
+            $rangeInfo->getCount()
         );
-
-        if (!empty($search) && isset($searchTypeMap[$searchType])) {
-            $fieldName = $searchTypeMap[$searchType];
-            switch ($searchMatch) {
-                case 'is':
-                    $searchSql = "AND LOWER($fieldName) = LOWER(?)";
-                    $paramArray[] = $search;
-                    break;
-                case 'contains':
-                    $searchSql = "AND LOWER($fieldName) LIKE LOWER(?)";
-                    $paramArray[] = '%' . $search . '%';
-                    break;
-                case 'startsWith':
-                    $searchSql = "AND LOWER($fieldName) LIKE LOWER(?)";
-                    $paramArray[] = $search . '%';
-                    break;
-            }
-        } elseif (!empty($search)) {
-            switch ($searchType) {
-                case USER_FIELD_USERID:
-                    $searchSql = 'AND u.user_id=?';
-                    $paramArray[] = $search;
-                    break;
-            }
-        }
-
-        $searchSql .= ' ' . $this->userDao->getOrderBy();
-
-        $sql = 'SELECT DISTINCT u.*,
-        ' . $this->userDao->getFetchColumns() . '
-        FROM users AS u
-        LEFT JOIN user_user_groups uug ON (uug.user_id = u.user_id)
-        LEFT JOIN user_groups ug ON (ug.user_group_id = uug.user_group_id)
-        LEFT JOIN controlled_vocabs cv ON (cv.assoc_type = ? AND cv.assoc_id = u.user_id AND cv.symbolic = ?)
-        LEFT JOIN user_settings usgs ON (usgs.user_id = u.user_id AND usgs.setting_name = ?)
-        LEFT JOIN user_settings usfs ON (usfs.user_id = u.user_id AND usfs.setting_name = ?)
-        LEFT JOIN controlled_vocab_entries cve ON (cve.controlled_vocab_id = cv.controlled_vocab_id)
-        LEFT JOIN controlled_vocab_entry_settings cves ON (cves.controlled_vocab_entry_id = cve.controlled_vocab_entry_id)
-        ' . $this->userDao->getFetchJoins() . '
-        WHERE 1=1 AND ug.role_id = ?' . (isset($contextId) ? ' AND ug.context_id = ?' : '') . ' ' . $searchSql;
-        $result = $this->retrieveRange(
-            $sql,
-            $paramArray,
-            $dbResultRange
-        );
-
-        return new DAOResultFactory($result, $this, 'returnReviewerFromRow', [], $sql, $paramArray, $dbResultRange);
     }
 
     public function getReviewerUser($reviewerId)
     {
-        $userDao = DAORegistry::getDAO('UserDAO'); /* @var $userDao UserDAO */
-        $user = $userDao->getById($reviewerId);
-        return $user;
+        return Repo::user()->get((int) $reviewerId);
     }
 
-    public function returnReviewerFromRow($row)
+    private function createReviewer($reviewerUser): RCRReviewerDTO
     {
-        $reviewerUser = $this->getReviewerUser($row['user_id']);
-        $completedReviews = $this->getCompletedReviews($this->contextId, null, $row['user_id']);
+        $completedReviews = $this->getCompletedReviews($this->contextId, null, $reviewerUser->getId());
         $reviewsSummary = new RCRReviewsSummary($completedReviews);
 
         $reviewer = new RCRReviewerDTO(
@@ -145,17 +94,30 @@ class ReviewersControlReportDAO extends DAO
         $gridCells = [];
 
         foreach ($completedReviews as $completedReview) {
-            $submissionUrl = $this->getSubmissionWorkflowUrl(
+            $submissionUrl = htmlspecialchars($this->getSubmissionWorkflowUrl(
                 $completedReview->getSubmissionId(),
                 $completedReview->getSubmissionStageId()
+            ), ENT_QUOTES, 'UTF-8');
+            $submissionTitle = htmlspecialchars(
+                $this->formatStringLength($this->getPlainTextTitle($completedReview->getSubmissionTitle()), 40),
+                ENT_QUOTES,
+                'UTF-8'
             );
-            $submissionTitle = $this->formatStringLength($completedReview->getSubmissionTitle(), 40);
             $dateCompleted = date('Y-m-d', strtotime($completedReview->getDateCompleted()));
 
-            $gridCells[] = ["<td style='width: 200pt;' colspan='2'><a href=" . $submissionUrl . ">" . $submissionTitle . "</a></td><td colspan='2'>" . __('common.completed.date', ['dateCompleted' => $dateCompleted]) . "</td>"];
+            $gridCells[] = ["<td style='width: 200pt;' colspan='2'><a href=\"" . $submissionUrl . "\">" . $submissionTitle . "</a></td><td colspan='2'>" . __('common.completed.date', ['dateCompleted' => $dateCompleted]) . "</td>"];
         }
 
         return $gridCells;
+    }
+
+    /**
+     * Titles may carry inline markup such as <i>, which the grid shows as
+     * plain text: truncating markup could leave a tag open.
+     */
+    private function getPlainTextTitle(string $title): string
+    {
+        return html_entity_decode(strip_tags($title), ENT_QUOTES | ENT_HTML5, 'UTF-8');
     }
 
     /**
@@ -246,7 +208,7 @@ class ReviewersControlReportDAO extends DAO
             $submissionLocales[$row['submission_id']] = $row['submission_locale'];
         }
 
-        $currentLocale = AppLocale::getLocale();
+        $currentLocale = Locale::getLocale();
         $titles = [];
         foreach ($titlesByLocale as $submissionId => $localizedTitles) {
             $titles[$submissionId] = $localizedTitles[$currentLocale]

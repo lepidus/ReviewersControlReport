@@ -1,7 +1,9 @@
 <?php
 
-import('lib.pkp.classes.linkAction.request.AjaxModal');
-import('plugins.generic.reviewersControlReport.classes.traits.RCRStringLength');
+namespace APP\plugins\generic\reviewersControlReport\classes;
+
+use APP\plugins\generic\reviewersControlReport\classes\traits\RCRStringLength;
+use PKP\core\DataObject;
 
 class RCRReviewerDTO extends DataObject
 {

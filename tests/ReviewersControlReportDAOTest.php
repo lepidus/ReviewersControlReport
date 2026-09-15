@@ -1,21 +1,29 @@
 <?php
 
-import('lib.pkp.tests.DatabaseTestCase');
-import('classes.submission.Submission');
-import('classes.publication.Publication');
-import('lib.pkp.classes.user.User');
-import('lib.pkp.classes.submission.reviewAssignment.ReviewAssignment');
-import('plugins.generic.reviewersControlReport.classes.RCRClosedDateInterval');
-import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportDAO');
+use APP\facades\Repo;
+use APP\core\Application;
+use APP\core\PageRouter;
+use APP\journal\Journal;
+use APP\plugins\generic\reviewersControlReport\classes\RCRClosedDateInterval;
+use APP\plugins\generic\reviewersControlReport\classes\ReviewersControlReportDAO;
+use APP\publication\Publication;
+use APP\submission\Submission;
+use Illuminate\Support\Facades\DB;
+use PKP\db\DAORegistry;
+use PKP\db\DBResultRange;
+use PKP\security\Role;
+use PKP\submission\reviewAssignment\ReviewAssignment;
+use PKP\tests\DatabaseTestCase;
+use PKP\user\User;
 
 class ReviewersControlReportDAOTest extends DatabaseTestCase
 {
     private $dao;
-    private $locale = 'en_US';
+    private $locale = 'en';
     // Context ids of their own, so the reviews seeded in the test database
     // (all under journal 1) do not leak into the assertions
-    private $contextId = 9001;
-    private $otherContextId = 9002;
+    private $contextId;
+    private $otherContextId;
     private $reviewerId;
     private $submissionOfContext;
     private $submissionOfOtherContext;
@@ -23,7 +31,14 @@ class ReviewersControlReportDAOTest extends DatabaseTestCase
     public function setUp(): void
     {
         parent::setUp();
+        $request = Application::get()->getRequest();
+        if (is_null($request->getRouter())) {
+            $request->setRouter(new PageRouter());
+        }
+        DB::beginTransaction();
         $this->dao = new ReviewersControlReportDAO();
+        $this->contextId = $this->createContext('reviewers-report-primary');
+        $this->otherContextId = $this->createContext('reviewers-report-other');
         $this->reviewerId = $this->createReviewer();
         $this->submissionOfContext = $this->createSubmission($this->contextId, 'Central do Brasil');
         $this->submissionOfOtherContext = $this->createSubmission($this->otherContextId, 'Cidade de Deus');
@@ -31,37 +46,55 @@ class ReviewersControlReportDAOTest extends DatabaseTestCase
 
     protected function getAffectedTables()
     {
-        return ['submissions', 'submission_settings', 'publications', 'publication_settings',
-            'review_assignments', 'review_rounds', 'users', 'user_settings'];
+        return [];
+    }
+
+    protected function tearDown(): void
+    {
+        DB::rollBack();
+        parent::tearDown();
+    }
+
+    private function createContext(string $path): int
+    {
+        $journal = new Journal();
+        $journal->setPath(substr($path, 0, 4) . uniqid());
+        $journal->setPrimaryLocale($this->locale);
+        $journal->setEnabled(true);
+        $journal->setSequence(1);
+        $journal->setName($path, $this->locale);
+
+        return DAORegistry::getDAO('JournalDAO')->insertObject($journal);
     }
 
     private function createReviewer(): int
     {
+        $suffix = uniqid();
         $user = new User();
-        $user->setData('givenName', [$this->locale => 'Walter']);
-        $user->setData('familyName', [$this->locale => 'Salles']);
-        $user->setData('email', 'walter.salles@ancine.com.br');
-        $user->setData('username', 'walter.salles');
-        $user->setData('password', 'walter.salles');
+        $user->setGivenName('Walter', $this->locale);
+        $user->setFamilyName('Salles', $this->locale);
+        $user->setEmail('rcr.' . $suffix . '@example.test');
+        $user->setUsername('rcr' . $suffix);
+        $user->setPassword('walter.salles');
+        $user->setDateRegistered('2026-01-01 00:00:00');
 
-        return DAORegistry::getDAO('UserDAO')->insertObject($user);
+        return Repo::user()->add($user);
     }
 
     private function createSubmission($contextId, $title): int
     {
         $submission = new Submission();
         $submission->setData('contextId', $contextId);
-        $submission->setData('status', STATUS_QUEUED);
+        $submission->setData('status', Submission::STATUS_QUEUED);
         $submission->setData('locale', $this->locale);
-        $submissionId = DAORegistry::getDAO('SubmissionDAO')->insertObject($submission);
+        $submissionId = Repo::submission()->dao->insert($submission);
 
         $publication = new Publication();
         $publication->setData('submissionId', $submissionId);
         $publication->setData('title', $title, $this->locale);
-        $publicationId = DAORegistry::getDAO('PublicationDAO')->insertObject($publication);
+        $publicationId = Repo::publication()->add($publication);
 
-        $submission->setData('currentPublicationId', $publicationId);
-        DAORegistry::getDAO('SubmissionDAO')->updateObject($submission);
+        Repo::submission()->edit($submission, ['currentPublicationId' => $publicationId]);
 
         return $submissionId;
     }
@@ -79,10 +112,13 @@ class ReviewersControlReportDAOTest extends DatabaseTestCase
         $reviewAssignment->setStageId(WORKFLOW_STAGE_ID_EXTERNAL_REVIEW);
         $reviewAssignment->setRound(1);
         $reviewAssignment->setDateAssigned('2026-01-02 10:00:00');
+        $reviewAssignment->setDateResponseDue('2026-01-10 00:00:00');
         $reviewAssignment->setDateDue('2026-01-20 00:00:00');
         $reviewAssignment->setDateCompleted($dateCompleted);
         $reviewAssignment->setQuality($overrides['quality'] ?? 4);
-        $reviewAssignment->setRecommendation($overrides['recommendation'] ?? SUBMISSION_REVIEWER_RECOMMENDATION_ACCEPT);
+        $reviewAssignment->setRecommendation(
+            $overrides['recommendation'] ?? ReviewAssignment::SUBMISSION_REVIEWER_RECOMMENDATION_ACCEPT
+        );
         $reviewAssignment->setDeclined($overrides['declined'] ?? 0);
         $reviewAssignment->setCancelled($overrides['cancelled'] ?? 0);
 
@@ -97,6 +133,36 @@ class ReviewersControlReportDAOTest extends DatabaseTestCase
         $completedReviews = $this->dao->getCompletedReviews($this->contextId, null);
 
         $this->assertCount(2, $completedReviews);
+    }
+
+    public function testDisabledReviewersRemainInReportAndPaginatedGrid()
+    {
+        $group = Repo::userGroup()->newDataObject([
+            'contextId' => $this->contextId,
+            'roleId' => Role::ROLE_ID_REVIEWER,
+            'name' => [$this->locale => 'Reviewers'],
+            'abbrev' => [$this->locale => 'R'],
+        ]);
+        $groupId = Repo::userGroup()->add($group);
+        Repo::userGroup()->assignUserToGroup($this->reviewerId, $groupId);
+        $reviewer = Repo::user()->get($this->reviewerId);
+        Repo::user()->edit($reviewer, ['disabled' => true]);
+        $activeReviewerId = $this->createReviewer();
+        Repo::userGroup()->assignUserToGroup($activeReviewerId, $groupId);
+        Repo::user()->edit(Repo::user()->get($activeReviewerId), [
+            'familyName' => [$this->locale => 'Zulu'],
+        ]);
+
+        $this->assertContains($this->reviewerId, $this->dao->getReviewersIds($this->contextId));
+        $grid = $this->dao->getReviewers($this->contextId, new DBResultRange(1, 1));
+        $this->assertSame(2, $grid->getCount());
+        $this->assertArrayHasKey($this->reviewerId, $grid->toArray());
+        $this->assertCount(1, $grid->toArray());
+        $secondPage = $this->dao->getReviewers($this->contextId, new DBResultRange(1, 2));
+        $this->assertSame(2, $secondPage->getPage());
+        $this->assertArrayHasKey($activeReviewerId, $secondPage->toArray());
+        $this->assertCount(1, $secondPage->toArray());
+        $this->assertSame([], $this->dao->getReviewersIds($this->otherContextId));
     }
 
     public function testDoesNotReturnReviewsOfAnotherContext()
@@ -156,7 +222,10 @@ class ReviewersControlReportDAOTest extends DatabaseTestCase
         $this->assertEquals(1, $completedReview->getRound());
         $this->assertEquals('2026-01-02 10:00:00', $completedReview->getDateAssigned());
         $this->assertEquals('2026-01-20 00:00:00', $completedReview->getDateDue());
-        $this->assertEquals(SUBMISSION_REVIEWER_RECOMMENDATION_ACCEPT, $completedReview->getRecommendation());
+        $this->assertEquals(
+            ReviewAssignment::SUBMISSION_REVIEWER_RECOMMENDATION_ACCEPT,
+            $completedReview->getRecommendation()
+        );
         $this->assertEquals(4, $completedReview->getQuality());
     }
 }

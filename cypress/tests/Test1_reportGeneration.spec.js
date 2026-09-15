@@ -5,9 +5,8 @@ import '../support/commands';
 // (push, trim, match, padStart) breaks the bundling of the entire spec before
 // a single test runs.
 //
-// The report is requested rather than downloaded by clicking: the Cypress 5.6
-// that OJS 3.3 pins has no downloads folder, so a file saved by the browser
-// cannot be read back.
+// The report is requested rather than downloaded by clicking so the response
+// headers and CSV body can be asserted directly.
 describe('Reviewers Control Report - Report generation', function() {
 	const reviewsHeader = '"Submission ID","Submission Title","Review Round",Reviewer,Email,Affiliation,"Date Assigned","Date Due","Date Completed",Recommendation,"Quality Rating"';
 	const reviewersHeader = '"Quality Average","Completed Reviews","Reviewed Submissions (Titles)"';

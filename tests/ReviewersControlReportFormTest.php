@@ -1,14 +1,19 @@
 <?php
 
-import('lib.pkp.tests.DatabaseTestCase');
-import('lib.pkp.classes.user.User');
-import('plugins.generic.reviewersControlReport.classes.RCRCompletedReview');
-import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportForm');
+use APP\facades\Repo;
+use APP\core\Application;
+use APP\core\PageRouter;
+use APP\plugins\generic\reviewersControlReport\classes\RCRCompletedReview;
+use APP\plugins\generic\reviewersControlReport\classes\ReviewersControlReportForm;
+use Illuminate\Support\Facades\DB;
+use PKP\submission\reviewAssignment\ReviewAssignment;
+use PKP\tests\DatabaseTestCase;
+use PKP\user\User;
 
 class ReviewersControlReportFormTest extends DatabaseTestCase
 {
     private $reviewerId;
-    private $locale = 'en_US';
+    private $locale = 'en';
     private $givenName = 'Walter';
     private $familyName = 'Salles';
     private $username = 'walter.salles';
@@ -18,25 +23,40 @@ class ReviewersControlReportFormTest extends DatabaseTestCase
     public function setUp(): void
     {
         parent::setUp();
+        $request = Application::get()->getRequest();
+        if (is_null($request->getRouter())) {
+            $request->setRouter(new PageRouter());
+        }
+        DB::beginTransaction();
         $this->reviewerId = $this->createUser();
     }
 
     protected function getAffectedTables()
     {
-        return ['users', 'user_settings'];
+        return [];
+    }
+
+    protected function tearDown(): void
+    {
+        DB::rollBack();
+        parent::tearDown();
     }
 
     private function createUser()
     {
+        $suffix = uniqid();
+        $this->username = 'rcr' . $suffix;
+        $this->email = 'rcr.' . $suffix . '@example.test';
         $user = new User();
-        $user->setData('givenName', [$this->locale => $this->givenName]);
-        $user->setData('familyName', [$this->locale => $this->familyName]);
-        $user->setData('affiliation', [$this->locale => $this->affiliation]);
-        $user->setData('email', $this->email);
-        $user->setData('username', $this->username);
-        $user->setData('password', $this->username);
+        $user->setGivenName($this->givenName, $this->locale);
+        $user->setFamilyName($this->familyName, $this->locale);
+        $user->setAffiliation($this->affiliation, $this->locale);
+        $user->setEmail($this->email);
+        $user->setUsername($this->username);
+        $user->setPassword($this->username);
+        $user->setDateRegistered('2026-01-01 00:00:00');
 
-        return DAORegistry::getDAO('UserDAO')->insertObject($user);
+        return Repo::user()->add($user);
     }
 
     public function testGetsPersonalDataOfTheReviewersOfTheGivenReviews()
@@ -50,7 +70,7 @@ class ReviewersControlReportFormTest extends DatabaseTestCase
             '2026-01-02 10:00:00',
             '2026-01-20 00:00:00',
             '2026-01-15 14:32:00',
-            SUBMISSION_REVIEWER_RECOMMENDATION_ACCEPT,
+            ReviewAssignment::SUBMISSION_REVIEWER_RECOMMENDATION_ACCEPT,
             4
         );
 

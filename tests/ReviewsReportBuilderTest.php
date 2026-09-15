@@ -1,8 +1,10 @@
 <?php
 
-import('lib.pkp.tests.PKPTestCase');
-import('plugins.generic.reviewersControlReport.classes.RCRCompletedReview');
-import('plugins.generic.reviewersControlReport.classes.ReviewsReportBuilder');
+use APP\plugins\generic\reviewersControlReport\classes\RCRCompletedReview;
+use APP\plugins\generic\reviewersControlReport\classes\ReviewsReportBuilder;
+use PKP\facades\Locale;
+use PKP\submission\reviewAssignment\ReviewAssignment;
+use PKP\tests\PKPTestCase;
 
 class ReviewsReportBuilderTest extends PKPTestCase
 {
@@ -15,6 +17,7 @@ class ReviewsReportBuilderTest extends PKPTestCase
     public function setUp(): void
     {
         parent::setUp();
+        Locale::registerPath(dirname(__DIR__) . '/locale');
         $this->builder = new ReviewsReportBuilder();
     }
 
@@ -27,7 +30,7 @@ class ReviewsReportBuilderTest extends PKPTestCase
             'dateAssigned' => '2026-01-02 10:00:00',
             'dateDue' => '2026-01-20 00:00:00',
             'dateCompleted' => '2026-01-15 14:32:00',
-            'recommendation' => SUBMISSION_REVIEWER_RECOMMENDATION_ACCEPT,
+            'recommendation' => ReviewAssignment::SUBMISSION_REVIEWER_RECOMMENDATION_ACCEPT,
             'quality' => 4,
         ], $overrides);
 

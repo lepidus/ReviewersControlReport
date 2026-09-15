@@ -1,19 +1,28 @@
 <?php
 
-import('lib.pkp.classes.controllers.grid.GridHandler');
-import('plugins.generic.reviewersControlReport.controllers.grid.ReviewersGridCellProvider');
-import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportDAO');
+namespace APP\plugins\generic\reviewersControlReport\controllers\grid;
+
+use APP\plugins\generic\reviewersControlReport\classes\ReviewersControlReportDAO;
+use APP\plugins\generic\reviewersControlReport\ReviewersControlReportPlugin;
+use PKP\controllers\grid\feature\PagingFeature;
+use PKP\controllers\grid\GridColumn;
+use PKP\controllers\grid\GridHandler;
+use PKP\i18n\PKPLocale;
+use PKP\security\authorization\ContextAccessPolicy;
+use PKP\security\Role;
 
 class ReviewersGridHandler extends GridHandler
 {
     private $contextId;
+    private $plugin;
 
-    public function __construct()
+    public function __construct(ReviewersControlReportPlugin $plugin)
     {
         parent::__construct();
+        $this->plugin = $plugin;
 
         $this->addRoleAssignment(
-            array(ROLE_ID_MANAGER),
+            [Role::ROLE_ID_SITE_ADMIN, Role::ROLE_ID_MANAGER, Role::ROLE_ID_SUB_EDITOR],
             array(
                 'fetchGrid',
                 'fetchCategory',
@@ -24,7 +33,6 @@ class ReviewersGridHandler extends GridHandler
 
     public function authorize($request, &$args, $roleAssignments)
     {
-        import('lib.pkp.classes.security.authorization.ContextAccessPolicy');
         $this->addPolicy(new ContextAccessPolicy($request, $roleAssignments));
 
         return parent::authorize($request, $args, $roleAssignments);
@@ -37,7 +45,7 @@ class ReviewersGridHandler extends GridHandler
         $context = $request->getContext();
         $this->contextId = $context->getId();
 
-        AppLocale::requireComponents(
+        PKPLocale::requireComponents(
             LOCALE_COMPONENT_PKP_USER,
             LOCALE_COMPONENT_PKP_MANAGER,
             LOCALE_COMPONENT_APP_MANAGER,
@@ -74,22 +82,19 @@ class ReviewersGridHandler extends GridHandler
     {
         $contextId = $this->getContextId();
         $rangeInfo = $this->getGridRangeInfo($request, $this->getId());
-
         $reviewersControlReportDAO = new ReviewersControlReportDAO();
-        $reviewers = $reviewersControlReportDAO->getReviewers($contextId, null, null, null, $rangeInfo);
+        $reviewers = $reviewersControlReportDAO->getReviewers($contextId, $rangeInfo);
         return $reviewers;
     }
 
     protected function getRowInstance()
     {
-        import('plugins.generic.reviewersControlReport.controllers.grid.ReviewersGridRow');
-        return new ReviewersGridRow();
+        return new ReviewersGridRow($this->plugin);
     }
 
     public function initFeatures($request, $args)
     {
-        import('lib.pkp.classes.controllers.grid.feature.PagingFeature');
-        return array(new PagingFeature());
+        return [new PagingFeature()];
     }
 
     private function getContextId()
