@@ -10,6 +10,8 @@ The latest release of this plugin is compatible with the following PKP applicati
 
 * OJS 3.5.x
 
+For OJS 3.4 and 3.3, use the `stable-3_4_0` and `stable-3_3_0` branches, respectively.
+
 ## Installation
 
 1. Install the plugin using the latest Package available for the application you are using.

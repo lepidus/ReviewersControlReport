@@ -10,6 +10,8 @@ A versão mais recente deste plugin é compatível com as seguintes aplicações
 
 * OJS 3.5.x
 
+Para o OJS 3.4 e 3.3, use os ramos `stable-3_4_0` e `stable-3_3_0`, respectivamente.
+
 ## Instalação
 
 1. Instale o plugin usando o Pacote mais recente disponível para a aplicação que você utiliza.

@@ -10,6 +10,8 @@ La versión más reciente de este módulo es compatible con las siguientes aplic
 
 * OJS 3.5.x
 
+Para OJS 3.4 y 3.3, utilice las ramas `stable-3_4_0` y `stable-3_3_0`, respectivamente.
+
 ## Instalación
 
 1. Instale el módulo usando el Paquete más reciente disponible para la aplicación que utiliza.
