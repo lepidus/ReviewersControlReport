@@ -113,7 +113,7 @@ class ReviewersControlReportFormTest extends ReviewersControlReportTestCase
         $this->assertContains($this->reviewerId, $dao->getReviewersIds(1));
         $this->assertArrayHasKey($this->reviewerId, $dao->getReviewers(1));
 
-        $firstPage = $dao->getReviewers(1, null, null, null, new DBResultRange(1, 1));
+        $firstPage = $dao->getReviewers(1, new DBResultRange(1, 1));
         $this->assertCount(1, $firstPage->toArray());
         $this->assertGreaterThanOrEqual(1, $firstPage->getCount());
     }

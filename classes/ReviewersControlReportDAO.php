@@ -27,13 +27,8 @@ class ReviewersControlReportDAO
             ->all();
     }
 
-    public function getReviewers(
-        ?int $contextId = null,
-        $searchType = null,
-        $search = null,
-        $searchMatch = null,
-        ?DBResultRange $dbResultRange = null
-    ) {
+    public function getReviewers(?int $contextId = null, ?DBResultRange $dbResultRange = null)
+    {
         if ($contextId === null) {
             return [];
         }
@@ -44,10 +39,6 @@ class ReviewersControlReportDAO
             ->filterByRoleIds([Role::ROLE_ID_REVIEWER])
             ->filterByStatus(UserCollector::STATUS_ALL)
             ->orderBy(UserCollector::ORDERBY_FAMILYNAME, UserCollector::ORDER_DIR_ASC);
-
-        if (is_string($search) && trim($search) !== '') {
-            $collector->searchPhrase($search);
-        }
 
         $totalCount = $collector->getCount();
         if ($dbResultRange?->isValid()) {
