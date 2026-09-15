@@ -41,7 +41,7 @@
 
 		<td{if $col_class} class="{$col_class}" {/if}>
 			{if ($row->hasActions() || $row->getReviews()) && $column->hasFlag('firstColumn')}
-				{if $row->getReviews()}
+				{if $row->getReviews() || $row->getActions(PKP\controllers\grid\GridHandler::GRID_ACTION_POSITION_DEFAULT)}
 					<a href="#" class="show_extras">
 						<span class="pkp_screen_reader">{translate key="grid.settings"}</span>
 					</a>
