@@ -139,7 +139,15 @@ class ReviewersControlReportDAO
         );
     }
 
-    /** @return list<RCRCompletedReview> */
+    /**
+     * Completed reviews of a context: everything the reports and the grid
+     * summarize. Equivalent to filtering review assignments by the statuses
+     * RECEIVED, COMPLETE and THANKED, but without going through
+     * ReviewAssignment::getStatus(), whose isRead() check costs several
+     * queries per assignment.
+     *
+     * @return list<RCRCompletedReview>
+     */
     public function getCompletedReviews(int $contextId, ?RCRClosedDateInterval $interval = null, ?int $reviewerId = null): array
     {
         $query = DB::table('review_assignments as ra')
@@ -173,23 +181,15 @@ class ReviewersControlReportDAO
             ]);
         }
 
-        $completedReviews = [];
-        foreach ($query->get() as $row) {
-            $submission = Repo::submission()->get((int) $row->submission_id);
-            if (!$submission) {
-                continue;
-            }
-            $publication = $submission->getCurrentPublication();
-            $localizedTitles = (array) ($publication?->getData('title') ?? []);
-            $title = $localizedTitles[Locale::getLocale()]
-                ?? $localizedTitles[$submission->getData('locale')]
-                ?? reset($localizedTitles)
-                ?: '';
+        $rows = $query->get();
+        $titles = $this->getSubmissionTitles($rows->pluck('submission_id')->all());
 
+        $completedReviews = [];
+        foreach ($rows as $row) {
             $completedReviews[] = new RCRCompletedReview(
                 $row->reviewer_id,
                 $row->submission_id,
-                $title,
+                $titles[$row->submission_id] ?? '',
                 $row->round,
                 $row->date_assigned,
                 $row->date_due,
@@ -201,5 +201,44 @@ class ReviewersControlReportDAO
         }
 
         return $completedReviews;
+    }
+
+    /**
+     * Titles of the current publication of each submission, in one query
+     * instead of one submission fetch per review.
+     */
+    private function getSubmissionTitles(array $submissionIds): array
+    {
+        $submissionIds = array_values(array_unique(array_map('intval', $submissionIds)));
+        if (empty($submissionIds)) {
+            return [];
+        }
+
+        $rows = DB::table('submissions as s')
+            ->join('publications as p', 'p.publication_id', '=', 's.current_publication_id')
+            ->join('publication_settings as ps', function ($join) {
+                $join->on('ps.publication_id', '=', 'p.publication_id')
+                    ->where('ps.setting_name', '=', 'title');
+            })
+            ->whereIn('s.submission_id', $submissionIds)
+            ->select(['s.submission_id', 's.locale as submission_locale', 'ps.locale', 'ps.setting_value'])
+            ->get();
+
+        $titlesByLocale = [];
+        $submissionLocales = [];
+        foreach ($rows as $row) {
+            $titlesByLocale[$row->submission_id][$row->locale] = $row->setting_value;
+            $submissionLocales[$row->submission_id] = $row->submission_locale;
+        }
+
+        $currentLocale = Locale::getLocale();
+        $titles = [];
+        foreach ($titlesByLocale as $submissionId => $localizedTitles) {
+            $titles[$submissionId] = $localizedTitles[$currentLocale]
+                ?? $localizedTitles[$submissionLocales[$submissionId]]
+                ?? reset($localizedTitles);
+        }
+
+        return $titles;
     }
 }

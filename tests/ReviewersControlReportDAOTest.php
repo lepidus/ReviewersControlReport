@@ -180,6 +180,24 @@ class ReviewersControlReportDAOTest extends ReviewersControlReportTestCase
         $this->assertCount(2, $completedReviews);
     }
 
+    public function testQueriesDoNotGrowWithTheNumberOfCompletedReviews()
+    {
+        $otherSubmission = $this->createSubmission($this->contextId, 'Ainda Estou Aqui');
+        $this->createReviewAssignment($this->submissionOfContext, '2026-01-15 14:32:00');
+        $this->createReviewAssignment($this->submissionOfContext, '2026-02-15 14:32:00');
+        $this->createReviewAssignment($otherSubmission, '2026-03-15 14:32:00');
+
+        DB::flushQueryLog();
+        DB::enableQueryLog();
+        $completedReviews = $this->dao->getCompletedReviews($this->contextId);
+        $queries = DB::getQueryLog();
+        DB::disableQueryLog();
+
+        $this->assertCount(3, $completedReviews);
+        $this->assertCount(2, $queries);
+        $this->assertEquals('Ainda Estou Aqui', $completedReviews[2]->getSubmissionTitle());
+    }
+
     public function testCompletedReviewCarriesTheDataTheReportNeeds()
     {
         $this->createReviewAssignment($this->submissionOfContext, '2026-01-15 14:32:00');
