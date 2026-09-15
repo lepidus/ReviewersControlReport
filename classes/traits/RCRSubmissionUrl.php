@@ -2,14 +2,23 @@
 
 namespace APP\plugins\generic\reviewersControlReport\classes\traits;
 
-use APP\facades\Repo;
+use APP\core\Application;
 
 trait RCRSubmissionUrl
 {
+    /**
+     * Only editorial roles see the grid, so every link goes to the editorial
+     * workflow, which enforces its own access. Resolving the URL by the roles
+     * of the user would cost several queries per listed review.
+     */
     public function getSubmissionWorkflowUrl($submissionId, $submissionStageId)
     {
-        $submission = Repo::submission()->get((int) $submissionId);
+        $request = Application::get()->getRequest();
+        $dispatcher = $request->getDispatcher();
+        if (!$dispatcher) {
+            return '';
+        }
 
-        return $submission ? Repo::submission()->getWorkflowUrlByUserRoles($submission) : '';
+        return $dispatcher->url($request, Application::ROUTE_PAGE, null, 'workflow', 'access', [(int) $submissionId]);
     }
 }
