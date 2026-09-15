@@ -1,11 +1,12 @@
 <?php
 
-import('lib.pkp.tests.PKPTestCase');
-import('lib.pkp.classes.submission.reviewAssignment.ReviewAssignment');
-import('plugins.generic.reviewersControlReport.classes.RCRCompletedReview');
-import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportDAO');
+use APP\plugins\generic\reviewersControlReport\classes\RCRCompletedReview;
+use APP\plugins\generic\reviewersControlReport\classes\ReviewersControlReportDAO;
+use PKP\submission\reviewAssignment\ReviewAssignment;
 
-class ReviewersGridContentSecurityTest extends PKPTestCase
+require_once __DIR__ . '/ReviewersControlReportTestCase.php';
+
+class ReviewersGridContentSecurityTest extends ReviewersControlReportTestCase
 {
     public function testSubmissionTitleAndWorkflowUrlAreEscapedInGridHtml()
     {
@@ -19,7 +20,7 @@ class ReviewersGridContentSecurityTest extends PKPTestCase
             '2026-01-02 10:00:00',
             '2026-01-20 00:00:00',
             '2026-01-15 14:32:00',
-            SUBMISSION_REVIEWER_RECOMMENDATION_ACCEPT,
+            ReviewAssignment::SUBMISSION_REVIEWER_RECOMMENDATION_ACCEPT,
             4
         );
 
@@ -32,16 +33,41 @@ class ReviewersGridContentSecurityTest extends PKPTestCase
             'href="https://example.test/workflow?value=&quot; onclick=&quot;alert(2)&amp;other=1"',
             $html
         );
-        $this->assertStringContainsString('&lt;img src=x onerror=alert(1)&gt;', $html);
         $this->assertStringNotContainsString('<img', $html);
+        $this->assertStringNotContainsString('onerror', $html);
+    }
+
+    public function testInlineMarkupOfSubmissionTitleIsShownAsPlainText()
+    {
+        $dao = new TestableReviewersControlReportDAO();
+        $dao->workflowUrl = 'https://example.test/workflow';
+        $completedReview = new RCRCompletedReview(
+            11,
+            100,
+            'The <i>Homo sapiens</i> &lt;script&gt; case',
+            1,
+            '2026-01-02 10:00:00',
+            '2026-01-20 00:00:00',
+            '2026-01-15 14:32:00',
+            ReviewAssignment::SUBMISSION_REVIEWER_RECOMMENDATION_ACCEPT,
+            4
+        );
+
+        $method = new ReflectionMethod($dao, 'getReviewsGridCells');
+        $method->setAccessible(true);
+        $html = $method->invoke($dao, [$completedReview])[0][0];
+
+        $this->assertStringContainsString('>The Homo sapiens &lt;script&gt; case</a>', $html);
+        $this->assertStringNotContainsString('<i>', $html);
+        $this->assertStringNotContainsString('<script>', $html);
     }
 }
 
 class TestableReviewersControlReportDAO extends ReviewersControlReportDAO
 {
-    public $workflowUrl;
+    public string $workflowUrl = '';
 
-    public function getSubmissionWorkflowUrl($submissionId, $submissionStageId)
+    protected function getSubmissionWorkflowUrl(int $submissionId): string
     {
         return $this->workflowUrl;
     }

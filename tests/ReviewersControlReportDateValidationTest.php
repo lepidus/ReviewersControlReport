@@ -1,13 +1,14 @@
 <?php
 
-import('lib.pkp.tests.PKPTestCase');
-import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportForm');
+use APP\plugins\generic\reviewersControlReport\classes\ReviewersControlReportForm;
+use PKP\form\Form;
 
-class ReviewersControlReportDateValidationTest extends PKPTestCase
+require_once __DIR__ . '/ReviewersControlReportTestCase.php';
+use PHPUnit\Framework\Attributes\DataProvider;
+
+class ReviewersControlReportDateValidationTest extends ReviewersControlReportTestCase
 {
-    /**
-     * @dataProvider invalidDateProvider
-     */
+    #[DataProvider('invalidDateProvider')]
     public function testMalformedNonexistentAndNonStringDatesBecomeFormErrors($field, $value)
     {
         $form = $this->createFormWithoutRequestValidators();
@@ -26,7 +27,7 @@ class ReviewersControlReportDateValidationTest extends PKPTestCase
         }
     }
 
-    public function invalidDateProvider(): array
+    public static function invalidDateProvider(): array
     {
         return [
             'malformed beginning date' => ['startDateInterval', 'not-a-date'],
@@ -40,10 +41,9 @@ class ReviewersControlReportDateValidationTest extends PKPTestCase
 
     public function testValidDatesStillBuildTheClosedInterval()
     {
-        $form = new ReviewersControlReportForm();
+        $form = new ReviewersControlReportForm(null, 'en', ['en']);
         $form->setData('startDateInterval', '2024-02-29');
         $form->setData('endDateInterval', '2026-12-31');
-
         $interval = $form->getDateInterval();
 
         $this->assertSame('2024-02-29 00:00:00', $interval->getBeginningDate());
@@ -52,22 +52,40 @@ class ReviewersControlReportDateValidationTest extends PKPTestCase
 
     public function testInvalidDateCannotBuildAnIntervalWhenCalledDirectly()
     {
-        $form = new ReviewersControlReportForm();
+        $form = new ReviewersControlReportForm(null, 'en', ['en']);
         $form->setData('startDateInterval', '2026-02-31');
         $form->setData('endDateInterval', '2026-12-31');
-
-        $this->expectException(InvalidArgumentException::class);
-
+        $this->expectException(\InvalidArgumentException::class);
         $form->getDateInterval();
     }
 
-    private function createFormWithoutRequestValidators(): ReviewersControlReportForm
+    public function testArrayReadFromRequestIsRejectedBeforeItIsCleanedForRedisplay()
     {
-        $form = new ReviewersControlReportForm();
+        $form = new class (null, 'en', ['en']) extends ReviewersControlReportForm {
+            public function readUserVars($vars)
+            {
+                $this->setData('reportType', self::REPORT_TYPE_REVIEWS);
+                $this->setData('startDateInterval', ['2026-01-01']);
+                $this->setData('endDateInterval', '');
+            }
+        };
         $checks = new ReflectionProperty(Form::class, '_checks');
         $checks->setAccessible(true);
         $checks->setValue($form, []);
 
+        $form->readInputData();
+        $this->assertIsArray($form->getData('startDateInterval'));
+        $this->assertFalse($form->validate(false));
+        $this->assertArrayHasKey('startDateInterval', $form->getErrorsArray());
+        $this->assertSame('', $form->getData('startDateInterval'));
+    }
+
+    private function createFormWithoutRequestValidators(): ReviewersControlReportForm
+    {
+        $form = new ReviewersControlReportForm(null, 'en', ['en']);
+        $checks = new ReflectionProperty(Form::class, '_checks');
+        $checks->setAccessible(true);
+        $checks->setValue($form, []);
         return $form;
     }
 }

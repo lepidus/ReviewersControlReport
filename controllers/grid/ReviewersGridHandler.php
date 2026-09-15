@@ -1,8 +1,14 @@
 <?php
 
-import('lib.pkp.classes.controllers.grid.GridHandler');
-import('plugins.generic.reviewersControlReport.controllers.grid.ReviewersGridCellProvider');
-import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportDAO');
+namespace APP\plugins\generic\reviewersControlReport\controllers\grid;
+
+use APP\core\Application;
+use APP\plugins\generic\reviewersControlReport\classes\ReviewersControlReportDAO;
+use PKP\controllers\grid\GridColumn;
+use PKP\controllers\grid\GridHandler;
+use PKP\controllers\grid\feature\PagingFeature;
+use PKP\security\authorization\ContextAccessPolicy;
+use PKP\security\Role;
 
 class ReviewersGridHandler extends GridHandler
 {
@@ -13,18 +19,17 @@ class ReviewersGridHandler extends GridHandler
         parent::__construct();
 
         $this->addRoleAssignment(
-            array(ROLE_ID_SITE_ADMIN, ROLE_ID_MANAGER, ROLE_ID_SUB_EDITOR),
-            array(
+            [Role::ROLE_ID_SITE_ADMIN, Role::ROLE_ID_MANAGER, Role::ROLE_ID_SUB_EDITOR],
+            [
                 'fetchGrid',
                 'fetchCategory',
                 'fetchRow',
-            )
+            ]
         );
     }
 
     public function authorize($request, &$args, $roleAssignments)
     {
-        import('lib.pkp.classes.security.authorization.ContextAccessPolicy');
         $this->addPolicy(new ContextAccessPolicy($request, $roleAssignments));
 
         return parent::authorize($request, $args, $roleAssignments);
@@ -36,13 +41,6 @@ class ReviewersGridHandler extends GridHandler
 
         $context = $request->getContext();
         $this->contextId = $context->getId();
-
-        AppLocale::requireComponents(
-            LOCALE_COMPONENT_PKP_USER,
-            LOCALE_COMPONENT_PKP_MANAGER,
-            LOCALE_COMPONENT_APP_MANAGER,
-            LOCALE_COMPONENT_PKP_SUBMISSION
-        );
 
         $this->setTitle('plugins.reports.reviewersControlReport.displayName');
 
@@ -76,30 +74,23 @@ class ReviewersGridHandler extends GridHandler
         $rangeInfo = $this->getGridRangeInfo($request, $this->getId());
 
         $reviewersControlReportDAO = new ReviewersControlReportDAO();
-        $reviewers = $reviewersControlReportDAO->getReviewers($contextId, null, null, null, $rangeInfo);
+        $reviewers = $reviewersControlReportDAO->getReviewers($contextId, $rangeInfo);
         return $reviewers;
     }
 
     protected function getRowInstance()
     {
-        import('plugins.generic.reviewersControlReport.controllers.grid.ReviewersGridRow');
-        $roles = (array) $this->getAuthorizedContextObject(ASSOC_TYPE_USER_ROLES);
-        return new ReviewersGridRow(self::canRolesEditUsers($roles));
-    }
-
-    /**
-     * Section editors can see the grid, but the core user grid only lets
-     * managers and site administrators edit users.
-     */
-    public static function canRolesEditUsers(array $roles): bool
-    {
-        return (bool) array_intersect([ROLE_ID_SITE_ADMIN, ROLE_ID_MANAGER], $roles);
+        $roles = (array) $this->getAuthorizedContextObject(Application::ASSOC_TYPE_USER_ROLES);
+        $canEditUsers = (bool) array_intersect(
+            [Role::ROLE_ID_SITE_ADMIN, Role::ROLE_ID_MANAGER],
+            $roles
+        );
+        return new ReviewersGridRow($canEditUsers);
     }
 
     public function initFeatures($request, $args)
     {
-        import('lib.pkp.classes.controllers.grid.feature.PagingFeature');
-        return array(new PagingFeature());
+        return [new PagingFeature()];
     }
 
     private function getContextId()
