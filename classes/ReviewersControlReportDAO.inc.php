@@ -145,14 +145,18 @@ class ReviewersControlReportDAO extends DAO
         $gridCells = [];
 
         foreach ($completedReviews as $completedReview) {
-            $submissionUrl = $this->getSubmissionWorkflowUrl(
+            $submissionUrl = htmlspecialchars($this->getSubmissionWorkflowUrl(
                 $completedReview->getSubmissionId(),
                 $completedReview->getSubmissionStageId()
+            ), ENT_QUOTES, 'UTF-8');
+            $submissionTitle = htmlspecialchars(
+                $this->formatStringLength($completedReview->getSubmissionTitle(), 40),
+                ENT_QUOTES,
+                'UTF-8'
             );
-            $submissionTitle = $this->formatStringLength($completedReview->getSubmissionTitle(), 40);
             $dateCompleted = date('Y-m-d', strtotime($completedReview->getDateCompleted()));
 
-            $gridCells[] = ["<td style='width: 200pt;' colspan='2'><a href=" . $submissionUrl . ">" . $submissionTitle . "</a></td><td colspan='2'>" . __('common.completed.date', ['dateCompleted' => $dateCompleted]) . "</td>"];
+            $gridCells[] = ["<td style='width: 200pt;' colspan='2'><a href=\"" . $submissionUrl . "\">" . $submissionTitle . "</a></td><td colspan='2'>" . __('common.completed.date', ['dateCompleted' => $dateCompleted]) . "</td>"];
         }
 
         return $gridCells;

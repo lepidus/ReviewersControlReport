@@ -6,9 +6,11 @@ Cypress.Commands.add('loginAsManager', () => {
 });
 
 Cypress.Commands.add('goToPluginsGrid', () => {
+	cy.server();
+	cy.route('GET', '**/grid/settings/plugins/settings-plugin-grid/fetch-grid*').as('pluginsGrid');
 	cy.visit('index.php/publicknowledge/management/settings/website');
 	cy.get('#plugins-button').should('be.visible').click();
-	cy.wait(2000); // The grid reloads its rows, detaching whatever was clicked too early
+	cy.wait('@pluginsGrid').its('status').should('eq', 200);
 });
 
 Cypress.Commands.add('goToReviewersControlReport', () => {

@@ -44,6 +44,22 @@ class ReviewersControlReportForm extends Form
     {
         $isValid = parent::validate($callHooks);
 
+        foreach (['startDateInterval', 'endDateInterval'] as $field) {
+            $date = $this->getData($field);
+            if (!$this->isValidDateInput($date)) {
+                if (!is_null($date) && !is_string($date)) {
+                    $this->setData($field, '');
+                }
+                $this->addError($field, __('plugins.reports.reviewersControlReport.warning.invalidDate'));
+                $this->addErrorField($field);
+                $isValid = false;
+            }
+        }
+
+        if (!$isValid) {
+            return false;
+        }
+
         $dateInterval = $this->getDateInterval();
         if (!is_null($dateInterval) && !$dateInterval->isValid()) {
             $this->addError('startDateInterval', __('plugins.reports.reviewersControlReport.warning.invalidDateInterval'));
@@ -60,8 +76,14 @@ class ReviewersControlReportForm extends Form
      */
     public function getDateInterval()
     {
-        $startDate = trim((string) $this->getData('startDateInterval'));
-        $endDate = trim((string) $this->getData('endDateInterval'));
+        $startDateInput = $this->getData('startDateInterval');
+        $endDateInput = $this->getData('endDateInterval');
+        if (!$this->isValidDateInput($startDateInput) || !$this->isValidDateInput($endDateInput)) {
+            throw new InvalidArgumentException('Dates must be valid strings in the YYYY-MM-DD format.');
+        }
+
+        $startDate = $this->normalizeDateInput($startDateInput);
+        $endDate = $this->normalizeDateInput($endDateInput);
 
         if ($startDate === '' && $endDate === '') {
             return null;
@@ -87,11 +109,64 @@ class ReviewersControlReportForm extends Form
         $this->emitHttpHeaders();
 
         $csvFile = fopen('php://output', 'wt');
-        fputcsv($csvFile, $reportBuilder->getColumns());
+        $this->writeCsvRow($csvFile, $reportBuilder->getColumns());
         foreach ($reportBuilder->getRows($reviewersPersonalData, $completedReviews) as $row) {
-            fputcsv($csvFile, $row);
+            $this->writeCsvRow($csvFile, $row);
         }
         fclose($csvFile);
+    }
+
+    private function writeCsvRow($csvFile, array $row): void
+    {
+        $fields = array_map(function ($cell) {
+            $cell = (string) $cell;
+            if (strpbrk($cell, ",\"\r\n\t ") !== false) {
+                return '"' . str_replace('"', '""', $cell) . '"';
+            }
+
+            return $cell;
+        }, $this->prepareCsvRow($row));
+
+        fwrite($csvFile, implode(',', $fields) . "\n");
+    }
+
+    private function prepareCsvRow(array $row): array
+    {
+        return array_map(function ($cell) {
+            if (is_string($cell) && preg_match('/^(?:[\x00-\x20]*[=+\-@]|[\t\r\n])/', $cell)) {
+                return "'" . $cell;
+            }
+
+            return $cell;
+        }, $row);
+    }
+
+    private function isValidDateInput($date): bool
+    {
+        if (is_null($date) || $date === '') {
+            return true;
+        }
+        if (!is_string($date)) {
+            return false;
+        }
+
+        if (!preg_match('/^(\d{4})-(\d{2})-(\d{2})\z/', $date, $matches)) {
+            return false;
+        }
+
+        return checkdate((int) $matches[2], (int) $matches[3], (int) $matches[1]);
+    }
+
+    private function normalizeDateInput($date): string
+    {
+        if (is_null($date)) {
+            return '';
+        }
+        if (!is_string($date)) {
+            throw new InvalidArgumentException('Date input must be a string.');
+        }
+
+        return trim($date);
     }
 
     private function isReviewsReport(): bool
@@ -135,7 +210,7 @@ class ReviewersControlReportForm extends Form
 
     private function getFileNameDate($date): string
     {
-        $date = trim((string) $date);
+        $date = $this->normalizeDateInput($date);
 
         return $date === '' ? '' : date('Ymd', strtotime($date));
     }

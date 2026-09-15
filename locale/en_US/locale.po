@@ -67,6 +67,9 @@ msgstr "Review completion date range"
 msgid "plugins.reports.reviewersControlReport.warning.invalidDateInterval"
 msgstr "The start date must not be later than the end date."
 
+msgid "plugins.reports.reviewersControlReport.warning.invalidDate"
+msgstr "Enter a valid date in YYYY-MM-DD format."
+
 msgid "plugins.reports.reviewersControlReport.field.reviewedSubmissionsTitles"
 msgstr "Reviewed Submissions (Titles)"
 

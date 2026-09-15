@@ -5,10 +5,22 @@ import('lib.pkp.classes.linkAction.request.AjaxModal');
 
 class ReviewersGridRow extends GridRow
 {
+    private $canEditUsers;
+
+    public function __construct(bool $canEditUsers = false)
+    {
+        parent::__construct();
+        $this->canEditUsers = $canEditUsers;
+    }
+
     public function initialize($request, $template = null)
     {
         $plugin = PluginRegistry::getPlugin('generic', 'ReviewersControlReportPlugin');
         parent::initialize($request, $plugin->getTemplateResource('gridRow.tpl'));
+
+        if (!$this->canEditUsers) {
+            return;
+        }
 
         $rowId = $this->getId();
         $dispatcher = $request->getDispatcher();

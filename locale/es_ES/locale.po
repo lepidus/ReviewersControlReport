@@ -68,6 +68,9 @@ msgstr "Intervalo de la fecha de finalización de la revisión"
 msgid "plugins.reports.reviewersControlReport.warning.invalidDateInterval"
 msgstr "La fecha inicial no puede ser posterior a la fecha final."
 
+msgid "plugins.reports.reviewersControlReport.warning.invalidDate"
+msgstr "Introduzca una fecha válida con el formato AAAA-MM-DD."
+
 msgid "plugins.reports.reviewersControlReport.field.reviewedSubmissionsTitles"
 msgstr "Envíos Revisados (Títulos)"
 
