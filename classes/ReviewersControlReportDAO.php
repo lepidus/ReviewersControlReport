@@ -2,6 +2,7 @@
 
 namespace APP\plugins\generic\reviewersControlReport\classes;
 
+use APP\core\Application;
 use APP\facades\Repo;
 use APP\plugins\generic\reviewersControlReport\classes\traits\RCRStringLength;
 use Illuminate\Support\Facades\DB;
@@ -100,10 +101,28 @@ class ReviewersControlReportDAO
         return $gridCells;
     }
 
+    /**
+     * Only editorial roles see the grid, so every link goes to the editorial
+     * workflow, which enforces its own access. Resolving the URL by the roles
+     * of the user would cost several queries per listed review.
+     */
     protected function getSubmissionWorkflowUrl(int $submissionId): string
     {
-        $submission = Repo::submission()->get($submissionId);
-        return $submission ? Repo::submission()->getWorkflowUrlByUserRoles($submission) : '';
+        $request = Application::get()->getRequest();
+        $dispatcher = $request->getDispatcher();
+        if (!$dispatcher) {
+            return '';
+        }
+
+        return $dispatcher->url(
+            $request,
+            Application::ROUTE_PAGE,
+            null,
+            'dashboard',
+            'editorial',
+            null,
+            ['workflowSubmissionId' => $submissionId]
+        );
     }
 
     /** @return list<RCRCompletedReview> */
