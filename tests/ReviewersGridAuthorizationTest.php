@@ -19,6 +19,15 @@ class ReviewersGridAuthorizationTest extends PKPTestCase
         $this->assertNotContains(ROLE_ID_REVIEWER, $coreRoles);
     }
 
+    public function testOnlyManagersAndSiteAdministratorsCanEditReviewers()
+    {
+        $this->assertTrue(ReviewersGridHandler::canRolesEditUsers([ROLE_ID_MANAGER]));
+        $this->assertTrue(ReviewersGridHandler::canRolesEditUsers([ROLE_ID_SITE_ADMIN]));
+        $this->assertTrue(ReviewersGridHandler::canRolesEditUsers([ROLE_ID_SUB_EDITOR, ROLE_ID_MANAGER]));
+        $this->assertFalse(ReviewersGridHandler::canRolesEditUsers([ROLE_ID_SUB_EDITOR]));
+        $this->assertFalse(ReviewersGridHandler::canRolesEditUsers([]));
+    }
+
     private function getRolesForOperation($handler, string $operation): array
     {
         $roles = [];

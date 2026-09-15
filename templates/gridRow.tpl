@@ -6,7 +6,7 @@
 {/if}
 
 {assign var="row_class" value="gridRow"}
-{if $row->getActions($smarty.const.GRID_ACTION_POSITION_DEFAULT)}
+{if $row->getReviews() || $row->getActions($smarty.const.GRID_ACTION_POSITION_DEFAULT)}
 	{assign var="row_class" value=$row_class|cat:' has_extras'}
 {/if}
 
@@ -40,8 +40,8 @@
 		{/if}
 
 		<td{if $col_class} class="{$col_class}" {/if}>
-			{if $row->hasActions() && $column->hasFlag('firstColumn')}
-				{if $row->getActions($smarty.const.GRID_ACTION_POSITION_DEFAULT)}
+			{if ($row->getReviews() || $row->hasActions()) && $column->hasFlag('firstColumn')}
+				{if $row->getReviews() || $row->getActions($smarty.const.GRID_ACTION_POSITION_DEFAULT)}
 					<a href="#" class="show_extras">
 						<span class="pkp_screen_reader">{translate key="grid.settings"}</span>
 					</a>
