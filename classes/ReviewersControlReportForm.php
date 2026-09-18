@@ -103,28 +103,13 @@ class ReviewersControlReportForm extends Form
         $reportBuilder = $this->getReportBuilder();
 
         $this->emitHttpHeaders();
+        $csvWriter = new RCRCsvWriter();
         $csvFile = fopen('php://output', 'wt');
-        $this->writeCsvRow($csvFile, $reportBuilder->getColumns());
+        $csvWriter->writeRow($csvFile, $reportBuilder->getColumns());
         foreach ($reportBuilder->getRows($reviewersPersonalData, $completedReviews) as $row) {
-            $this->writeCsvRow($csvFile, $row);
+            $csvWriter->writeRow($csvFile, $row);
         }
         fclose($csvFile);
-    }
-
-    private function writeCsvRow($csvFile, array $row): void
-    {
-        fputcsv($csvFile, $this->prepareCsvRow($row), ',', '"', '');
-    }
-
-    private function prepareCsvRow(array $row): array
-    {
-        return array_map(function ($cell) {
-            if (is_string($cell) && preg_match('/^(?:[\x00-\x20]*[=+\-@]|[\t\r\n])/', $cell)) {
-                return "'" . $cell;
-            }
-
-            return $cell;
-        }, $row);
     }
 
     private function isValidDateInput($date): bool
