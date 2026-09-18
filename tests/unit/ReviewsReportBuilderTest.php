@@ -4,7 +4,7 @@ use APP\plugins\generic\reviewersControlReport\classes\RCRCompletedReview;
 use APP\plugins\generic\reviewersControlReport\classes\ReviewsReportBuilder;
 use PKP\submission\reviewAssignment\ReviewAssignment;
 
-require_once __DIR__ . '/ReviewersControlReportTestCase.php';
+require_once __DIR__ . '/../ReviewersControlReportTestCase.php';
 
 class ReviewsReportBuilderTest extends ReviewersControlReportTestCase
 {

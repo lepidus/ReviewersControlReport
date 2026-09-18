@@ -9,9 +9,9 @@ use PKP\db\DBResultRange;
 use PKP\security\Role;
 use PKP\submission\reviewAssignment\ReviewAssignment;
 
-require_once __DIR__ . '/ReviewersControlReportTestCase.php';
+require_once __DIR__ . '/../ReviewersControlReportTestCase.php';
 
-class ReviewersControlReportFormTest extends ReviewersControlReportTestCase
+class ReviewerDataForReportsTest extends ReviewersControlReportTestCase
 {
     private $reviewerId;
     private $locale = 'en';

@@ -10,7 +10,7 @@ use PKP\security\authorization\UserRolesRequiredPolicy;
 use PKP\security\Role;
 use PKP\userGroup\UserGroup;
 
-require_once __DIR__ . '/ReviewersControlReportTestCase.php';
+require_once __DIR__ . '/../ReviewersControlReportTestCase.php';
 
 class ReviewersGridAuthorizationTest extends ReviewersControlReportTestCase
 {

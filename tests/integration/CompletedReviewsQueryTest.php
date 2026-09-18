@@ -12,9 +12,9 @@ use PKP\security\Role;
 use PKP\submission\PKPSubmission;
 use PKP\submission\reviewAssignment\ReviewAssignment;
 
-require_once __DIR__ . '/ReviewersControlReportTestCase.php';
+require_once __DIR__ . '/../ReviewersControlReportTestCase.php';
 
-class ReviewersControlReportDAOTest extends ReviewersControlReportTestCase
+class CompletedReviewsQueryTest extends ReviewersControlReportTestCase
 {
     private $dao;
     private $locale = 'en';

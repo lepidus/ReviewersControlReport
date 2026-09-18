@@ -4,9 +4,9 @@ use APP\plugins\generic\reviewersControlReport\classes\RCRCompletedReview;
 use APP\plugins\generic\reviewersControlReport\classes\ReviewersControlReportDAO;
 use PKP\submission\reviewAssignment\ReviewAssignment;
 
-require_once __DIR__ . '/ReviewersControlReportTestCase.php';
+require_once __DIR__ . '/../ReviewersControlReportTestCase.php';
 
-class ReviewersGridContentSecurityTest extends ReviewersControlReportTestCase
+class ReviewersControlReportDAOTest extends ReviewersControlReportTestCase
 {
     public function testSubmissionTitleAndWorkflowUrlAreEscapedInGridHtml()
     {
