@@ -18,6 +18,15 @@ class ReviewersGridRow extends GridRow
         $this->canEditUsers = $canEditUsers;
     }
 
+    /**
+     * The core user grid only lets managers and site administrators edit
+     * users, so the row offers the action to them alone.
+     */
+    public function canEditUsers(): bool
+    {
+        return $this->canEditUsers;
+    }
+
     public function initialize($request, $template = null)
     {
         $plugin = PluginRegistry::getPlugin('generic', 'ReviewersControlReportPlugin');

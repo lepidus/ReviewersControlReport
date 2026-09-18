@@ -3,10 +3,12 @@
 use APP\core\Application;
 use APP\facades\Repo;
 use APP\plugins\generic\reviewersControlReport\controllers\grid\ReviewersGridHandler;
+use APP\plugins\generic\reviewersControlReport\controllers\grid\ReviewersGridRow;
 use Illuminate\Support\Facades\DB;
 use PKP\core\Registry;
 use PKP\security\authorization\UserRolesRequiredPolicy;
 use PKP\security\Role;
+use PKP\userGroup\UserGroup;
 
 require_once __DIR__ . '/ReviewersControlReportTestCase.php';
 
@@ -56,13 +58,43 @@ class ReviewersGridAuthorizationTest extends ReviewersControlReportTestCase
         $this->assertFalse($this->authorizeAs(Role::ROLE_ID_MANAGER, 'enable'));
     }
 
+    public function testManagersMayEditTheListedReviewers()
+    {
+        $this->assertTrue($this->rowOfGridAs(Role::ROLE_ID_MANAGER)->canEditUsers());
+    }
+
+    public function testSiteAdministratorsMayEditTheListedReviewers()
+    {
+        $this->assertTrue($this->rowOfGridAs(Role::ROLE_ID_SITE_ADMIN)->canEditUsers());
+    }
+
+    public function testSectionEditorsMayNotEditTheListedReviewers()
+    {
+        $this->assertFalse($this->rowOfGridAs(Role::ROLE_ID_SUB_EDITOR)->canEditUsers());
+    }
+
+    private function rowOfGridAs(int $roleId): ReviewersGridRow
+    {
+        $handler = new ReviewersGridHandler();
+        $this->authorizeHandler($handler, $roleId, 'fetchGrid');
+
+        $getRowInstance = new ReflectionMethod($handler, 'getRowInstance');
+        $getRowInstance->setAccessible(true);
+
+        return $getRowInstance->invoke($handler);
+    }
+
     private function authorizeAs(int $roleId, string $operation): bool
+    {
+        return $this->authorizeHandler(new ReviewersGridHandler(), $roleId, $operation);
+    }
+
+    private function authorizeHandler(ReviewersGridHandler $handler, int $roleId, string $operation): bool
     {
         $userId = $this->createUserWithRole($roleId);
         $request = $this->mockRequest('publicknowledge/reviewers-grid/' . $operation, $userId);
         $user = Repo::user()->get($userId);
         Registry::set('user', $user);
-        $handler = new ReviewersGridHandler();
         $request->getRouter()->setHandler($handler);
         // Tests run with the session disabled, and the core only loads the
         // roles of the user into the authorized context when it is enabled.
@@ -94,8 +126,12 @@ class ReviewersGridAuthorizationTest extends ReviewersControlReportTestCase
         $user->setData('dateRegistered', '2026-01-01 00:00:00');
         $userId = Repo::user()->add($user);
 
-        $userGroup = Repo::userGroup()->getByRoleIds([$roleId], $this->contextId)->first();
-        $this->assertNotNull($userGroup, 'The test journal has no user group for role ' . $roleId);
+        // Site administrators hold their role on the site, which has no
+        // context id of its own, so the group is looked up by role alone.
+        $userGroup = $roleId === Role::ROLE_ID_SITE_ADMIN
+            ? UserGroup::withRoleIds([$roleId])->first()
+            : Repo::userGroup()->getByRoleIds([$roleId], $this->contextId)->first();
+        $this->assertNotNull($userGroup, 'The test database has no user group for role ' . $roleId);
         Repo::userGroup()->assignUserToGroup($userId, $userGroup->id);
 
         return $userId;
