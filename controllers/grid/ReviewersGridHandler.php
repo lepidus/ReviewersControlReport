@@ -74,8 +74,9 @@ class ReviewersGridHandler extends GridHandler
         $rangeInfo = $this->getGridRangeInfo($request, $this->getId());
 
         $reviewersControlReportDAO = new ReviewersControlReportDAO();
-        $reviewers = $reviewersControlReportDAO->getReviewers($contextId, $rangeInfo);
-        return $reviewers;
+        return $rangeInfo
+            ? $reviewersControlReportDAO->getReviewersPage($contextId, $rangeInfo)
+            : $reviewersControlReportDAO->getReviewers($contextId);
     }
 
     protected function getRowInstance()

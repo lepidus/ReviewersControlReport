@@ -26,53 +26,65 @@ class ReviewersControlReportDAO
             ->all();
     }
 
-    public function getReviewers(?int $contextId = null, ?DBResultRange $dbResultRange = null)
+    /**
+     * Every reviewer of the context, keyed by user id.
+     *
+     * @return array<int, RCRReviewerDTO>
+     */
+    public function getReviewers(int $contextId): array
     {
-        if ($contextId === null) {
-            return [];
+        $reviewers = [];
+        foreach ($this->getReviewerCollector($contextId)->getMany() as $reviewerUser) {
+            $reviewers[$reviewerUser->getId()] = $this->createReviewer($contextId, $reviewerUser);
         }
 
-        $collector = Repo::user()->getCollector()
+        return $reviewers;
+    }
+
+    /**
+     * One page of reviewers, in the iterator the grid pages through.
+     */
+    public function getReviewersPage(int $contextId, DBResultRange $dbResultRange): VirtualArrayIterator
+    {
+        $collector = $this->getReviewerCollector($contextId);
+        $totalCount = $collector->getCount();
+
+        $count = $dbResultRange->getCount();
+        $offset = $dbResultRange->getOffset() + max(0, ($dbResultRange->getPage() - 1) * $count);
+        $collector->limit($count)->offset($offset);
+
+        $reviewers = [];
+        foreach ($collector->getMany() as $reviewerUser) {
+            $reviewers[$reviewerUser->getId()] = $this->createReviewer($contextId, $reviewerUser);
+        }
+
+        return new VirtualArrayIterator($reviewers, $totalCount, $dbResultRange->getPage(), $count);
+    }
+
+    private function getReviewerCollector(int $contextId): UserCollector
+    {
+        return Repo::user()->getCollector()
             ->filterByContextIds([$contextId])
             ->filterByRoleIds([Role::ROLE_ID_REVIEWER])
             ->filterByStatus(UserCollector::STATUS_ALL)
             ->orderBy(UserCollector::ORDERBY_FAMILYNAME, UserCollector::ORDER_DIR_ASC);
+    }
 
-        $totalCount = $collector->getCount();
-        if ($dbResultRange?->isValid()) {
-            $count = $dbResultRange->getCount();
-            $offset = $dbResultRange->getOffset() + max(0, ($dbResultRange->getPage() - 1) * $count);
-            $collector->limit($count)->offset($offset);
-        }
+    private function createReviewer(int $contextId, $reviewerUser): RCRReviewerDTO
+    {
+        $completedReviews = $this->getCompletedReviews($contextId, null, $reviewerUser->getId());
+        $reviewsSummary = new RCRReviewsSummary($completedReviews);
 
-        $reviewers = [];
-        foreach ($collector->getMany() as $reviewerUser) {
-            $locale = Locale::getLocale();
-            $completedReviews = $this->getCompletedReviews($contextId, null, $reviewerUser->getId());
-            $reviewsSummary = new RCRReviewsSummary($completedReviews);
-            $reviewer = new RCRReviewerDTO(
-                $reviewerUser->getId(),
-                $reviewerUser->getEmail(),
-                $reviewerUser->getFullName(true, false, $locale),
-                (string) $reviewerUser->getLocalizedAffiliation(),
-                $reviewerUser->getInterestString(),
-                $reviewsSummary->getQualityAverage(),
-                $reviewsSummary->getTotal(),
-                $this->getReviewsGridCells($completedReviews)
-            );
-            $reviewers[$reviewer->getId()] = $reviewer;
-        }
-
-        if ($dbResultRange?->isValid()) {
-            return new VirtualArrayIterator(
-                $reviewers,
-                $totalCount,
-                $dbResultRange->getPage(),
-                $dbResultRange->getCount()
-            );
-        }
-
-        return $reviewers;
+        return new RCRReviewerDTO(
+            $reviewerUser->getId(),
+            $reviewerUser->getEmail(),
+            $reviewerUser->getFullName(true, false, Locale::getLocale()),
+            (string) $reviewerUser->getLocalizedAffiliation(),
+            $reviewerUser->getInterestString(),
+            $reviewsSummary->getQualityAverage(),
+            $reviewsSummary->getTotal(),
+            $this->getReviewsGridCells($completedReviews)
+        );
     }
 
     /**
