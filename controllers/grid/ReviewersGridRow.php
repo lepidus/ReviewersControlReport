@@ -62,6 +62,6 @@ class ReviewersGridRow extends GridRow
 
     public function getReviews()
     {
-        return $this->getData()->getReviewedSubmissionsTitleAndDate();
+        return $this->getData()->getCompletedReviews();
     }
 }
