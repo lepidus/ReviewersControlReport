@@ -1,5 +1,6 @@
 <?php
 
+use APP\core\Application;
 use APP\facades\Repo;
 use APP\plugins\generic\reviewersControlReport\controllers\grid\ReviewersGridHandler;
 use Illuminate\Support\Facades\DB;
@@ -69,7 +70,17 @@ class ReviewersGridAuthorizationTest extends ReviewersControlReportTestCase
         $handler->addPolicy($userRolesPolicy, true);
         $args = [];
 
-        return $handler->authorize($request, $args, $handler->getRoleAssignments());
+        $decision = $handler->authorize($request, $args, $handler->getRoleAssignments());
+
+        // A denial means nothing when the roles of the user never reached the
+        // authorized context: every role would be denied, for the wrong reason.
+        $this->assertContains(
+            $roleId,
+            (array) $handler->getAuthorizedContextObject(Application::ASSOC_TYPE_USER_ROLES),
+            'The role of the user did not reach the authorized context'
+        );
+
+        return $decision;
     }
 
     private function createUserWithRole(int $roleId): int
