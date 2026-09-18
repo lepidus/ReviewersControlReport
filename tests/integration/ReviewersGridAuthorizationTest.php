@@ -3,7 +3,6 @@
 use APP\core\Application;
 use APP\facades\Repo;
 use APP\plugins\generic\reviewersControlReport\controllers\grid\ReviewersGridHandler;
-use APP\plugins\generic\reviewersControlReport\controllers\grid\ReviewersGridRow;
 use Illuminate\Support\Facades\DB;
 use PKP\core\Registry;
 use PKP\security\authorization\UserRolesRequiredPolicy;
@@ -65,27 +64,25 @@ class ReviewersGridAuthorizationTest extends ReviewersControlReportTestCase
 
     public function testManagersMayEditTheListedReviewers()
     {
-        $this->assertTrue($this->rowOfGridAs(Role::ROLE_ID_MANAGER)->canEditUsers());
+        $this->assertTrue($this->mayEditUsersAs(Role::ROLE_ID_MANAGER));
     }
 
     public function testSiteAdministratorsMayEditTheListedReviewers()
     {
-        $this->assertTrue($this->rowOfGridAs(Role::ROLE_ID_SITE_ADMIN)->canEditUsers());
+        $this->assertTrue($this->mayEditUsersAs(Role::ROLE_ID_SITE_ADMIN));
     }
 
     public function testSectionEditorsMayNotEditTheListedReviewers()
     {
-        $this->assertFalse($this->rowOfGridAs(Role::ROLE_ID_SUB_EDITOR)->canEditUsers());
+        $this->assertFalse($this->mayEditUsersAs(Role::ROLE_ID_SUB_EDITOR));
     }
 
-    private function rowOfGridAs(int $roleId): ReviewersGridRow
+    private function mayEditUsersAs(int $roleId): bool
     {
         $handler = new ReviewersGridHandler();
         $this->authorizeHandler($handler, $roleId, 'fetchGrid');
 
-        $getRowInstance = new ReflectionMethod($handler, 'getRowInstance');
-
-        return $getRowInstance->invoke($handler);
+        return $handler->canCurrentUserEditUsers();
     }
 
     private function authorizeAs(int $roleId, string $operation): bool

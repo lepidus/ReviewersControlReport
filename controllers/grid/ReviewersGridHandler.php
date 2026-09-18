@@ -81,12 +81,18 @@ class ReviewersGridHandler extends GridHandler
 
     protected function getRowInstance()
     {
+        return new ReviewersGridRow($this->canCurrentUserEditUsers());
+    }
+
+    /**
+     * Section editors reach this grid, but the core user grid only lets
+     * managers and site administrators edit users.
+     */
+    public function canCurrentUserEditUsers(): bool
+    {
         $roles = (array) $this->getAuthorizedContextObject(Application::ASSOC_TYPE_USER_ROLES);
-        $canEditUsers = (bool) array_intersect(
-            [Role::ROLE_ID_SITE_ADMIN, Role::ROLE_ID_MANAGER],
-            $roles
-        );
-        return new ReviewersGridRow($canEditUsers);
+
+        return (bool) array_intersect([Role::ROLE_ID_SITE_ADMIN, Role::ROLE_ID_MANAGER], $roles);
     }
 
     public function initFeatures($request, $args)
