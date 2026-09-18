@@ -178,20 +178,40 @@ class ReviewersControlReportDAOTest extends ReviewersControlReportTestCase
 
     public function testQueriesDoNotGrowWithTheNumberOfCompletedReviews()
     {
-        $otherSubmission = $this->createSubmission($this->contextId, 'Ainda Estou Aqui');
         $this->createReviewAssignment($this->submissionOfContext, '2026-01-15 14:32:00');
         $this->createReviewAssignment($this->submissionOfContext, '2026-02-15 14:32:00');
+        $queriesOfTwoReviews = $this->countQueriesOfCompletedReviews();
+
+        $otherSubmission = $this->createSubmission($this->contextId, 'Ainda Estou Aqui');
+        $this->createReviewAssignment($otherSubmission, '2026-03-15 14:32:00');
+        $this->createReviewAssignment($otherSubmission, '2026-04-15 14:32:00');
+        $queriesOfFourReviews = $this->countQueriesOfCompletedReviews();
+
+        $this->assertSame($queriesOfTwoReviews, $queriesOfFourReviews);
+    }
+
+    public function testEachCompletedReviewCarriesTheTitleOfItsOwnSubmission()
+    {
+        $otherSubmission = $this->createSubmission($this->contextId, 'Ainda Estou Aqui');
+        $this->createReviewAssignment($this->submissionOfContext, '2026-01-15 14:32:00');
         $this->createReviewAssignment($otherSubmission, '2026-03-15 14:32:00');
 
+        $completedReviews = $this->dao->getCompletedReviews($this->contextId);
+
+        $this->assertCount(2, $completedReviews);
+        $this->assertEquals('Central do Brasil', $completedReviews[0]->getSubmissionTitle());
+        $this->assertEquals('Ainda Estou Aqui', $completedReviews[1]->getSubmissionTitle());
+    }
+
+    private function countQueriesOfCompletedReviews(): int
+    {
         DB::flushQueryLog();
         DB::enableQueryLog();
-        $completedReviews = $this->dao->getCompletedReviews($this->contextId);
+        $this->dao->getCompletedReviews($this->contextId);
         $queries = DB::getQueryLog();
         DB::disableQueryLog();
 
-        $this->assertCount(3, $completedReviews);
-        $this->assertCount(2, $queries);
-        $this->assertEquals('Ainda Estou Aqui', $completedReviews[2]->getSubmissionTitle());
+        return count($queries);
     }
 
     public function testCompletedReviewCarriesTheDataTheReportNeeds()
