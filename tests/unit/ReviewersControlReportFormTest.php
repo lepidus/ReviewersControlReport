@@ -70,7 +70,6 @@ class ReviewersControlReportFormTest extends ReviewersControlReportTestCase
             }
         };
         $checks = new ReflectionProperty(Form::class, '_checks');
-        $checks->setAccessible(true);
         $checks->setValue($form, []);
 
         $form->readInputData();
@@ -84,7 +83,6 @@ class ReviewersControlReportFormTest extends ReviewersControlReportTestCase
     {
         $form = new ReviewersControlReportForm(null, 'en', ['en']);
         $checks = new ReflectionProperty(Form::class, '_checks');
-        $checks->setAccessible(true);
         $checks->setValue($form, []);
         return $form;
     }

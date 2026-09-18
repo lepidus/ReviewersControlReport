@@ -49,7 +49,6 @@ abstract class ReviewersControlReportTestCase extends PKPTestCase
     private function readLocale(): string
     {
         $property = new ReflectionProperty(Locale::getFacadeRoot(), 'locale');
-        $property->setAccessible(true);
 
         return (string) $property->getValue(Locale::getFacadeRoot());
     }
@@ -57,7 +56,6 @@ abstract class ReviewersControlReportTestCase extends PKPTestCase
     private function writeLocale(string $locale): void
     {
         $property = new ReflectionProperty(Locale::getFacadeRoot(), 'locale');
-        $property->setAccessible(true);
         $property->setValue(Locale::getFacadeRoot(), $locale);
     }
 }

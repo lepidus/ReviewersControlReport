@@ -84,7 +84,6 @@ class ReviewersGridAuthorizationTest extends ReviewersControlReportTestCase
         $this->authorizeHandler($handler, $roleId, 'fetchGrid');
 
         $getRowInstance = new ReflectionMethod($handler, 'getRowInstance');
-        $getRowInstance->setAccessible(true);
 
         return $getRowInstance->invoke($handler);
     }
