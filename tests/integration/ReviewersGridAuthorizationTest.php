@@ -11,10 +11,13 @@ use PKP\security\Role;
 use PKP\userGroup\UserGroup;
 
 require_once __DIR__ . '/../ReviewersControlReportTestCase.php';
+require_once __DIR__ . '/../RCRReportFixtures.php';
 
 class ReviewersGridAuthorizationTest extends ReviewersControlReportTestCase
 {
-    private $contextId = RCRTestFixture::SEEDED_CONTEXT_ID;
+    use RCRReportFixtures;
+
+    private $contextId = self::SEEDED_CONTEXT_ID;
 
     protected function getMockedRegistryKeys(): array
     {
@@ -117,8 +120,8 @@ class ReviewersGridAuthorizationTest extends ReviewersControlReportTestCase
 
     private function createUserWithRole(int $roleId): int
     {
-        $userId = $this->fixture->createUser(['userName' => 'walter.salles.' . $roleId]);
-        $this->fixture->giveUserTheRole($userId, $roleId);
+        $userId = $this->createUser(['userName' => 'walter.salles.' . $roleId]);
+        $this->giveUserTheRole($userId, $roleId);
 
         return $userId;
     }

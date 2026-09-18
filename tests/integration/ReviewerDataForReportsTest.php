@@ -10,9 +10,12 @@ use PKP\security\Role;
 use PKP\submission\reviewAssignment\ReviewAssignment;
 
 require_once __DIR__ . '/../ReviewersControlReportTestCase.php';
+require_once __DIR__ . '/../RCRReportFixtures.php';
 
 class ReviewerDataForReportsTest extends ReviewersControlReportTestCase
 {
+    use RCRReportFixtures;
+
     private $reviewerId;
     private $locale = 'en';
     private $givenName = 'Walter';
@@ -25,7 +28,7 @@ class ReviewerDataForReportsTest extends ReviewersControlReportTestCase
     {
         parent::setUp();
         DB::beginTransaction();
-        $this->reviewerId = $this->fixture->createUser([
+        $this->reviewerId = $this->createUser([
             'email' => $this->email,
             'userName' => $this->username,
         ]);
@@ -92,13 +95,13 @@ class ReviewerDataForReportsTest extends ReviewersControlReportTestCase
         $reviewer = Repo::user()->get($this->reviewerId);
         Repo::user()->edit($reviewer, ['disabled' => true]);
 
-        $this->fixture->giveUserTheRole($this->reviewerId, Role::ROLE_ID_REVIEWER);
+        $this->giveUserTheRole($this->reviewerId, Role::ROLE_ID_REVIEWER);
 
         $dao = new ReviewersControlReportDAO();
-        $this->assertContains($this->reviewerId, $dao->getReviewersIds(RCRTestFixture::SEEDED_CONTEXT_ID));
-        $this->assertArrayHasKey($this->reviewerId, $dao->getReviewers(RCRTestFixture::SEEDED_CONTEXT_ID));
+        $this->assertContains($this->reviewerId, $dao->getReviewersIds(self::SEEDED_CONTEXT_ID));
+        $this->assertArrayHasKey($this->reviewerId, $dao->getReviewers(self::SEEDED_CONTEXT_ID));
 
-        $firstPage = $dao->getReviewersPage(RCRTestFixture::SEEDED_CONTEXT_ID, new DBResultRange(1, 1));
+        $firstPage = $dao->getReviewersPage(self::SEEDED_CONTEXT_ID, new DBResultRange(1, 1));
         $this->assertCount(1, $firstPage->toArray());
         $this->assertGreaterThanOrEqual(1, $firstPage->getCount());
     }

@@ -13,9 +13,12 @@ use PKP\submission\PKPSubmission;
 use PKP\submission\reviewAssignment\ReviewAssignment;
 
 require_once __DIR__ . '/../ReviewersControlReportTestCase.php';
+require_once __DIR__ . '/../RCRReportFixtures.php';
 
 class CompletedReviewsQueryTest extends ReviewersControlReportTestCase
 {
+    use RCRReportFixtures;
+
     private $dao;
     private $locale = 'en';
     private $contextId;
@@ -29,11 +32,11 @@ class CompletedReviewsQueryTest extends ReviewersControlReportTestCase
         parent::setUp();
         DB::beginTransaction();
         $this->dao = new ReviewersControlReportDAO();
-        $this->contextId = $this->fixture->createContext('rcr-primary');
-        $this->otherContextId = $this->fixture->createContext('rcr-secondary');
-        $this->reviewerId = $this->fixture->createUser();
-        $this->submissionOfContext = $this->fixture->createSubmission($this->contextId, 'Central do Brasil');
-        $this->submissionOfOtherContext = $this->fixture->createSubmission($this->otherContextId, 'Cidade de Deus');
+        $this->contextId = $this->createContext('rcr-primary');
+        $this->otherContextId = $this->createContext('rcr-secondary');
+        $this->reviewerId = $this->createUser();
+        $this->submissionOfContext = $this->createSubmission($this->contextId, 'Central do Brasil');
+        $this->submissionOfOtherContext = $this->createSubmission($this->otherContextId, 'Cidade de Deus');
     }
 
     protected function tearDown(): void
@@ -44,7 +47,7 @@ class CompletedReviewsQueryTest extends ReviewersControlReportTestCase
 
     private function createReviewAssignment($submissionId, $dateCompleted, $overrides = []): void
     {
-        $this->fixture->createCompletedReview(
+        $this->createCompletedReview(
             $submissionId,
             $overrides['reviewerId'] ?? $this->reviewerId,
             $dateCompleted,
@@ -116,7 +119,7 @@ class CompletedReviewsQueryTest extends ReviewersControlReportTestCase
         $this->createReviewAssignment($this->submissionOfContext, '2026-02-15 14:32:00');
         $queriesOfTwoReviews = $this->countQueriesOfCompletedReviews();
 
-        $otherSubmission = $this->fixture->createSubmission($this->contextId, 'Ainda Estou Aqui');
+        $otherSubmission = $this->createSubmission($this->contextId, 'Ainda Estou Aqui');
         $this->createReviewAssignment($otherSubmission, '2026-03-15 14:32:00');
         $this->createReviewAssignment($otherSubmission, '2026-04-15 14:32:00');
         $queriesOfFourReviews = $this->countQueriesOfCompletedReviews();
@@ -126,7 +129,7 @@ class CompletedReviewsQueryTest extends ReviewersControlReportTestCase
 
     public function testEachCompletedReviewCarriesTheTitleOfItsOwnSubmission()
     {
-        $otherSubmission = $this->fixture->createSubmission($this->contextId, 'Ainda Estou Aqui');
+        $otherSubmission = $this->createSubmission($this->contextId, 'Ainda Estou Aqui');
         $this->createReviewAssignment($this->submissionOfContext, '2026-01-15 14:32:00');
         $this->createReviewAssignment($otherSubmission, '2026-03-15 14:32:00');
 
@@ -169,11 +172,11 @@ class CompletedReviewsQueryTest extends ReviewersControlReportTestCase
 
     public function testGridAffiliationFallsBackWhenUiLocaleHasNoValue()
     {
-        $this->fixture->giveUserTheRole($this->reviewerId, Role::ROLE_ID_REVIEWER);
+        $this->giveUserTheRole($this->reviewerId, Role::ROLE_ID_REVIEWER);
 
         $this->useLocale('pt_BR');
 
-        $reviewers = $this->dao->getReviewers(RCRTestFixture::SEEDED_CONTEXT_ID);
+        $reviewers = $this->dao->getReviewers(self::SEEDED_CONTEXT_ID);
 
         $this->assertArrayHasKey($this->reviewerId, $reviewers);
         $this->assertSame('Agência Nacional do Cinema', $reviewers[$this->reviewerId]->getAffiliation());

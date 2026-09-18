@@ -11,42 +11,37 @@ use PKP\userGroup\UserGroup;
 /**
  * Builds the journals, users, submissions and reviews the integration tests
  * work on, so that each test says what it needs instead of copying how to
- * create it.
+ * create it. Only the tests that reach the database take it.
  */
-class RCRTestFixture
+trait RCRReportFixtures
 {
     public const SEEDED_CONTEXT_ID = 1;
 
-    private $locale;
+    private $fixtureLocale = 'en';
 
-    public function __construct(string $locale = 'en')
-    {
-        $this->locale = $locale;
-    }
-
-    public function createContext(string $path): int
+    protected function createContext(string $path): int
     {
         $context = Application::getContextDAO()->newDataObject();
         $context->setData('urlPath', $path);
         $context->setData('enabled', true);
         $context->setData('seq', 1);
-        $context->setData('primaryLocale', $this->locale);
-        $context->setData('supportedLocales', [$this->locale]);
-        $context->setData('name', [$this->locale => $path]);
+        $context->setData('primaryLocale', $this->fixtureLocale);
+        $context->setData('supportedLocales', [$this->fixtureLocale]);
+        $context->setData('name', [$this->fixtureLocale => $path]);
         $context->setData('contactName', 'Reviewers Control Report');
         $context->setData('contactEmail', 'reviewers-control@example.test');
 
         return Application::getContextDAO()->insertObject($context);
     }
 
-    public function createUser(array $overrides = []): int
+    protected function createUser(array $overrides = []): int
     {
         $username = $overrides['userName'] ?? 'walter.salles';
         $user = Repo::user()->newDataObject();
-        $user->setData('givenName', [$this->locale => $overrides['givenName'] ?? 'Walter']);
-        $user->setData('familyName', [$this->locale => $overrides['familyName'] ?? 'Salles']);
+        $user->setData('givenName', [$this->fixtureLocale => $overrides['givenName'] ?? 'Walter']);
+        $user->setData('familyName', [$this->fixtureLocale => $overrides['familyName'] ?? 'Salles']);
         $user->setData('affiliation', [
-            $this->locale => $overrides['affiliation'] ?? 'Agência Nacional do Cinema',
+            $this->fixtureLocale => $overrides['affiliation'] ?? 'Agência Nacional do Cinema',
         ]);
         $user->setData('email', $overrides['email'] ?? $username . '@ancine.com.br');
         $user->setData('userName', $username);
@@ -61,7 +56,7 @@ class RCRTestFixture
      * so tests that need a role work on that journal. This is the only place
      * that depends on it.
      */
-    public function giveUserTheRole(int $userId, int $roleId): void
+    protected function giveUserTheRole(int $userId, int $roleId): void
     {
         // Site administrators hold their role on the site, which has no
         // context id of its own, so the group is looked up by role alone.
@@ -76,18 +71,18 @@ class RCRTestFixture
         Repo::userGroup()->assignUserToGroup($userId, $userGroup->id);
     }
 
-    public function createSubmission(int $contextId, string $title): int
+    protected function createSubmission(int $contextId, string $title): int
     {
         $submission = Repo::submission()->newDataObject([
             'contextId' => $contextId,
             'status' => PKPSubmission::STATUS_QUEUED,
-            'locale' => $this->locale,
+            'locale' => $this->fixtureLocale,
         ]);
         $submissionId = Repo::submission()->dao->insert($submission);
 
         $publication = Repo::publication()->newDataObject([
             'submissionId' => $submissionId,
-            'title' => [$this->locale => $title],
+            'title' => [$this->fixtureLocale => $title],
         ]);
         $publicationId = Repo::publication()->add($publication);
 
@@ -96,7 +91,7 @@ class RCRTestFixture
         return $submissionId;
     }
 
-    public function createCompletedReview(int $submissionId, int $reviewerId, ?string $dateCompleted, array $overrides = []): void
+    protected function createCompletedReview(int $submissionId, int $reviewerId, ?string $dateCompleted, array $overrides = []): void
     {
         $reviewRoundId = DAORegistry::getDAO('ReviewRoundDAO')
             ->build($submissionId, WORKFLOW_STAGE_ID_EXTERNAL_REVIEW, 1)
