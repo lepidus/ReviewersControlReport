@@ -16,8 +16,6 @@ class ReviewersControlReportDAO
 {
     use RCRStringLength;
 
-    private ?int $contextId = null;
-
     public function getReviewersIds(int $contextId): array
     {
         return Repo::user()->getCollector()
@@ -34,7 +32,6 @@ class ReviewersControlReportDAO
             return [];
         }
 
-        $this->contextId = $contextId;
         $collector = Repo::user()->getCollector()
             ->filterByContextIds([$contextId])
             ->filterByRoleIds([Role::ROLE_ID_REVIEWER])
