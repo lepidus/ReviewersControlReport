@@ -6,8 +6,11 @@ use PKP\core\Registry;
 use PKP\facades\Locale;
 use PKP\tests\PKPTestCase;
 
+require_once __DIR__ . '/RCRTestFixture.php';
+
 abstract class ReviewersControlReportTestCase extends PKPTestCase
 {
+    protected RCRTestFixture $fixture;
     private $routerBackup;
     private $localeBackup;
 
@@ -17,6 +20,7 @@ abstract class ReviewersControlReportTestCase extends PKPTestCase
 
         // Unit tests do not route a request through a journal, so the locale
         // service has no context from which to select its primary locale.
+        $this->fixture = new RCRTestFixture();
         $this->localeBackup = $this->readLocale();
         $this->writeLocale('en');
 

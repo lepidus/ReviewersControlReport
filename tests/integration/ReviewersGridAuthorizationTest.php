@@ -14,7 +14,7 @@ require_once __DIR__ . '/../ReviewersControlReportTestCase.php';
 
 class ReviewersGridAuthorizationTest extends ReviewersControlReportTestCase
 {
-    private $contextId = 1;
+    private $contextId = RCRTestFixture::SEEDED_CONTEXT_ID;
 
     protected function getMockedRegistryKeys(): array
     {
@@ -117,22 +117,8 @@ class ReviewersGridAuthorizationTest extends ReviewersControlReportTestCase
 
     private function createUserWithRole(int $roleId): int
     {
-        $user = Repo::user()->newDataObject();
-        $user->setData('givenName', ['en' => 'Walter']);
-        $user->setData('familyName', ['en' => 'Salles']);
-        $user->setData('email', 'walter.salles.' . $roleId . '@example.test');
-        $user->setData('userName', 'walter.salles.' . $roleId);
-        $user->setData('password', 'walter.salles');
-        $user->setData('dateRegistered', '2026-01-01 00:00:00');
-        $userId = Repo::user()->add($user);
-
-        // Site administrators hold their role on the site, which has no
-        // context id of its own, so the group is looked up by role alone.
-        $userGroup = $roleId === Role::ROLE_ID_SITE_ADMIN
-            ? UserGroup::withRoleIds([$roleId])->first()
-            : Repo::userGroup()->getByRoleIds([$roleId], $this->contextId)->first();
-        $this->assertNotNull($userGroup, 'The test database has no user group for role ' . $roleId);
-        Repo::userGroup()->assignUserToGroup($userId, $userGroup->id);
+        $userId = $this->fixture->createUser(['userName' => 'walter.salles.' . $roleId]);
+        $this->fixture->giveUserTheRole($userId, $roleId);
 
         return $userId;
     }

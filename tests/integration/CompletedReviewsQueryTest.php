@@ -29,11 +29,11 @@ class CompletedReviewsQueryTest extends ReviewersControlReportTestCase
         parent::setUp();
         DB::beginTransaction();
         $this->dao = new ReviewersControlReportDAO();
-        $this->contextId = $this->createContext('rcr-primary');
-        $this->otherContextId = $this->createContext('rcr-secondary');
-        $this->reviewerId = $this->createReviewer();
-        $this->submissionOfContext = $this->createSubmission($this->contextId, 'Central do Brasil');
-        $this->submissionOfOtherContext = $this->createSubmission($this->otherContextId, 'Cidade de Deus');
+        $this->contextId = $this->fixture->createContext('rcr-primary');
+        $this->otherContextId = $this->fixture->createContext('rcr-secondary');
+        $this->reviewerId = $this->fixture->createUser();
+        $this->submissionOfContext = $this->fixture->createSubmission($this->contextId, 'Central do Brasil');
+        $this->submissionOfOtherContext = $this->fixture->createSubmission($this->otherContextId, 'Cidade de Deus');
     }
 
     protected function tearDown(): void
@@ -42,80 +42,14 @@ class CompletedReviewsQueryTest extends ReviewersControlReportTestCase
         parent::tearDown();
     }
 
-    private function createReviewer(): int
-    {
-        $user = Repo::user()->newDataObject();
-        $user->setData('givenName', [$this->locale => 'Walter']);
-        $user->setData('familyName', [$this->locale => 'Salles']);
-        $user->setData('affiliation', [$this->locale => 'Agência Nacional do Cinema']);
-        $user->setData('email', 'walter.salles@ancine.com.br');
-        $user->setData('userName', 'walter.salles');
-        $user->setData('password', 'walter.salles');
-        $user->setData('dateRegistered', '2026-01-01 00:00:00');
-
-        return Repo::user()->add($user);
-    }
-
-    private function createContext(string $path): int
-    {
-        $context = Application::getContextDAO()->newDataObject();
-        $context->setData('urlPath', $path);
-        $context->setData('enabled', true);
-        $context->setData('seq', 1);
-        $context->setData('primaryLocale', $this->locale);
-        $context->setData('supportedLocales', [$this->locale]);
-        $context->setData('name', [$this->locale => $path]);
-        $context->setData('contactName', 'Reviewers Control Report');
-        $context->setData('contactEmail', 'reviewers-control@example.test');
-
-        return Application::getContextDAO()->insertObject($context);
-    }
-
-    private function createSubmission($contextId, $title): int
-    {
-        $submission = Repo::submission()->newDataObject([
-            'contextId' => $contextId,
-            'status' => PKPSubmission::STATUS_QUEUED,
-            'locale' => $this->locale,
-        ]);
-        $submissionId = Repo::submission()->dao->insert($submission);
-
-        $publication = Repo::publication()->newDataObject([
-            'submissionId' => $submissionId,
-            'title' => [$this->locale => $title],
-        ]);
-        $publicationId = Repo::publication()->add($publication);
-
-        Repo::submission()->edit($submission, ['currentPublicationId' => $publicationId]);
-
-        return $submissionId;
-    }
-
     private function createReviewAssignment($submissionId, $dateCompleted, $overrides = []): void
     {
-        $reviewRoundId = DAORegistry::getDAO('ReviewRoundDAO')
-            ->build($submissionId, WORKFLOW_STAGE_ID_EXTERNAL_REVIEW, 1)
-            ->getId();
-
-        $reviewAssignment = Repo::reviewAssignment()->newDataObject();
-        $reviewAssignment->setSubmissionId($submissionId);
-        $reviewAssignment->setReviewerId($overrides['reviewerId'] ?? $this->reviewerId);
-        $reviewAssignment->setReviewRoundId($reviewRoundId);
-        $reviewAssignment->setStageId(WORKFLOW_STAGE_ID_EXTERNAL_REVIEW);
-        $reviewAssignment->setRound(1);
-        $reviewAssignment->setDateAssigned('2026-01-02 10:00:00');
-        $reviewAssignment->setDateResponseDue('2026-01-10 00:00:00');
-        $reviewAssignment->setDateConfirmed('2026-01-03 00:00:00');
-        $reviewAssignment->setDateDue('2026-01-20 00:00:00');
-        $reviewAssignment->setDateCompleted($dateCompleted);
-        $reviewAssignment->setQuality($overrides['quality'] ?? 4);
-        $reviewAssignment->setRecommendation(
-            $overrides['recommendation'] ?? ReviewAssignment::SUBMISSION_REVIEWER_RECOMMENDATION_ACCEPT
+        $this->fixture->createCompletedReview(
+            $submissionId,
+            $overrides['reviewerId'] ?? $this->reviewerId,
+            $dateCompleted,
+            $overrides
         );
-        $reviewAssignment->setDeclined($overrides['declined'] ?? 0);
-        $reviewAssignment->setCancelled($overrides['cancelled'] ?? 0);
-
-        Repo::reviewAssignment()->add($reviewAssignment);
     }
 
     public function testReturnsCompletedReviewsOfTheContextWhenNoIntervalIsGiven()
@@ -182,7 +116,7 @@ class CompletedReviewsQueryTest extends ReviewersControlReportTestCase
         $this->createReviewAssignment($this->submissionOfContext, '2026-02-15 14:32:00');
         $queriesOfTwoReviews = $this->countQueriesOfCompletedReviews();
 
-        $otherSubmission = $this->createSubmission($this->contextId, 'Ainda Estou Aqui');
+        $otherSubmission = $this->fixture->createSubmission($this->contextId, 'Ainda Estou Aqui');
         $this->createReviewAssignment($otherSubmission, '2026-03-15 14:32:00');
         $this->createReviewAssignment($otherSubmission, '2026-04-15 14:32:00');
         $queriesOfFourReviews = $this->countQueriesOfCompletedReviews();
@@ -192,7 +126,7 @@ class CompletedReviewsQueryTest extends ReviewersControlReportTestCase
 
     public function testEachCompletedReviewCarriesTheTitleOfItsOwnSubmission()
     {
-        $otherSubmission = $this->createSubmission($this->contextId, 'Ainda Estou Aqui');
+        $otherSubmission = $this->fixture->createSubmission($this->contextId, 'Ainda Estou Aqui');
         $this->createReviewAssignment($this->submissionOfContext, '2026-01-15 14:32:00');
         $this->createReviewAssignment($otherSubmission, '2026-03-15 14:32:00');
 
@@ -235,13 +169,11 @@ class CompletedReviewsQueryTest extends ReviewersControlReportTestCase
 
     public function testGridAffiliationFallsBackWhenUiLocaleHasNoValue()
     {
-        $reviewerGroup = Repo::userGroup()->getByRoleIds([Role::ROLE_ID_REVIEWER], 1)->first();
-        $this->assertNotNull($reviewerGroup);
-        Repo::userGroup()->assignUserToGroup($this->reviewerId, $reviewerGroup->id);
+        $this->fixture->giveUserTheRole($this->reviewerId, Role::ROLE_ID_REVIEWER);
 
         $this->useLocale('pt_BR');
 
-        $reviewers = $this->dao->getReviewers(1);
+        $reviewers = $this->dao->getReviewers(RCRTestFixture::SEEDED_CONTEXT_ID);
 
         $this->assertArrayHasKey($this->reviewerId, $reviewers);
         $this->assertSame('Agência Nacional do Cinema', $reviewers[$this->reviewerId]->getAffiliation());
