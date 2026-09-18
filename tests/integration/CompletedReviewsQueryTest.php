@@ -172,11 +172,11 @@ class CompletedReviewsQueryTest extends ReviewersControlReportTestCase
 
     public function testGridAffiliationFallsBackWhenUiLocaleHasNoValue()
     {
-        $this->giveUserTheRole($this->reviewerId, Role::ROLE_ID_REVIEWER);
+        $this->giveUserTheRole($this->reviewerId, Role::ROLE_ID_REVIEWER, $this->contextId);
 
         $this->useLocale('pt_BR');
 
-        $reviewers = $this->dao->getReviewers(self::SEEDED_CONTEXT_ID);
+        $reviewers = $this->dao->getReviewers($this->contextId);
 
         $this->assertArrayHasKey($this->reviewerId, $reviewers);
         $this->assertSame('Agência Nacional do Cinema', $reviewers[$this->reviewerId]->getAffiliation());

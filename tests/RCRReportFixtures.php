@@ -15,8 +15,6 @@ use PKP\userGroup\UserGroup;
  */
 trait RCRReportFixtures
 {
-    public const SEEDED_CONTEXT_ID = 1;
-
     private $fixtureLocale = 'en';
 
     protected function createContext(string $path): int
@@ -52,21 +50,24 @@ trait RCRReportFixtures
     }
 
     /**
-     * The user groups of a role belong to the journal the installer seeded,
-     * so tests that need a role work on that journal. This is the only place
-     * that depends on it.
+     * Roles live in user groups of a journal, and a journal created by a test
+     * has none: the installer seeds them only for the journals it creates.
      */
-    protected function giveUserTheRole(int $userId, int $roleId): void
+    protected function giveUserTheRole(int $userId, int $roleId, ?int $contextId = null): void
     {
-        // Site administrators hold their role on the site, which has no
-        // context id of its own, so the group is looked up by role alone.
-        $userGroup = $roleId === Role::ROLE_ID_SITE_ADMIN
-            ? UserGroup::withRoleIds([$roleId])->first()
-            : Repo::userGroup()->getByRoleIds([$roleId], self::SEEDED_CONTEXT_ID)->first();
-
-        if (is_null($userGroup)) {
-            throw new RuntimeException('The test database has no user group for role ' . $roleId);
-        }
+        $userGroup = UserGroup::create([
+            // Site administrators hold their role on the site, which has no
+            // context id of its own.
+            'contextId' => $roleId === Role::ROLE_ID_SITE_ADMIN ? null : $contextId,
+            'roleId' => $roleId,
+            'isDefault' => true,
+            'showTitle' => false,
+            'permitSelfRegistration' => false,
+            'permitMetadataEdit' => false,
+            'masthead' => false,
+            'name' => [$this->fixtureLocale => 'Role ' . $roleId],
+            'abbrev' => [$this->fixtureLocale => 'R' . $roleId],
+        ]);
 
         Repo::userGroup()->assignUserToGroup($userId, $userGroup->id);
     }

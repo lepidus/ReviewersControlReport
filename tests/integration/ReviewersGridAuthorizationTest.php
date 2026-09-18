@@ -17,7 +17,8 @@ class ReviewersGridAuthorizationTest extends ReviewersControlReportTestCase
 {
     use RCRReportFixtures;
 
-    private $contextId = self::SEEDED_CONTEXT_ID;
+    private $contextId;
+    private $contextPath = 'rcr-grid-access';
 
     protected function getMockedRegistryKeys(): array
     {
@@ -28,6 +29,7 @@ class ReviewersGridAuthorizationTest extends ReviewersControlReportTestCase
     {
         parent::setUp();
         DB::beginTransaction();
+        $this->contextId = $this->createContext($this->contextPath);
     }
 
     protected function tearDown(): void
@@ -95,7 +97,7 @@ class ReviewersGridAuthorizationTest extends ReviewersControlReportTestCase
     private function authorizeHandler(ReviewersGridHandler $handler, int $roleId, string $operation): bool
     {
         $userId = $this->createUserWithRole($roleId);
-        $request = $this->mockRequest('publicknowledge/reviewers-grid/' . $operation, $userId);
+        $request = $this->mockRequest($this->contextPath . '/reviewers-grid/' . $operation, $userId);
         $user = Repo::user()->get($userId);
         Registry::set('user', $user);
         $request->getRouter()->setHandler($handler);
@@ -121,7 +123,7 @@ class ReviewersGridAuthorizationTest extends ReviewersControlReportTestCase
     private function createUserWithRole(int $roleId): int
     {
         $userId = $this->createUser(['userName' => 'walter.salles.' . $roleId]);
-        $this->giveUserTheRole($userId, $roleId);
+        $this->giveUserTheRole($userId, $roleId, $this->contextId);
 
         return $userId;
     }
