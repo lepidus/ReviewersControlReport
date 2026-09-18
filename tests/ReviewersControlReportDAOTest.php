@@ -27,10 +27,6 @@ class ReviewersControlReportDAOTest extends ReviewersControlReportTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $request = Application::get()->getRequest();
-        if (is_null($request->getRouter())) {
-            $request->setRouter(new PageRouter());
-        }
         DB::beginTransaction();
         $this->dao = new ReviewersControlReportDAO();
         $this->contextId = $this->createContext('rcr-primary');
@@ -223,10 +219,7 @@ class ReviewersControlReportDAOTest extends ReviewersControlReportTestCase
         $this->assertNotNull($reviewerGroup);
         Repo::userGroup()->assignUserToGroup($this->reviewerId, $reviewerGroup->id);
 
-        $locale = Locale::getFacadeRoot();
-        $property = new ReflectionProperty($locale, 'locale');
-        $property->setAccessible(true);
-        $property->setValue($locale, 'pt_BR');
+        $this->useLocale('pt_BR');
 
         $reviewers = $this->dao->getReviewers(1);
 
