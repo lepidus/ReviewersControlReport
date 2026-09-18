@@ -83,36 +83,33 @@ class ReviewersControlReportDAO
             $reviewerUser->getInterestString(),
             $reviewsSummary->getQualityAverage(),
             $reviewsSummary->getTotal(),
-            $this->getReviewsGridCells($completedReviews)
+            $this->getReviewsOfTheGrid($completedReviews)
         );
     }
 
     /**
      * The expandable rows the grid shows under a reviewer: one submission
-     * title, linked to its workflow, plus the date the review was completed.
+     * title, the workflow it links to, and the date the review was completed.
+     * The template renders and escapes them.
      *
-     * @return list<list<string>>
+     * @return list<array{title: string, url: string, dateCompleted: string}>
      */
-    private function getReviewsGridCells(array $completedReviews): array
+    public function getReviewsOfTheGrid(array $completedReviews): array
     {
-        $gridCells = [];
+        $reviews = [];
 
         foreach ($completedReviews as $completedReview) {
-            $submissionUrl = $this->getSubmissionWorkflowUrl($completedReview->getSubmissionId());
-            $escapedUrl = htmlspecialchars($submissionUrl, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-            $escapedTitle = htmlspecialchars(
-                $this->formatStringLength($this->getPlainTextTitle($completedReview->getSubmissionTitle()), 40),
-                ENT_QUOTES | ENT_SUBSTITUTE,
-                'UTF-8'
-            );
-            $dateCompleted = date('Y-m-d', strtotime($completedReview->getDateCompleted()));
-
-            $gridCells[] = ['<td style="width: 200pt;" colspan="2"><a href="'
-                . $escapedUrl . '">' . $escapedTitle . '</a></td><td colspan="2">'
-                . __('common.completed.date', ['dateCompleted' => $dateCompleted]) . '</td>'];
+            $reviews[] = [
+                'title' => $this->formatStringLength(
+                    $this->getPlainTextTitle($completedReview->getSubmissionTitle()),
+                    40
+                ),
+                'url' => $this->getSubmissionWorkflowUrl($completedReview->getSubmissionId()),
+                'dateCompleted' => date('Y-m-d', strtotime($completedReview->getDateCompleted())),
+            ];
         }
 
-        return $gridCells;
+        return $reviews;
     }
 
     /**

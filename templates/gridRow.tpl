@@ -76,9 +76,12 @@
 {if $row->getReviews()}
 	{foreach from=$row->getReviews() item=review}
 		<tr class="row_controls row_review-{$row_id}">
-			{foreach from=$review item=reviewData}
-					{$reviewData}
-			{/foreach}
+			<td style="width: 200pt;" colspan="2">
+				<a href="{$review.url|escape}">{$review.title|escape}</a>
+			</td>
+			<td colspan="2">
+				{translate key="common.completed.date" dateCompleted=$review.dateCompleted}
+			</td>
 		</tr>
 	{/foreach}
 {/if}
