@@ -2,7 +2,7 @@
 
 use APP\plugins\generic\reviewersControlReport\classes\RCRClosedDateInterval;
 
-require_once __DIR__ . '/ReviewersControlReportTestCase.php';
+require_once __DIR__ . '/../ReviewersControlReportTestCase.php';
 
 class RCRClosedDateIntervalTest extends ReviewersControlReportTestCase
 {

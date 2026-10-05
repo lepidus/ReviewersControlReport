@@ -1,20 +1,17 @@
 <?php
 
 use APP\plugins\generic\reviewersControlReport\classes\RCRCompletedReview;
-use APP\plugins\generic\reviewersControlReport\classes\ReviewersControlReportForm;
+use APP\plugins\generic\reviewersControlReport\classes\RCRCsvWriter;
 use APP\plugins\generic\reviewersControlReport\classes\ReviewersReportBuilder;
 use APP\plugins\generic\reviewersControlReport\classes\ReviewsReportBuilder;
 
-require_once __DIR__ . '/ReviewersControlReportTestCase.php';
+require_once __DIR__ . '/../ReviewersControlReportTestCase.php';
 
-class ReviewersControlReportCsvSecurityTest extends ReviewersControlReportTestCase
+class RCRCsvWriterTest extends ReviewersControlReportTestCase
 {
     public function testFormulaLikeTextIsNeutralizedWhileNumbersKeepTheirTypes()
     {
-        $form = new ReviewersControlReportForm(null, 'en', ['en']);
-        $method = new ReflectionMethod($form, 'prepareCsvRow');
-        $method->setAccessible(true);
-        $row = $method->invoke($form, [
+        $row = (new RCRCsvWriter())->neutralizeFormulas([
             '=1+1', '+cmd', '-2+3', '@SUM(A1:A2)', "\t=1+1", "\r=1+1",
             '  =1+1', "\0 =1+1", "\nordinary text", 'ordinary text', 42, 4.5,
         ]);
@@ -33,13 +30,10 @@ class ReviewersControlReportCsvSecurityTest extends ReviewersControlReportTestCa
         $this->assertSame(4.5, $row[11]);
     }
 
-    public function testCsvWriterUsesStandardQuoteEscaping()
+    public function testRowIsWrittenWithStandardQuoteEscaping()
     {
-        $form = new ReviewersControlReportForm(null, 'en', ['en']);
-        $method = new ReflectionMethod($form, 'writeCsvRow');
-        $method->setAccessible(true);
         $stream = fopen('php://memory', 'w+');
-        $method->invoke($form, $stream, ['text \\"quoted"']);
+        (new RCRCsvWriter())->writeRow($stream, ['text \\"quoted"']);
         rewind($stream);
         $csv = stream_get_contents($stream);
         fclose($stream);
@@ -65,12 +59,10 @@ class ReviewersControlReportCsvSecurityTest extends ReviewersControlReportTestCa
             (new ReviewersReportBuilder())->getRows($reviewerData, [$review])[0],
             (new ReviewsReportBuilder())->getRows($reviewerData, [$review])[0],
         ];
-        $form = new ReviewersControlReportForm(null, 'en', ['en']);
-        $method = new ReflectionMethod($form, 'prepareCsvRow');
-        $method->setAccessible(true);
+        $csvWriter = new RCRCsvWriter();
 
-        $reviewersRow = $method->invoke($form, $rows[0]);
-        $reviewsRow = $method->invoke($form, $rows[1]);
+        $reviewersRow = $csvWriter->neutralizeFormulas($rows[0]);
+        $reviewsRow = $csvWriter->neutralizeFormulas($rows[1]);
         $this->assertSame("'=1+1", $reviewersRow[0]);
         $this->assertSame("'=EXTERNAL_REFERENCE()", $reviewsRow[1]);
         $this->assertSame("'@AFFILIATION", $reviewsRow[5]);

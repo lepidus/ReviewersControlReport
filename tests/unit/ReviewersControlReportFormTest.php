@@ -1,12 +1,12 @@
 <?php
 
 use APP\plugins\generic\reviewersControlReport\classes\ReviewersControlReportForm;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PKP\form\Form;
 
-require_once __DIR__ . '/ReviewersControlReportTestCase.php';
-use PHPUnit\Framework\Attributes\DataProvider;
+require_once __DIR__ . '/../ReviewersControlReportTestCase.php';
 
-class ReviewersControlReportDateValidationTest extends ReviewersControlReportTestCase
+class ReviewersControlReportFormTest extends ReviewersControlReportTestCase
 {
     #[DataProvider('invalidDateProvider')]
     public function testMalformedNonexistentAndNonStringDatesBecomeFormErrors($field, $value)
@@ -70,7 +70,6 @@ class ReviewersControlReportDateValidationTest extends ReviewersControlReportTes
             }
         };
         $checks = new ReflectionProperty(Form::class, '_checks');
-        $checks->setAccessible(true);
         $checks->setValue($form, []);
 
         $form->readInputData();
@@ -84,7 +83,6 @@ class ReviewersControlReportDateValidationTest extends ReviewersControlReportTes
     {
         $form = new ReviewersControlReportForm(null, 'en', ['en']);
         $checks = new ReflectionProperty(Form::class, '_checks');
-        $checks->setAccessible(true);
         $checks->setValue($form, []);
         return $form;
     }

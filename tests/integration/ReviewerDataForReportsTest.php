@@ -9,10 +9,14 @@ use PKP\db\DBResultRange;
 use PKP\security\Role;
 use PKP\submission\reviewAssignment\ReviewAssignment;
 
-require_once __DIR__ . '/ReviewersControlReportTestCase.php';
+require_once __DIR__ . '/../ReviewersControlReportTestCase.php';
+require_once __DIR__ . '/../RCRReportFixtures.php';
 
-class ReviewersControlReportFormTest extends ReviewersControlReportTestCase
+class ReviewerDataForReportsTest extends ReviewersControlReportTestCase
 {
+    use RCRReportFixtures;
+
+    private $contextId;
     private $reviewerId;
     private $locale = 'en';
     private $givenName = 'Walter';
@@ -25,27 +29,17 @@ class ReviewersControlReportFormTest extends ReviewersControlReportTestCase
     {
         parent::setUp();
         DB::beginTransaction();
-        $this->reviewerId = $this->createUser();
+        $this->contextId = $this->createContext('rcr-reviewer-data');
+        $this->reviewerId = $this->createUser([
+            'email' => $this->email,
+            'userName' => $this->username,
+        ]);
     }
 
     protected function tearDown(): void
     {
         DB::rollBack();
         parent::tearDown();
-    }
-
-    private function createUser()
-    {
-        $user = Repo::user()->newDataObject();
-        $user->setData('givenName', [$this->locale => $this->givenName]);
-        $user->setData('familyName', [$this->locale => $this->familyName]);
-        $user->setData('affiliation', [$this->locale => $this->affiliation]);
-        $user->setData('email', $this->email);
-        $user->setData('userName', $this->username);
-        $user->setData('password', $this->username);
-        $user->setData('dateRegistered', '2026-01-01 00:00:00');
-
-        return Repo::user()->add($user);
     }
 
     public function testGetsPersonalDataOfTheReviewersOfTheGivenReviews()
@@ -103,17 +97,13 @@ class ReviewersControlReportFormTest extends ReviewersControlReportTestCase
         $reviewer = Repo::user()->get($this->reviewerId);
         Repo::user()->edit($reviewer, ['disabled' => true]);
 
-        $reviewerGroup = Repo::userGroup()
-            ->getByRoleIds([Role::ROLE_ID_REVIEWER], 1)
-            ->first();
-        $this->assertNotNull($reviewerGroup);
-        Repo::userGroup()->assignUserToGroup($this->reviewerId, $reviewerGroup->id);
+        $this->giveUserTheRole($this->reviewerId, Role::ROLE_ID_REVIEWER, $this->contextId);
 
         $dao = new ReviewersControlReportDAO();
-        $this->assertContains($this->reviewerId, $dao->getReviewersIds(1));
-        $this->assertArrayHasKey($this->reviewerId, $dao->getReviewers(1));
+        $this->assertContains($this->reviewerId, $dao->getReviewersIds($this->contextId));
+        $this->assertArrayHasKey($this->reviewerId, $dao->getReviewers($this->contextId));
 
-        $firstPage = $dao->getReviewers(1, new DBResultRange(1, 1));
+        $firstPage = $dao->getReviewersPage($this->contextId, new DBResultRange(1, 1));
         $this->assertCount(1, $firstPage->toArray());
         $this->assertGreaterThanOrEqual(1, $firstPage->getCount());
     }

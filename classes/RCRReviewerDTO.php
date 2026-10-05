@@ -16,9 +16,9 @@ class RCRReviewerDTO extends DataObject
     private $interests;
     private $qualityAverage;
     private $totalReviewedSubmissions;
-    private $reviewedSubmissionsTitleAndDate;
+    private $completedReviews;
 
-    public function __construct($id, $email, $fullName, $affiliation, $interests, $qualityAverage, $totalReviewedSubmissions, $reviewedSubmissionsTitleAndDate)
+    public function __construct($id, $email, $fullName, $affiliation, $interests, $qualityAverage, $totalReviewedSubmissions, $completedReviews)
     {
         $this->id = (int) $id;
         $this->setData('id', $id);
@@ -28,7 +28,7 @@ class RCRReviewerDTO extends DataObject
         $this->interests = $this->formatStringLength($interests);
         $this->qualityAverage = $qualityAverage;
         $this->totalReviewedSubmissions = $totalReviewedSubmissions;
-        $this->reviewedSubmissionsTitleAndDate = $reviewedSubmissionsTitleAndDate;
+        $this->completedReviews = $completedReviews;
     }
 
     public function getId(): int
@@ -71,6 +71,6 @@ class RCRReviewerDTO extends DataObject
 
     public function getReviewedSubmissionsTitleAndDate(): array
     {
-        return $this->reviewedSubmissionsTitleAndDate;
+        return $this->completedReviews;
     }
 }
