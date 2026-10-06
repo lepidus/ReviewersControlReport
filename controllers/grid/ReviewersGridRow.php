@@ -55,6 +55,11 @@ class ReviewersGridRow extends GridRow
         );
     }
 
+    public function getReviewsTemplate(): string
+    {
+        return $this->getPlugin()->getTemplateResource('gridReviews.tpl');
+    }
+
     private function getPlugin()
     {
         return PluginRegistry::getPlugin('generic', 'ReviewersControlReportPlugin');

@@ -63,7 +63,7 @@ class ReviewersControlReportReportPlugin extends ReportPlugin
         $templateManager = TemplateManager::getManager($request);
         $templateManager->addStyleSheet(
             'reviewersControlReport',
-            $request->getBaseUrl() . '/' . $this->getPluginPath() . '/styles/reviewersControlReport.css',
+            $this->getStyleSheetUrl($request),
             ['contexts' => 'backend']
         );
         $templateManager->assign([
@@ -85,5 +85,16 @@ class ReviewersControlReportReportPlugin extends ReportPlugin
             ],
         ]);
         $form->display($request);
+    }
+
+    /**
+     * Versioned by the file itself: OJS would add its own version only, so
+     * browsers would keep using a cached copy after the stylesheet changes.
+     */
+    public function getStyleSheetUrl($request): string
+    {
+        $styleSheet = 'styles/reviewersControlReport.css';
+        return $request->getBaseUrl() . '/' . $this->getPluginPath() . '/' . $styleSheet
+            . '?v=' . filemtime(__DIR__ . '/' . $styleSheet);
     }
 }
