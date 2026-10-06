@@ -69,7 +69,7 @@ class RCRReviewerDTO extends DataObject
         return $this->totalReviewedSubmissions;
     }
 
-    public function getReviewedSubmissionsTitleAndDate(): array
+    public function getCompletedReviews(): array
     {
         return $this->completedReviews;
     }
