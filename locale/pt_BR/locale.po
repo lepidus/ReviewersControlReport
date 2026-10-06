@@ -65,6 +65,12 @@ msgstr "Deixe as duas datas em branco para incluir todas as avaliações conclu�
 msgid "plugins.reports.reviewersControlReport.dateCompletedInterval"
 msgstr "Intervalo da data de conclusão do parecer"
 
+msgid "plugins.reports.reviewersControlReport.dateCompletedInterval.start"
+msgstr "De"
+
+msgid "plugins.reports.reviewersControlReport.dateCompletedInterval.end"
+msgstr "Até"
+
 msgid "plugins.reports.reviewersControlReport.warning.invalidDateInterval"
 msgstr "A data inicial não pode ser posterior à data final."
 

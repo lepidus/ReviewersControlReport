@@ -65,6 +65,12 @@ msgstr "Deje ambas fechas en blanco para incluir todas las revisiones completada
 msgid "plugins.reports.reviewersControlReport.dateCompletedInterval"
 msgstr "Intervalo de la fecha de finalización de la revisión"
 
+msgid "plugins.reports.reviewersControlReport.dateCompletedInterval.start"
+msgstr "Desde"
+
+msgid "plugins.reports.reviewersControlReport.dateCompletedInterval.end"
+msgstr "Hasta"
+
 msgid "plugins.reports.reviewersControlReport.warning.invalidDateInterval"
 msgstr "La fecha inicial no puede ser posterior a la fecha final."
 
