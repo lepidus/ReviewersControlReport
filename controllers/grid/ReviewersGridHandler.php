@@ -42,8 +42,6 @@ class ReviewersGridHandler extends GridHandler
         $context = $request->getContext();
         $this->contextId = $context->getId();
 
-        $this->setTitle('plugins.reports.reviewersControlReport.displayName');
-
         $cellProvider = new ReviewersGridCellProvider();
 
         $columnsInfo = [

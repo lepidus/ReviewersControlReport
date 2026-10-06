@@ -14,7 +14,7 @@
     </h1>
 
     <div class="app__contentPanel reviewersControlReport__panel">
-        <h2>{translate key="plugins.reports.reviewersControlReport.generateReport"}</h2>
+        <h2 class="text-2xl-bold">{translate key="plugins.reports.reviewersControlReport.generateReport"}</h2>
         <p>{translate key="plugins.reports.reviewersControlReport.generateReport.description"}</p>
 
         <form class="pkp_form" id="reviewersControlReportForm" method="post" action="">
@@ -50,7 +50,7 @@
     </div>
 
     <div class="app__contentPanel reviewersControlReport__panel">
-        <h2>{translate key="plugins.reports.reviewersControlReport.reviewersList"}</h2>
+        <h2 class="text-2xl-bold">{translate key="plugins.reports.reviewersControlReport.reviewersList"}</h2>
         <p>{translate key="plugins.reports.reviewersControlReport.reviewersList.description"}</p>
 
         {capture assign=reviewersUrl}{url router=PKP\core\PKPApplication::ROUTE_COMPONENT component="plugins.generic.reviewersControlReport.controllers.grid.ReviewersGridHandler" op="fetchGrid" escape=false}{/capture}

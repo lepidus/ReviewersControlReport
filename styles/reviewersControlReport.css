@@ -29,6 +29,10 @@
 	margin-top: 2rem;
 }
 
+#reviewersReportGridContainer {
+	margin-top: 1rem;
+}
+
 .pkp_controllers_grid .reviewersControlReport__reviewsHeader,
 .pkp_controllers_grid .reviewersControlReport__review {
 	display: none;
