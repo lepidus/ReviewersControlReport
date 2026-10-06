@@ -85,14 +85,23 @@ class ReviewersGridHandler extends GridHandler
     }
 
     /**
-     * Section editors reach this grid, but the core user grid only lets
-     * managers and site administrators edit users.
+     * Section editors reach this grid, but the user page sits under the
+     * journal settings, which CanAccessSettingsPolicy opens only to site
+     * administrators and to managers allowed to change the settings.
      */
     public function canCurrentUserEditUsers(): bool
     {
-        $roles = (array) $this->getAuthorizedContextObject(Application::ASSOC_TYPE_USER_ROLES);
+        $userGroups = (array) $this->getAuthorizedContextObject(Application::ASSOC_TYPE_USER_GROUP);
+        foreach ($userGroups as $userGroup) {
+            if ($userGroup->roleId == Role::ROLE_ID_SITE_ADMIN) {
+                return true;
+            }
+            if ($userGroup->roleId == Role::ROLE_ID_MANAGER && $userGroup->permitSettings) {
+                return true;
+            }
+        }
 
-        return (bool) array_intersect([Role::ROLE_ID_SITE_ADMIN, Role::ROLE_ID_MANAGER], $roles);
+        return false;
     }
 
     public function initFeatures($request, $args)

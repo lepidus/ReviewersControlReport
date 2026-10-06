@@ -62,9 +62,14 @@ class ReviewersGridAuthorizationTest extends ReviewersControlReportTestCase
         $this->assertFalse($this->authorizeAs(Role::ROLE_ID_MANAGER, 'enable'));
     }
 
-    public function testManagersMayEditTheListedReviewers()
+    public function testManagersAllowedToChangeTheSettingsMayEditTheListedReviewers()
     {
-        $this->assertTrue($this->mayEditUsersAs(Role::ROLE_ID_MANAGER));
+        $this->assertTrue($this->mayEditUsersAs(Role::ROLE_ID_MANAGER, ['permitSettings' => true]));
+    }
+
+    public function testManagersWithoutAccessToTheSettingsMayNotEditTheListedReviewers()
+    {
+        $this->assertFalse($this->mayEditUsersAs(Role::ROLE_ID_MANAGER, ['permitSettings' => false]));
     }
 
     public function testSiteAdministratorsMayEditTheListedReviewers()
@@ -77,10 +82,10 @@ class ReviewersGridAuthorizationTest extends ReviewersControlReportTestCase
         $this->assertFalse($this->mayEditUsersAs(Role::ROLE_ID_SUB_EDITOR));
     }
 
-    private function mayEditUsersAs(int $roleId): bool
+    private function mayEditUsersAs(int $roleId, array $userGroupOverrides = []): bool
     {
         $handler = new ReviewersGridHandler();
-        $this->authorizeHandler($handler, $roleId, 'fetchGrid');
+        $this->authorizeHandler($handler, $roleId, 'fetchGrid', $userGroupOverrides);
 
         return $handler->canCurrentUserEditUsers();
     }
@@ -90,9 +95,9 @@ class ReviewersGridAuthorizationTest extends ReviewersControlReportTestCase
         return $this->authorizeHandler(new ReviewersGridHandler(), $roleId, $operation);
     }
 
-    private function authorizeHandler(ReviewersGridHandler $handler, int $roleId, string $operation): bool
+    private function authorizeHandler(ReviewersGridHandler $handler, int $roleId, string $operation, array $userGroupOverrides = []): bool
     {
-        $userId = $this->createUserWithRole($roleId);
+        $userId = $this->createUserWithRole($roleId, $userGroupOverrides);
         $request = $this->mockRequest($this->contextPath . '/reviewers-grid/' . $operation, $userId);
         $user = Repo::user()->get($userId);
         Registry::set('user', $user);
@@ -116,10 +121,10 @@ class ReviewersGridAuthorizationTest extends ReviewersControlReportTestCase
         return $decision;
     }
 
-    private function createUserWithRole(int $roleId): int
+    private function createUserWithRole(int $roleId, array $userGroupOverrides = []): int
     {
         $userId = $this->createUser(['userName' => 'walter.salles.' . $roleId]);
-        $this->giveUserTheRole($userId, $roleId, $this->contextId);
+        $this->giveUserTheRole($userId, $roleId, $this->contextId, $userGroupOverrides);
 
         return $userId;
     }

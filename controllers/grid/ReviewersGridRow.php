@@ -5,7 +5,7 @@ namespace APP\plugins\generic\reviewersControlReport\controllers\grid;
 use PKP\controllers\grid\GridRow;
 use PKP\core\PKPApplication;
 use PKP\linkAction\LinkAction;
-use PKP\linkAction\request\AjaxModal;
+use PKP\linkAction\request\RedirectAction;
 use PKP\plugins\PluginRegistry;
 
 class ReviewersGridRow extends GridRow
@@ -19,8 +19,8 @@ class ReviewersGridRow extends GridRow
     }
 
     /**
-     * The core user grid only lets managers and site administrators edit
-     * users, so the row offers the action to them alone.
+     * The user page sits under the journal settings, so the row offers the
+     * action only to those who may open them.
      */
     public function canEditUsers(): bool
     {
@@ -29,35 +29,35 @@ class ReviewersGridRow extends GridRow
 
     public function initialize($request, $template = null)
     {
-        $plugin = PluginRegistry::getPlugin('generic', 'ReviewersControlReportPlugin');
-        parent::initialize($request, $plugin->getTemplateResource('gridRow.tpl'));
+        parent::initialize($request, $this->getPlugin()->getTemplateResource('gridRow.tpl'));
 
-        $rowId = $this->getId();
-        $dispatcher = $request->getDispatcher();
-
-        if (!$this->canEditUsers) {
-            return;
+        if ($this->canEditUsers) {
+            $this->addAction($this->getEditUserAction($request));
         }
+    }
 
-        $this->addAction(new LinkAction(
+    protected function getEditUserAction($request): LinkAction
+    {
+        $editUserUrl = $request->getDispatcher()->url(
+            $request,
+            PKPApplication::ROUTE_PAGE,
+            null,
+            'management',
+            'settings',
+            ['user', $this->getId()]
+        );
+
+        return new LinkAction(
             'edit',
-            new AjaxModal(
-                $dispatcher->url(
-                    $request,
-                    PKPApplication::ROUTE_COMPONENT,
-                    null,
-                    'grid.settings.user.UserGridHandler',
-                    'editUser',
-                    null,
-                    ['rowId' => $rowId]
-                ),
-                __('grid.user.edit'),
-                'modal_edit',
-                true
-            ),
+            new RedirectAction($editUserUrl),
             __('grid.user.edit'),
             'edit'
-        ));
+        );
+    }
+
+    private function getPlugin()
+    {
+        return PluginRegistry::getPlugin('generic', 'ReviewersControlReportPlugin');
     }
 
     public function getReviews()

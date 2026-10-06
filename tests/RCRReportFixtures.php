@@ -53,9 +53,9 @@ trait RCRReportFixtures
      * Roles live in user groups of a journal, and a journal created by a test
      * has none: the installer seeds them only for the journals it creates.
      */
-    protected function giveUserTheRole(int $userId, int $roleId, ?int $contextId = null): void
+    protected function giveUserTheRole(int $userId, int $roleId, ?int $contextId = null, array $userGroupOverrides = []): void
     {
-        $userGroup = UserGroup::create([
+        $userGroup = UserGroup::create([...[
             // Site administrators hold their role on the site, which has no
             // context id of its own.
             'contextId' => $roleId === Role::ROLE_ID_SITE_ADMIN ? null : $contextId,
@@ -67,7 +67,7 @@ trait RCRReportFixtures
             'masthead' => false,
             'name' => [$this->fixtureLocale => 'Role ' . $roleId],
             'abbrev' => [$this->fixtureLocale => 'R' . $roleId],
-        ]);
+        ], ...$userGroupOverrides]);
 
         Repo::userGroup()->assignUserToGroup($userId, $userGroup->id);
     }
