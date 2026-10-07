@@ -81,16 +81,17 @@ class ReviewersGridHandler extends GridHandler
     protected function getRowInstance()
     {
         import('plugins.generic.reviewersControlReport.controllers.grid.ReviewersGridRow');
-        $roles = (array) $this->getAuthorizedContextObject(ASSOC_TYPE_USER_ROLES);
-        return new ReviewersGridRow(self::canRolesEditUsers($roles));
+        return new ReviewersGridRow($this->canCurrentUserEditUsers());
     }
 
     /**
      * Section editors can see the grid, but the core user grid only lets
      * managers and site administrators edit users.
      */
-    public static function canRolesEditUsers(array $roles): bool
+    public function canCurrentUserEditUsers(): bool
     {
+        $roles = (array) $this->getAuthorizedContextObject(ASSOC_TYPE_USER_ROLES);
+
         return (bool) array_intersect([ROLE_ID_SITE_ADMIN, ROLE_ID_MANAGER], $roles);
     }
 

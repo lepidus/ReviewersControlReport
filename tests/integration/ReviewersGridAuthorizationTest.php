@@ -1,43 +1,149 @@
 <?php
 
-import('lib.pkp.tests.PKPTestCase');
-import('lib.pkp.pages.stats.PKPStatsHandler');
+import('lib.pkp.tests.DatabaseTestCase');
+import('classes.core.PageRouter');
+import('lib.pkp.classes.core.Dispatcher');
+import('lib.pkp.classes.security.authorization.UserRolesRequiredPolicy');
 import('plugins.generic.reviewersControlReport.controllers.grid.ReviewersGridHandler');
 
-class ReviewersGridAuthorizationTest extends PKPTestCase
+require_once __DIR__ . '/../RCRReportFixtures.php';
+
+class ReviewersGridAuthorizationTest extends DatabaseTestCase
 {
-    public function testGridRolesMatchTheCoreReportsPageRoles()
+    use RCRReportFixtures;
+
+    private $contextId;
+    private $contextPath = 'rcr-grid-access';
+    private $serverBackup;
+
+    protected function getAffectedTables()
     {
-        $coreRoles = $this->getRolesForOperation(new PKPStatsHandler(), 'reports');
-        $gridHandler = new ReviewersGridHandler();
-
-        foreach (['fetchGrid', 'fetchCategory', 'fetchRow'] as $operation) {
-            $this->assertSame($coreRoles, $this->getRolesForOperation($gridHandler, $operation));
-        }
-
-        $this->assertSame([ROLE_ID_SITE_ADMIN, ROLE_ID_MANAGER, ROLE_ID_SUB_EDITOR], $coreRoles);
-        $this->assertNotContains(ROLE_ID_REVIEWER, $coreRoles);
+        return ['journals', 'journal_settings', 'users', 'user_settings',
+            'user_groups', 'user_group_settings', 'user_user_groups'];
     }
 
-    public function testOnlyManagersAndSiteAdministratorsCanEditReviewers()
+    protected function getMockedRegistryKeys()
     {
-        $this->assertTrue(ReviewersGridHandler::canRolesEditUsers([ROLE_ID_MANAGER]));
-        $this->assertTrue(ReviewersGridHandler::canRolesEditUsers([ROLE_ID_SITE_ADMIN]));
-        $this->assertTrue(ReviewersGridHandler::canRolesEditUsers([ROLE_ID_SUB_EDITOR, ROLE_ID_MANAGER]));
-        $this->assertFalse(ReviewersGridHandler::canRolesEditUsers([ROLE_ID_SUB_EDITOR]));
-        $this->assertFalse(ReviewersGridHandler::canRolesEditUsers([]));
+        return ['request', 'user'];
     }
 
-    private function getRolesForOperation($handler, string $operation): array
+    protected function setUp(): void
     {
-        $roles = [];
-        foreach ($handler->getRoleAssignments() as $roleId => $operations) {
-            if (in_array($operation, $operations, true)) {
-                $roles[] = $roleId;
-            }
-        }
-        sort($roles);
+        parent::setUp();
+        $this->serverBackup = $_SERVER;
+        $this->contextId = $this->createContext($this->contextPath);
+    }
 
-        return $roles;
+    protected function tearDown(): void
+    {
+        $_SERVER = $this->serverBackup;
+        parent::tearDown();
+    }
+
+    public function testManagersReachTheGrid()
+    {
+        $this->assertTrue($this->authorizeAs(ROLE_ID_MANAGER, 'fetchGrid'));
+    }
+
+    public function testSectionEditorsReachTheGrid()
+    {
+        $this->assertTrue($this->authorizeAs(ROLE_ID_SUB_EDITOR, 'fetchGrid'));
+    }
+
+    public function testReviewersDoNotReachTheGrid()
+    {
+        $this->assertFalse($this->authorizeAs(ROLE_ID_REVIEWER, 'fetchGrid'));
+    }
+
+    public function testAuthorsDoNotReachTheGrid()
+    {
+        $this->assertFalse($this->authorizeAs(ROLE_ID_AUTHOR, 'fetchGrid'));
+    }
+
+    public function testUndeclaredOperationsAreDeniedToManagers()
+    {
+        $this->assertFalse($this->authorizeAs(ROLE_ID_MANAGER, 'enable'));
+    }
+
+    public function testManagersMayEditTheListedReviewers()
+    {
+        $this->assertTrue($this->mayEditUsersAs(ROLE_ID_MANAGER));
+    }
+
+    public function testSiteAdministratorsMayEditTheListedReviewers()
+    {
+        $this->assertTrue($this->mayEditUsersAs(ROLE_ID_SITE_ADMIN));
+    }
+
+    public function testSectionEditorsMayNotEditTheListedReviewers()
+    {
+        $this->assertFalse($this->mayEditUsersAs(ROLE_ID_SUB_EDITOR));
+    }
+
+    private function mayEditUsersAs(int $roleId): bool
+    {
+        $handler = new ReviewersGridHandler();
+        $this->authorizeHandler($handler, $roleId, 'fetchGrid');
+
+        return $handler->canCurrentUserEditUsers();
+    }
+
+    private function authorizeAs(int $roleId, string $operation): bool
+    {
+        return $this->authorizeHandler(new ReviewersGridHandler(), $roleId, $operation);
+    }
+
+    private function authorizeHandler(ReviewersGridHandler $handler, int $roleId, string $operation): bool
+    {
+        $userId = $this->createUserWithRole($roleId);
+        $request = $this->requestFor($this->contextPath . '/reviewers-grid/' . $operation);
+        $user = DAORegistry::getDAO('UserDAO')->getById($userId);
+        Registry::set('user', $user);
+        $request->getRouter()->setHandler($handler);
+        // Tests run with the session disabled, and the core only loads the
+        // roles of the user into the authorized context when it is enabled.
+        $handler->addPolicy(new UserRolesRequiredPolicy($request), true);
+        $args = [];
+
+        $decision = $handler->authorize($request, $args, $handler->getRoleAssignments());
+
+        // A denial means nothing when the roles of the user never reached the
+        // authorized context: every role would be denied, for the wrong reason.
+        $this->assertContains(
+            $roleId,
+            (array) $handler->getAuthorizedContextObject(ASSOC_TYPE_USER_ROLES),
+            'The role of the user did not reach the authorized context'
+        );
+
+        return $decision;
+    }
+
+    /**
+     * PKPTestCase::mockRequest() would also start a session, which PHPUnit
+     * cannot do once it has written its own output.
+     */
+    private function requestFor(string $path)
+    {
+        Registry::delete('request');
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['PATH_INFO'] = $path;
+        $application = Application::get();
+        $request = $application->getRequest();
+        $router = new PageRouter();
+        $router->setApplication($application);
+        $dispatcher = new Dispatcher();
+        $dispatcher->setApplication($application);
+        $router->setDispatcher($dispatcher);
+        $request->setRouter($router);
+
+        return $request;
+    }
+
+    private function createUserWithRole(int $roleId): int
+    {
+        $userId = $this->createUser(['userName' => 'walter.salles.' . $roleId]);
+        $this->giveUserTheRole($userId, $roleId, $this->contextId);
+
+        return $userId;
     }
 }
