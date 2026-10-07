@@ -89,15 +89,27 @@ class CompletedReviewsQueryTest extends ReviewersControlReportTestCase
         ]);
 
         $this->assertContains($this->reviewerId, $this->dao->getReviewersIds($this->contextId));
-        $grid = $this->dao->getReviewers($this->contextId, new DBResultRange(1, 1));
+        $grid = $this->dao->getReviewersPage($this->contextId, new DBResultRange(1, 1));
         $this->assertSame(2, $grid->getCount());
         $this->assertArrayHasKey($this->reviewerId, $grid->toArray());
         $this->assertCount(1, $grid->toArray());
-        $secondPage = $this->dao->getReviewers($this->contextId, new DBResultRange(1, 2));
+        $secondPage = $this->dao->getReviewersPage($this->contextId, new DBResultRange(1, 2));
         $this->assertSame(2, $secondPage->getPage());
         $this->assertArrayHasKey($activeReviewerId, $secondPage->toArray());
         $this->assertCount(1, $secondPage->toArray());
         $this->assertSame([], $this->dao->getReviewersIds($this->otherContextId));
+    }
+
+    public function testFullListCarriesEveryReviewerOfTheContext()
+    {
+        $otherReviewerId = $this->createReviewer();
+        $this->giveUserTheRole($this->reviewerId, Role::ROLE_ID_REVIEWER, $this->contextId);
+        $this->giveUserTheRole($otherReviewerId, Role::ROLE_ID_REVIEWER, $this->contextId);
+
+        $reviewers = $this->dao->getReviewers($this->contextId);
+
+        $this->assertEqualsCanonicalizing([$this->reviewerId, $otherReviewerId], array_keys($reviewers));
+        $this->assertSame([], $this->dao->getReviewers($this->otherContextId));
     }
 
     public function testDoesNotReturnReviewsOfAnotherContext()

@@ -7,6 +7,7 @@ use APP\plugins\generic\reviewersControlReport\classes\traits\RCRStringLength;
 use APP\plugins\generic\reviewersControlReport\classes\traits\RCRSubmissionUrl;
 use PKP\db\DAO;
 use PKP\core\VirtualArrayIterator;
+use PKP\db\DBResultRange;
 use PKP\facades\Locale;
 use PKP\security\Role;
 use PKP\user\Collector;
@@ -16,8 +17,6 @@ class ReviewersControlReportDAO extends DAO
 {
     use RCRSubmissionUrl;
     use RCRStringLength;
-
-    private $contextId;
 
     public function getReviewersIds($journalId)
     {
@@ -29,37 +28,48 @@ class ReviewersControlReportDAO extends DAO
             ->all();
     }
 
-    public function getReviewers($contextId, $rangeInfo = null)
+    /**
+     * Every reviewer of the context, keyed by user id.
+     *
+     * @return array<int, RCRReviewerDTO>
+     */
+    public function getReviewers(int $contextId): array
     {
-        $this->contextId = (int) $contextId;
-        $collector = Repo::user()->getCollector()
-            ->filterByStatus(Collector::STATUS_ALL)
-            ->filterByRoleIds([Role::ROLE_ID_REVIEWER])
-            ->filterByContextIds([$this->contextId])
-            ->orderBy(Collector::ORDERBY_FAMILYNAME, Collector::ORDER_DIR_ASC, [Locale::getLocale()]);
-
-        $totalCount = $collector->getCount();
-        if ($rangeInfo) {
-            $collector
-                ->limit($rangeInfo->getCount())
-                ->offset($rangeInfo->getOffset() + max(0, $rangeInfo->getPage() - 1) * $rangeInfo->getCount());
+        $reviewers = [];
+        foreach ($this->getReviewerCollector($contextId)->getMany() as $reviewerUser) {
+            $reviewers[$reviewerUser->getId()] = $this->createReviewer($contextId, $reviewerUser);
         }
+
+        return $reviewers;
+    }
+
+    /**
+     * One page of reviewers, in the iterator the grid pages through.
+     */
+    public function getReviewersPage(int $contextId, DBResultRange $dbResultRange): VirtualArrayIterator
+    {
+        $collector = $this->getReviewerCollector($contextId);
+        $totalCount = $collector->getCount();
+
+        $count = $dbResultRange->getCount();
+        $offset = $dbResultRange->getOffset() + max(0, ($dbResultRange->getPage() - 1) * $count);
+        $collector->limit($count)->offset($offset);
 
         $reviewers = [];
-        foreach ($collector->getMany() as $user) {
-            $reviewers[$user->getId()] = $this->createReviewer($user);
+        foreach ($collector->getMany() as $reviewerUser) {
+            $reviewers[$reviewerUser->getId()] = $this->createReviewer($contextId, $reviewerUser);
         }
 
-        if (!$rangeInfo) {
-            return $reviewers;
-        }
+        return new VirtualArrayIterator($reviewers, $totalCount, $dbResultRange->getPage(), $count);
+    }
 
-        return new VirtualArrayIterator(
-            $reviewers,
-            $totalCount,
-            $rangeInfo->getPage(),
-            $rangeInfo->getCount()
-        );
+    private function getReviewerCollector(int $contextId): Collector
+    {
+        return Repo::user()->getCollector()
+            ->filterByStatus(Collector::STATUS_ALL)
+            ->filterByRoleIds([Role::ROLE_ID_REVIEWER])
+            ->filterByContextIds([$contextId])
+            ->orderBy(Collector::ORDERBY_FAMILYNAME, Collector::ORDER_DIR_ASC, [Locale::getLocale()]);
     }
 
     public function getReviewerUser($reviewerId)
@@ -67,9 +77,9 @@ class ReviewersControlReportDAO extends DAO
         return Repo::user()->get((int) $reviewerId);
     }
 
-    private function createReviewer($reviewerUser): RCRReviewerDTO
+    private function createReviewer(int $contextId, $reviewerUser): RCRReviewerDTO
     {
-        $completedReviews = $this->getCompletedReviews($this->contextId, null, $reviewerUser->getId());
+        $completedReviews = $this->getCompletedReviews($contextId, null, $reviewerUser->getId());
         $reviewsSummary = new RCRReviewsSummary($completedReviews);
 
         $reviewer = new RCRReviewerDTO(
