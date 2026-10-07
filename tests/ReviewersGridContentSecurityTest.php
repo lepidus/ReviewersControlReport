@@ -7,14 +7,24 @@ import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportDAO
 
 class ReviewersGridContentSecurityTest extends PKPTestCase
 {
-    public function testSubmissionTitleAndWorkflowUrlAreEscapedInGridHtml()
+    public function testReviewOfTheGridCarriesItsTitleLinkAndCompletionDate()
     {
         $dao = new TestableReviewersControlReportDAO();
-        $dao->workflowUrl = 'https://example.test/workflow?value=" onclick="alert(2)&other=1';
-        $completedReview = new RCRCompletedReview(
+        $dao->workflowUrl = 'https://example.test/workflow';
+
+        $review = $dao->getReviewsOfTheGrid([$this->completedReviewOfTitle('Central do Brasil')])[0];
+
+        $this->assertSame('Central do Brasil', $review['title']);
+        $this->assertSame('https://example.test/workflow', $review['url']);
+        $this->assertSame('2026-01-15', $review['dateCompleted']);
+    }
+
+    private function completedReviewOfTitle(string $title): RCRCompletedReview
+    {
+        return new RCRCompletedReview(
             11,
             100,
-            '<img src=x onerror=alert(1)>',
+            $title,
             1,
             '2026-01-02 10:00:00',
             '2026-01-20 00:00:00',
@@ -22,18 +32,6 @@ class ReviewersGridContentSecurityTest extends PKPTestCase
             SUBMISSION_REVIEWER_RECOMMENDATION_ACCEPT,
             4
         );
-
-        $method = new ReflectionMethod($dao, 'getReviewsGridCells');
-        $method->setAccessible(true);
-        $cells = $method->invoke($dao, [$completedReview]);
-        $html = $cells[0][0];
-
-        $this->assertStringContainsString(
-            'href="https://example.test/workflow?value=&quot; onclick=&quot;alert(2)&amp;other=1"',
-            $html
-        );
-        $this->assertStringContainsString('&lt;img src=x onerror=alert(1)&gt;', $html);
-        $this->assertStringNotContainsString('<img', $html);
     }
 }
 

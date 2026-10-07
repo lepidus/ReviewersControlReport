@@ -131,35 +131,32 @@ class ReviewersControlReportDAO extends DAO
             $reviewerUser->getInterestString(),
             $reviewsSummary->getQualityAverage(),
             $reviewsSummary->getTotal(),
-            $this->getReviewsGridCells($completedReviews)
+            $this->getReviewsOfTheGrid($completedReviews)
         );
         return $reviewer;
     }
 
     /**
      * The expandable rows the grid shows under a reviewer: one submission
-     * title, linked to its workflow, plus the date the review was completed.
+     * title, the workflow it links to, and the date the review was completed.
+     * The template renders and escapes them.
      */
-    private function getReviewsGridCells(array $completedReviews): array
+    public function getReviewsOfTheGrid(array $completedReviews): array
     {
-        $gridCells = [];
+        $reviews = [];
 
         foreach ($completedReviews as $completedReview) {
-            $submissionUrl = htmlspecialchars($this->getSubmissionWorkflowUrl(
-                $completedReview->getSubmissionId(),
-                $completedReview->getSubmissionStageId()
-            ), ENT_QUOTES, 'UTF-8');
-            $submissionTitle = htmlspecialchars(
-                $this->formatStringLength($completedReview->getSubmissionTitle(), 40),
-                ENT_QUOTES,
-                'UTF-8'
-            );
-            $dateCompleted = date('Y-m-d', strtotime($completedReview->getDateCompleted()));
-
-            $gridCells[] = ["<td style='width: 200pt;' colspan='2'><a href=\"" . $submissionUrl . "\">" . $submissionTitle . "</a></td><td colspan='2'>" . __('common.completed.date', ['dateCompleted' => $dateCompleted]) . "</td>"];
+            $reviews[] = [
+                'title' => $this->formatStringLength($completedReview->getSubmissionTitle(), 40),
+                'url' => $this->getSubmissionWorkflowUrl(
+                    $completedReview->getSubmissionId(),
+                    $completedReview->getSubmissionStageId()
+                ),
+                'dateCompleted' => date('Y-m-d', strtotime($completedReview->getDateCompleted())),
+            ];
         }
 
-        return $gridCells;
+        return $reviews;
     }
 
     /**
