@@ -2,14 +2,15 @@
 
 use APP\plugins\generic\reviewersControlReport\classes\ReviewersControlReportForm;
 use PKP\facades\Locale;
-use PKP\tests\PKPTestCase;
 
-class ReviewersControlReportDateValidationTest extends PKPTestCase
+require_once __DIR__ . '/../ReviewersControlReportTestCase.php';
+
+class ReviewersControlReportFormTest extends ReviewersControlReportTestCase
 {
     protected function setUp(): void
     {
         parent::setUp();
-        Locale::registerPath(dirname(__DIR__) . '/locale');
+        Locale::registerPath(dirname(__DIR__, 2) . '/locale');
     }
 
     /**

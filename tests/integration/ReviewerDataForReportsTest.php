@@ -1,16 +1,15 @@
 <?php
 
 use APP\facades\Repo;
-use APP\core\Application;
-use APP\core\PageRouter;
 use APP\plugins\generic\reviewersControlReport\classes\RCRCompletedReview;
 use APP\plugins\generic\reviewersControlReport\classes\ReviewersControlReportForm;
 use Illuminate\Support\Facades\DB;
 use PKP\submission\reviewAssignment\ReviewAssignment;
-use PKP\tests\DatabaseTestCase;
 use PKP\user\User;
 
-class ReviewersControlReportFormTest extends DatabaseTestCase
+require_once __DIR__ . '/../ReviewersControlReportTestCase.php';
+
+class ReviewerDataForReportsTest extends ReviewersControlReportTestCase
 {
     private $reviewerId;
     private $locale = 'en';
@@ -20,20 +19,11 @@ class ReviewersControlReportFormTest extends DatabaseTestCase
     private $email = 'walter.salles@ancine.com.br';
     private $affiliation = 'Agência Nacional do Cinema';
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
-        $request = Application::get()->getRequest();
-        if (is_null($request->getRouter())) {
-            $request->setRouter(new PageRouter());
-        }
         DB::beginTransaction();
         $this->reviewerId = $this->createUser();
-    }
-
-    protected function getAffectedTables()
-    {
-        return [];
     }
 
     protected function tearDown(): void

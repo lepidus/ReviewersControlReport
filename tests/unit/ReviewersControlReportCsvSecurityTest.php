@@ -5,9 +5,10 @@ use APP\plugins\generic\reviewersControlReport\classes\ReviewersControlReportFor
 use APP\plugins\generic\reviewersControlReport\classes\ReviewersReportBuilder;
 use APP\plugins\generic\reviewersControlReport\classes\ReviewsReportBuilder;
 use PKP\submission\reviewAssignment\ReviewAssignment;
-use PKP\tests\PKPTestCase;
 
-class ReviewersControlReportCsvSecurityTest extends PKPTestCase
+require_once __DIR__ . '/../ReviewersControlReportTestCase.php';
+
+class ReviewersControlReportCsvSecurityTest extends ReviewersControlReportTestCase
 {
     public function testFormulaLikeTextIsNeutralizedWhileNumbersKeepTheirTypes()
     {

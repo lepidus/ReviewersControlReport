@@ -6,9 +6,10 @@ use APP\template\TemplateManager;
 use PKP\core\Dispatcher;
 use PKP\core\Registry;
 use PKP\facades\Locale;
-use PKP\tests\PKPTestCase;
 
-class GridReviewsTemplateTest extends PKPTestCase
+require_once __DIR__ . '/../ReviewersControlReportTestCase.php';
+
+class GridReviewsTemplateTest extends ReviewersControlReportTestCase
 {
     protected function getMockedRegistryKeys(): array
     {
@@ -18,7 +19,7 @@ class GridReviewsTemplateTest extends PKPTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        Locale::registerPath(dirname(__DIR__) . '/locale');
+        Locale::registerPath(dirname(__DIR__, 2) . '/locale');
     }
 
     public function testSubmissionTitleAndWorkflowUrlAreEscaped()
@@ -69,7 +70,7 @@ class GridReviewsTemplateTest extends PKPTestCase
             'columnsCount' => 6,
             'dateFormatShort' => 'Y-m-d',
         ]);
-        return $templateManager->fetch('file:' . dirname(__DIR__) . '/templates/gridReviews.tpl');
+        return $templateManager->fetch('file:' . dirname(__DIR__, 2) . '/templates/gridReviews.tpl');
     }
 
     private function requestWithoutSession()

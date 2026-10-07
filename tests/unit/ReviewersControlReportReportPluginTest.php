@@ -3,9 +3,9 @@
 use APP\plugins\generic\reviewersControlReport\ReviewersControlReportReportPlugin;
 use PKP\core\PKPRequest;
 
-use PKP\tests\PKPTestCase;
+require_once __DIR__ . '/../ReviewersControlReportTestCase.php';
 
-class ReviewersControlReportReportPluginTest extends PKPTestCase
+class ReviewersControlReportReportPluginTest extends ReviewersControlReportTestCase
 {
     public function testStyleSheetUrlChangesWhenTheStyleSheetChanges()
     {
@@ -13,7 +13,7 @@ class ReviewersControlReportReportPluginTest extends PKPTestCase
         $request->method('getBaseUrl')->willReturn('https://example.test');
         $plugin = new ReviewersControlReportReportPlugin();
         $plugin->pluginPath = 'plugins/generic/reviewersControlReport';
-        $styleSheetVersion = filemtime(dirname(__DIR__) . '/styles/reviewersControlReport.css');
+        $styleSheetVersion = filemtime(dirname(__DIR__, 2) . '/styles/reviewersControlReport.css');
 
         $this->assertSame(
             'https://example.test/plugins/generic/reviewersControlReport/styles/reviewersControlReport.css?v=' . $styleSheetVersion,

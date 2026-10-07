@@ -5,9 +5,10 @@ use APP\plugins\generic\reviewersControlReport\controllers\grid\ReviewersGridHan
 use APP\plugins\generic\reviewersControlReport\ReviewersControlReportPlugin;
 use PKP\core\PKPComponentRouter;
 use PKP\core\PKPRequest;
-use PKP\tests\PKPTestCase;
 
-class ReviewersGridHandlerTest extends PKPTestCase
+require_once __DIR__ . '/../ReviewersControlReportTestCase.php';
+
+class ReviewersGridHandlerTest extends ReviewersControlReportTestCase
 {
     public function testGridHasNoTitleOfItsOwnSinceThePageAlreadyHeadsIt()
     {

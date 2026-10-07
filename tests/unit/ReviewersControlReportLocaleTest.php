@@ -1,8 +1,8 @@
 <?php
 
-use PKP\tests\PKPTestCase;
+require_once __DIR__ . '/../ReviewersControlReportTestCase.php';
 
-class ReviewersControlReportLocaleTest extends PKPTestCase
+class ReviewersControlReportLocaleTest extends ReviewersControlReportTestCase
 {
     private const PLUGIN_KEY_PREFIX = 'plugins.reports.reviewersControlReport.';
     private const PLUGIN_LOCALES = ['en', 'es', 'pt_BR'];
@@ -15,7 +15,7 @@ class ReviewersControlReportLocaleTest extends PKPTestCase
         );
 
         foreach (self::PLUGIN_LOCALES as $locale) {
-            $missingKeys = array_diff($pluginKeys, $this->getMessageIds(dirname(__DIR__) . "/locale/{$locale}"));
+            $missingKeys = array_diff($pluginKeys, $this->getMessageIds(dirname(__DIR__, 2) . "/locale/{$locale}"));
             $this->assertSame([], array_values($missingKeys), "Keys missing from the {$locale} locale");
         }
     }
@@ -38,7 +38,7 @@ class ReviewersControlReportLocaleTest extends PKPTestCase
     private function getKeysUsedByTemplates(): array
     {
         $keys = [];
-        foreach (glob(dirname(__DIR__) . '/templates/*.tpl') as $template) {
+        foreach (glob(dirname(__DIR__, 2) . '/templates/*.tpl') as $template) {
             preg_match_all('/\b(?:key|title|description|label)="([\w.]+)"/', file_get_contents($template), $matches);
             $keys = array_merge($keys, $matches[1]);
         }

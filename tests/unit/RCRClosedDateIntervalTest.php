@@ -1,9 +1,10 @@
 <?php
 
 use APP\plugins\generic\reviewersControlReport\classes\RCRClosedDateInterval;
-use PKP\tests\PKPTestCase;
 
-class RCRClosedDateIntervalTest extends PKPTestCase
+require_once __DIR__ . '/../ReviewersControlReportTestCase.php';
+
+class RCRClosedDateIntervalTest extends ReviewersControlReportTestCase
 {
     public function testIntervalIsValidWhenBeginningComesBeforeEnd()
     {

@@ -1,8 +1,6 @@
 <?php
 
 use APP\facades\Repo;
-use APP\core\Application;
-use APP\core\PageRouter;
 use APP\journal\Journal;
 use APP\plugins\generic\reviewersControlReport\classes\RCRClosedDateInterval;
 use APP\plugins\generic\reviewersControlReport\classes\ReviewersControlReportDAO;
@@ -13,10 +11,11 @@ use PKP\db\DAORegistry;
 use PKP\db\DBResultRange;
 use PKP\security\Role;
 use PKP\submission\reviewAssignment\ReviewAssignment;
-use PKP\tests\DatabaseTestCase;
 use PKP\user\User;
 
-class ReviewersControlReportDAOTest extends DatabaseTestCase
+require_once __DIR__ . '/../ReviewersControlReportTestCase.php';
+
+class CompletedReviewsQueryTest extends ReviewersControlReportTestCase
 {
     private $dao;
     private $locale = 'en';
@@ -28,13 +27,9 @@ class ReviewersControlReportDAOTest extends DatabaseTestCase
     private $submissionOfContext;
     private $submissionOfOtherContext;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
-        $request = Application::get()->getRequest();
-        if (is_null($request->getRouter())) {
-            $request->setRouter(new PageRouter());
-        }
         DB::beginTransaction();
         $this->dao = new ReviewersControlReportDAO();
         $this->contextId = $this->createContext('reviewers-report-primary');
@@ -42,11 +37,6 @@ class ReviewersControlReportDAOTest extends DatabaseTestCase
         $this->reviewerId = $this->createReviewer();
         $this->submissionOfContext = $this->createSubmission($this->contextId, 'Central do Brasil');
         $this->submissionOfOtherContext = $this->createSubmission($this->otherContextId, 'Cidade de Deus');
-    }
-
-    protected function getAffectedTables()
-    {
-        return [];
     }
 
     protected function tearDown(): void

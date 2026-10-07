@@ -3,9 +3,10 @@
 use APP\plugins\generic\reviewersControlReport\classes\RCRCompletedReview;
 use APP\plugins\generic\reviewersControlReport\classes\ReviewersControlReportDAO;
 use PKP\submission\reviewAssignment\ReviewAssignment;
-use PKP\tests\PKPTestCase;
 
-class ReviewersGridContentSecurityTest extends PKPTestCase
+require_once __DIR__ . '/../ReviewersControlReportTestCase.php';
+
+class ReviewersControlReportDAOTest extends ReviewersControlReportTestCase
 {
     public function testReviewOfTheGridCarriesItsTitleLinkAndCompletionDate()
     {

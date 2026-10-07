@@ -4,9 +4,10 @@ use APP\plugins\generic\reviewersControlReport\classes\RCRCompletedReview;
 use APP\plugins\generic\reviewersControlReport\classes\ReviewersReportBuilder;
 use PKP\facades\Locale;
 use PKP\submission\reviewAssignment\ReviewAssignment;
-use PKP\tests\PKPTestCase;
 
-class ReviewersReportBuilderTest extends PKPTestCase
+require_once __DIR__ . '/../ReviewersControlReportTestCase.php';
+
+class ReviewersReportBuilderTest extends ReviewersControlReportTestCase
 {
     private $builder;
     private $reviewersPersonalData = [
@@ -17,7 +18,7 @@ class ReviewersReportBuilderTest extends PKPTestCase
     public function setUp(): void
     {
         parent::setUp();
-        Locale::registerPath(dirname(__DIR__) . '/locale');
+        Locale::registerPath(dirname(__DIR__, 2) . '/locale');
         $this->builder = new ReviewersReportBuilder();
     }
 

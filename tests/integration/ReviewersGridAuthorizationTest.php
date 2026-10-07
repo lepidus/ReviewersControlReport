@@ -4,9 +4,10 @@ use APP\plugins\generic\reviewersControlReport\controllers\grid\ReviewersGridHan
 use APP\plugins\generic\reviewersControlReport\ReviewersControlReportPlugin;
 use PKP\pages\stats\PKPStatsHandler;
 use PKP\security\Role;
-use PKP\tests\PKPTestCase;
 
-class ReviewersGridAuthorizationTest extends PKPTestCase
+require_once __DIR__ . '/../ReviewersControlReportTestCase.php';
+
+class ReviewersGridAuthorizationTest extends ReviewersControlReportTestCase
 {
     public function testGridRolesMatchTheCoreReportsPageRoles()
     {
