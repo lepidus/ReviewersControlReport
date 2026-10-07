@@ -44,8 +44,6 @@ class ReviewersGridHandler extends GridHandler
             LOCALE_COMPONENT_PKP_SUBMISSION
         );
 
-        $this->setTitle('plugins.reports.reviewersControlReport.displayName');
-
         $cellProvider = new ReviewersGridCellProvider();
 
         $columnsInfo = [
