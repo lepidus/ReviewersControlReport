@@ -1,22 +1,20 @@
 <?php
 
 use APP\facades\Repo;
-use APP\journal\Journal;
 use APP\plugins\generic\reviewersControlReport\classes\RCRClosedDateInterval;
 use APP\plugins\generic\reviewersControlReport\classes\ReviewersControlReportDAO;
-use APP\publication\Publication;
-use APP\submission\Submission;
 use Illuminate\Support\Facades\DB;
-use PKP\db\DAORegistry;
 use PKP\db\DBResultRange;
 use PKP\security\Role;
 use PKP\submission\reviewAssignment\ReviewAssignment;
-use PKP\user\User;
 
 require_once __DIR__ . '/../ReviewersControlReportTestCase.php';
+require_once __DIR__ . '/../RCRReportFixtures.php';
 
 class CompletedReviewsQueryTest extends ReviewersControlReportTestCase
 {
+    use RCRReportFixtures;
+
     private $dao;
     private $locale = 'en';
     // Context ids of their own, so the reviews seeded in the test database
@@ -32,8 +30,8 @@ class CompletedReviewsQueryTest extends ReviewersControlReportTestCase
         parent::setUp();
         DB::beginTransaction();
         $this->dao = new ReviewersControlReportDAO();
-        $this->contextId = $this->createContext('reviewers-report-primary');
-        $this->otherContextId = $this->createContext('reviewers-report-other');
+        $this->contextId = $this->createContext('rcr' . uniqid());
+        $this->otherContextId = $this->createContext('rcr' . uniqid());
         $this->reviewerId = $this->createReviewer();
         $this->submissionOfContext = $this->createSubmission($this->contextId, 'Central do Brasil');
         $this->submissionOfOtherContext = $this->createSubmission($this->otherContextId, 'Cidade de Deus');
@@ -45,74 +43,21 @@ class CompletedReviewsQueryTest extends ReviewersControlReportTestCase
         parent::tearDown();
     }
 
-    private function createContext(string $path): int
-    {
-        $journal = new Journal();
-        $journal->setPath(substr($path, 0, 4) . uniqid());
-        $journal->setPrimaryLocale($this->locale);
-        $journal->setEnabled(true);
-        $journal->setSequence(1);
-        $journal->setName($path, $this->locale);
-
-        return DAORegistry::getDAO('JournalDAO')->insertObject($journal);
-    }
-
     private function createReviewer(): int
     {
         $suffix = uniqid();
-        $user = new User();
-        $user->setGivenName('Walter', $this->locale);
-        $user->setFamilyName('Salles', $this->locale);
-        $user->setEmail('rcr.' . $suffix . '@example.test');
-        $user->setUsername('rcr' . $suffix);
-        $user->setPassword('walter.salles');
-        $user->setDateRegistered('2026-01-01 00:00:00');
 
-        return Repo::user()->add($user);
-    }
-
-    private function createSubmission($contextId, $title): int
-    {
-        $submission = new Submission();
-        $submission->setData('contextId', $contextId);
-        $submission->setData('status', Submission::STATUS_QUEUED);
-        $submission->setData('locale', $this->locale);
-        $submissionId = Repo::submission()->dao->insert($submission);
-
-        $publication = new Publication();
-        $publication->setData('submissionId', $submissionId);
-        $publication->setData('title', $title, $this->locale);
-        $publicationId = Repo::publication()->add($publication);
-
-        Repo::submission()->edit($submission, ['currentPublicationId' => $publicationId]);
-
-        return $submissionId;
+        return $this->createUser(['userName' => 'rcr' . $suffix, 'email' => 'rcr.' . $suffix . '@example.test']);
     }
 
     private function createReviewAssignment($submissionId, $dateCompleted, $overrides = []): void
     {
-        $reviewRoundId = DAORegistry::getDAO('ReviewRoundDAO')
-            ->build($submissionId, WORKFLOW_STAGE_ID_EXTERNAL_REVIEW, 1)
-            ->getId();
-
-        $reviewAssignment = new ReviewAssignment();
-        $reviewAssignment->setSubmissionId($submissionId);
-        $reviewAssignment->setReviewerId($overrides['reviewerId'] ?? $this->reviewerId);
-        $reviewAssignment->setReviewRoundId($reviewRoundId);
-        $reviewAssignment->setStageId(WORKFLOW_STAGE_ID_EXTERNAL_REVIEW);
-        $reviewAssignment->setRound(1);
-        $reviewAssignment->setDateAssigned('2026-01-02 10:00:00');
-        $reviewAssignment->setDateResponseDue('2026-01-10 00:00:00');
-        $reviewAssignment->setDateDue('2026-01-20 00:00:00');
-        $reviewAssignment->setDateCompleted($dateCompleted);
-        $reviewAssignment->setQuality($overrides['quality'] ?? 4);
-        $reviewAssignment->setRecommendation(
-            $overrides['recommendation'] ?? ReviewAssignment::SUBMISSION_REVIEWER_RECOMMENDATION_ACCEPT
+        $this->createCompletedReview(
+            $submissionId,
+            $overrides['reviewerId'] ?? $this->reviewerId,
+            $dateCompleted,
+            $overrides
         );
-        $reviewAssignment->setDeclined($overrides['declined'] ?? 0);
-        $reviewAssignment->setCancelled($overrides['cancelled'] ?? 0);
-
-        DAORegistry::getDAO('ReviewAssignmentDAO')->insertObject($reviewAssignment);
     }
 
     public function testReturnsCompletedReviewsOfTheContextWhenNoIntervalIsGiven()

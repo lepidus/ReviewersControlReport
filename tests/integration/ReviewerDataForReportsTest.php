@@ -5,12 +5,14 @@ use APP\plugins\generic\reviewersControlReport\classes\RCRCompletedReview;
 use APP\plugins\generic\reviewersControlReport\classes\ReviewersControlReportForm;
 use Illuminate\Support\Facades\DB;
 use PKP\submission\reviewAssignment\ReviewAssignment;
-use PKP\user\User;
 
 require_once __DIR__ . '/../ReviewersControlReportTestCase.php';
+require_once __DIR__ . '/../RCRReportFixtures.php';
 
 class ReviewerDataForReportsTest extends ReviewersControlReportTestCase
 {
+    use RCRReportFixtures;
+
     private $reviewerId;
     private $locale = 'en';
     private $givenName = 'Walter';
@@ -23,30 +25,19 @@ class ReviewerDataForReportsTest extends ReviewersControlReportTestCase
     {
         parent::setUp();
         DB::beginTransaction();
-        $this->reviewerId = $this->createUser();
+        $suffix = uniqid();
+        $this->username = 'rcr' . $suffix;
+        $this->email = 'rcr.' . $suffix . '@example.test';
+        $this->reviewerId = $this->createUser([
+            'email' => $this->email,
+            'userName' => $this->username,
+        ]);
     }
 
     protected function tearDown(): void
     {
         DB::rollBack();
         parent::tearDown();
-    }
-
-    private function createUser()
-    {
-        $suffix = uniqid();
-        $this->username = 'rcr' . $suffix;
-        $this->email = 'rcr.' . $suffix . '@example.test';
-        $user = new User();
-        $user->setGivenName($this->givenName, $this->locale);
-        $user->setFamilyName($this->familyName, $this->locale);
-        $user->setAffiliation($this->affiliation, $this->locale);
-        $user->setEmail($this->email);
-        $user->setUsername($this->username);
-        $user->setPassword($this->username);
-        $user->setDateRegistered('2026-01-01 00:00:00');
-
-        return Repo::user()->add($user);
     }
 
     public function testGetsPersonalDataOfTheReviewersOfTheGivenReviews()
