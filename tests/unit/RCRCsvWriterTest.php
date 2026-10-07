@@ -3,19 +3,17 @@
 import('lib.pkp.tests.PKPTestCase');
 import('lib.pkp.classes.submission.reviewAssignment.ReviewAssignment');
 import('plugins.generic.reviewersControlReport.classes.RCRCompletedReview');
-import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportForm');
+import('plugins.generic.reviewersControlReport.classes.RCRCsvWriter');
 import('plugins.generic.reviewersControlReport.classes.ReviewersReportBuilder');
 import('plugins.generic.reviewersControlReport.classes.ReviewsReportBuilder');
 
-class ReviewersControlReportCsvSecurityTest extends PKPTestCase
+class RCRCsvWriterTest extends PKPTestCase
 {
     public function testFormulaLikeTextIsNeutralizedWhileNumbersKeepTheirTypes()
     {
-        $form = new ReviewersControlReportForm();
-        $method = new ReflectionMethod($form, 'prepareCsvRow');
-        $method->setAccessible(true);
+        $csvWriter = new RCRCsvWriter();
 
-        $row = $method->invoke($form, [
+        $row = $csvWriter->neutralizeFormulas([
             '=1+1',
             '+cmd',
             '-2+3',
@@ -44,15 +42,13 @@ class ReviewersControlReportCsvSecurityTest extends PKPTestCase
         $this->assertSame(4.5, $row[11]);
     }
 
-    public function testCsvWriterRoundTripsOrdinaryFields()
+    public function testRowRoundTripsOrdinaryFields()
     {
-        $form = new ReviewersControlReportForm();
-        $method = new ReflectionMethod($form, 'writeCsvRow');
-        $method->setAccessible(true);
+        $csvWriter = new RCRCsvWriter();
         $stream = fopen('php://memory', 'w+');
         $row = ['plain', 'with space', 'with,comma', 'quoted "text"', "line\nbreak", 42];
 
-        $method->invoke($form, $stream, $row);
+        $csvWriter->writeRow($stream, $row);
         rewind($stream);
         $csv = stream_get_contents($stream);
         fclose($stream);
@@ -60,20 +56,14 @@ class ReviewersControlReportCsvSecurityTest extends PKPTestCase
         $this->assertSame(array_map('strval', $row), str_getcsv($csv));
     }
 
-    public function testCsvWriterProducesStandardBytesAndPreservesBackslashes()
+    public function testRowIsWrittenAsStandardBytesKeepingBackslashes()
     {
-        $form = new ReviewersControlReportForm();
-        $method = new ReflectionMethod($form, 'writeCsvRow');
-        $method->setAccessible(true);
+        $csvWriter = new RCRCsvWriter();
         $stream = fopen('php://memory', 'w+');
 
-        $method->invoke(
-            $form,
-            $stream,
-            ['plain', 'with space', 'with,comma', "line\nbreak", "\ttab", 42, 4.5]
-        );
-        $method->invoke($form, $stream, ['text \\"quoted"']);
-        $method->invoke($form, $stream, ["\0 =1+1"]);
+        $csvWriter->writeRow($stream, ['plain', 'with space', 'with,comma', "line\nbreak", "\ttab", 42, 4.5]);
+        $csvWriter->writeRow($stream, ['text \\"quoted"']);
+        $csvWriter->writeRow($stream, ["\0 =1+1"]);
         rewind($stream);
         $csv = stream_get_contents($stream);
         fclose($stream);
@@ -102,12 +92,10 @@ class ReviewersControlReportCsvSecurityTest extends PKPTestCase
             (new ReviewersReportBuilder())->getRows($reviewerData, [$review])[0],
             (new ReviewsReportBuilder())->getRows($reviewerData, [$review])[0],
         ];
-        $form = new ReviewersControlReportForm();
-        $method = new ReflectionMethod($form, 'prepareCsvRow');
-        $method->setAccessible(true);
+        $csvWriter = new RCRCsvWriter();
 
-        $reviewersRow = $method->invoke($form, $rows[0]);
-        $reviewsRow = $method->invoke($form, $rows[1]);
+        $reviewersRow = $csvWriter->neutralizeFormulas($rows[0]);
+        $reviewsRow = $csvWriter->neutralizeFormulas($rows[1]);
 
         $this->assertSame("'=1+1", $reviewersRow[0]);
         $this->assertSame("'=EXTERNAL_REFERENCE()", $reviewsRow[1]);

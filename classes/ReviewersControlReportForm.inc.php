@@ -2,6 +2,7 @@
 
 import('lib.pkp.classes.form.Form');
 import('plugins.generic.reviewersControlReport.classes.RCRClosedDateInterval');
+import('plugins.generic.reviewersControlReport.classes.RCRCsvWriter');
 import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportDAO');
 import('plugins.generic.reviewersControlReport.classes.ReviewersReportBuilder');
 import('plugins.generic.reviewersControlReport.classes.ReviewsReportBuilder');
@@ -108,37 +109,13 @@ class ReviewersControlReportForm extends Form
 
         $this->emitHttpHeaders();
 
+        $csvWriter = new RCRCsvWriter();
         $csvFile = fopen('php://output', 'wt');
-        $this->writeCsvRow($csvFile, $reportBuilder->getColumns());
+        $csvWriter->writeRow($csvFile, $reportBuilder->getColumns());
         foreach ($reportBuilder->getRows($reviewersPersonalData, $completedReviews) as $row) {
-            $this->writeCsvRow($csvFile, $row);
+            $csvWriter->writeRow($csvFile, $row);
         }
         fclose($csvFile);
-    }
-
-    private function writeCsvRow($csvFile, array $row): void
-    {
-        $fields = array_map(function ($cell) {
-            $cell = (string) $cell;
-            if (strpbrk($cell, ",\"\r\n\t ") !== false) {
-                return '"' . str_replace('"', '""', $cell) . '"';
-            }
-
-            return $cell;
-        }, $this->prepareCsvRow($row));
-
-        fwrite($csvFile, implode(',', $fields) . "\n");
-    }
-
-    private function prepareCsvRow(array $row): array
-    {
-        return array_map(function ($cell) {
-            if (is_string($cell) && preg_match('/^(?:[\x00-\x20]*[=+\-@]|[\t\r\n])/', $cell)) {
-                return "'" . $cell;
-            }
-
-            return $cell;
-        }, $row);
     }
 
     private function isValidDateInput($date): bool
