@@ -1,15 +1,15 @@
 <?php
 
 import('lib.pkp.tests.DatabaseTestCase');
-import('classes.submission.Submission');
-import('classes.publication.Publication');
-import('lib.pkp.classes.user.User');
-import('lib.pkp.classes.submission.reviewAssignment.ReviewAssignment');
 import('plugins.generic.reviewersControlReport.classes.RCRClosedDateInterval');
 import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportDAO');
 
+require_once __DIR__ . '/../RCRReportFixtures.php';
+
 class CompletedReviewsQueryTest extends DatabaseTestCase
 {
+    use RCRReportFixtures;
+
     private $dao;
     private $locale = 'en_US';
     // Context ids of their own, so the reviews seeded in the test database
@@ -24,7 +24,7 @@ class CompletedReviewsQueryTest extends DatabaseTestCase
     {
         parent::setUp();
         $this->dao = new ReviewersControlReportDAO();
-        $this->reviewerId = $this->createReviewer();
+        $this->reviewerId = $this->createUser();
         $this->submissionOfContext = $this->createSubmission($this->contextId, 'Central do Brasil');
         $this->submissionOfOtherContext = $this->createSubmission($this->otherContextId, 'Cidade de Deus');
     }
@@ -35,58 +35,14 @@ class CompletedReviewsQueryTest extends DatabaseTestCase
             'review_assignments', 'review_rounds', 'users', 'user_settings'];
     }
 
-    private function createReviewer(): int
-    {
-        $user = new User();
-        $user->setData('givenName', [$this->locale => 'Walter']);
-        $user->setData('familyName', [$this->locale => 'Salles']);
-        $user->setData('email', 'walter.salles@ancine.com.br');
-        $user->setData('username', 'walter.salles');
-        $user->setData('password', 'walter.salles');
-
-        return DAORegistry::getDAO('UserDAO')->insertObject($user);
-    }
-
-    private function createSubmission($contextId, $title): int
-    {
-        $submission = new Submission();
-        $submission->setData('contextId', $contextId);
-        $submission->setData('status', STATUS_QUEUED);
-        $submission->setData('locale', $this->locale);
-        $submissionId = DAORegistry::getDAO('SubmissionDAO')->insertObject($submission);
-
-        $publication = new Publication();
-        $publication->setData('submissionId', $submissionId);
-        $publication->setData('title', $title, $this->locale);
-        $publicationId = DAORegistry::getDAO('PublicationDAO')->insertObject($publication);
-
-        $submission->setData('currentPublicationId', $publicationId);
-        DAORegistry::getDAO('SubmissionDAO')->updateObject($submission);
-
-        return $submissionId;
-    }
-
     private function createReviewAssignment($submissionId, $dateCompleted, $overrides = []): void
     {
-        $reviewRoundId = DAORegistry::getDAO('ReviewRoundDAO')
-            ->build($submissionId, WORKFLOW_STAGE_ID_EXTERNAL_REVIEW, 1)
-            ->getId();
-
-        $reviewAssignment = new ReviewAssignment();
-        $reviewAssignment->setSubmissionId($submissionId);
-        $reviewAssignment->setReviewerId($overrides['reviewerId'] ?? $this->reviewerId);
-        $reviewAssignment->setReviewRoundId($reviewRoundId);
-        $reviewAssignment->setStageId(WORKFLOW_STAGE_ID_EXTERNAL_REVIEW);
-        $reviewAssignment->setRound(1);
-        $reviewAssignment->setDateAssigned('2026-01-02 10:00:00');
-        $reviewAssignment->setDateDue('2026-01-20 00:00:00');
-        $reviewAssignment->setDateCompleted($dateCompleted);
-        $reviewAssignment->setQuality($overrides['quality'] ?? 4);
-        $reviewAssignment->setRecommendation($overrides['recommendation'] ?? SUBMISSION_REVIEWER_RECOMMENDATION_ACCEPT);
-        $reviewAssignment->setDeclined($overrides['declined'] ?? 0);
-        $reviewAssignment->setCancelled($overrides['cancelled'] ?? 0);
-
-        DAORegistry::getDAO('ReviewAssignmentDAO')->insertObject($reviewAssignment);
+        $this->createCompletedReview(
+            $submissionId,
+            $overrides['reviewerId'] ?? $this->reviewerId,
+            $dateCompleted,
+            $overrides
+        );
     }
 
     public function testReturnsCompletedReviewsOfTheContextWhenNoIntervalIsGiven()

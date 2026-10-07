@@ -1,12 +1,15 @@
 <?php
 
 import('lib.pkp.tests.DatabaseTestCase');
-import('lib.pkp.classes.user.User');
 import('plugins.generic.reviewersControlReport.classes.RCRCompletedReview');
 import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportForm');
 
+require_once __DIR__ . '/../RCRReportFixtures.php';
+
 class ReviewerDataForReportsTest extends DatabaseTestCase
 {
+    use RCRReportFixtures;
+
     private $reviewerId;
     private $locale = 'en_US';
     private $givenName = 'Walter';
@@ -18,25 +21,15 @@ class ReviewerDataForReportsTest extends DatabaseTestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->reviewerId = $this->createUser();
+        $this->reviewerId = $this->createUser([
+            'email' => $this->email,
+            'userName' => $this->username,
+        ]);
     }
 
     protected function getAffectedTables()
     {
         return ['users', 'user_settings'];
-    }
-
-    private function createUser()
-    {
-        $user = new User();
-        $user->setData('givenName', [$this->locale => $this->givenName]);
-        $user->setData('familyName', [$this->locale => $this->familyName]);
-        $user->setData('affiliation', [$this->locale => $this->affiliation]);
-        $user->setData('email', $this->email);
-        $user->setData('username', $this->username);
-        $user->setData('password', $this->username);
-
-        return DAORegistry::getDAO('UserDAO')->insertObject($user);
     }
 
     public function testGetsPersonalDataOfTheReviewersOfTheGivenReviews()
