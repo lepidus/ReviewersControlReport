@@ -64,6 +64,12 @@ msgstr "Leave both dates empty to include every completed review."
 msgid "plugins.reports.reviewersControlReport.dateCompletedInterval"
 msgstr "Review completion date range"
 
+msgid "plugins.reports.reviewersControlReport.dateCompletedInterval.start"
+msgstr "From"
+
+msgid "plugins.reports.reviewersControlReport.dateCompletedInterval.end"
+msgstr "Until"
+
 msgid "plugins.reports.reviewersControlReport.warning.invalidDateInterval"
 msgstr "The start date must not be later than the end date."
 

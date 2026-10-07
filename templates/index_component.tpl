@@ -32,11 +32,11 @@
                     {* Plain halves rather than nested form sections: a section
                        carries a bottom margin that staggers the two floats *}
                     <div class="inline pkp_helpers_half">
-                        <label for="startDateInterval">{translate key="common.from"}</label>
+                        <label for="startDateInterval">{translate key="plugins.reports.reviewersControlReport.dateCompletedInterval.start"}</label>
                         <input type="date" class="field text" id="startDateInterval" name="startDateInterval" value="{$startDateInterval|escape}" />
                     </div>
                     <div class="inline pkp_helpers_half">
-                        <label for="endDateInterval">{translate key="common.until"}</label>
+                        <label for="endDateInterval">{translate key="plugins.reports.reviewersControlReport.dateCompletedInterval.end"}</label>
                         <input type="date" class="field text" id="endDateInterval" name="endDateInterval" value="{$endDateInterval|escape}" />
                     </div>
                 {/fbvFormSection}
