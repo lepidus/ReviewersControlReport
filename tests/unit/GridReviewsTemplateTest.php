@@ -76,6 +76,7 @@ class GridReviewsTemplateTest extends ReviewersControlReportTestCase
     private function requestWithoutSession()
     {
         Registry::delete('request');
+        $_SERVER['PATH_INFO'] = 'index/test-page/test-op';
         $application = Application::get();
         $request = $application->getRequest();
         $router = new PageRouter();
