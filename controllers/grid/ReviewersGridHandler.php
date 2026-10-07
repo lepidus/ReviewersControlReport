@@ -2,6 +2,7 @@
 
 namespace APP\plugins\generic\reviewersControlReport\controllers\grid;
 
+use APP\core\Application;
 use APP\plugins\generic\reviewersControlReport\classes\ReviewersControlReportDAO;
 use APP\plugins\generic\reviewersControlReport\ReviewersControlReportPlugin;
 use PKP\controllers\grid\feature\PagingFeature;
@@ -87,7 +88,18 @@ class ReviewersGridHandler extends GridHandler
 
     protected function getRowInstance()
     {
-        return new ReviewersGridRow($this->plugin);
+        return new ReviewersGridRow($this->plugin, $this->canCurrentUserEditUsers());
+    }
+
+    /**
+     * Section editors reach this grid, but the core user grid only lets
+     * managers and site administrators edit users.
+     */
+    public function canCurrentUserEditUsers(): bool
+    {
+        $roles = (array) $this->getAuthorizedContextObject(Application::ASSOC_TYPE_USER_ROLES);
+
+        return (bool) array_intersect([Role::ROLE_ID_SITE_ADMIN, Role::ROLE_ID_MANAGER], $roles);
     }
 
     public function initFeatures($request, $args)

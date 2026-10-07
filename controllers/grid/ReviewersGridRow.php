@@ -3,22 +3,26 @@
 namespace APP\plugins\generic\reviewersControlReport\controllers\grid;
 
 use APP\core\Application;
-use APP\facades\Repo;
 use APP\plugins\generic\reviewersControlReport\ReviewersControlReportPlugin;
 use PKP\controllers\grid\GridRow;
 use PKP\linkAction\LinkAction;
 use PKP\linkAction\request\AjaxModal;
-use PKP\security\Role;
-use PKP\security\Validation;
 
 class ReviewersGridRow extends GridRow
 {
     private $plugin;
+    private $canEditUsers;
 
-    public function __construct(ReviewersControlReportPlugin $plugin)
+    public function __construct(ReviewersControlReportPlugin $plugin, bool $canEditUsers = false)
     {
         parent::__construct();
         $this->plugin = $plugin;
+        $this->canEditUsers = $canEditUsers;
+    }
+
+    public function canEditUsers(): bool
+    {
+        return $this->canEditUsers;
     }
 
     public function initialize($request, $template = null)
@@ -28,7 +32,7 @@ class ReviewersGridRow extends GridRow
         $rowId = $this->getId();
         $dispatcher = $request->getDispatcher();
 
-        if (!$this->canEditUsers($request)) {
+        if (!$this->canEditUsers) {
             return;
         }
 
@@ -51,27 +55,6 @@ class ReviewersGridRow extends GridRow
             __('grid.user.edit'),
             'edit'
         ));
-    }
-
-    private function canEditUsers($request): bool
-    {
-        if (Validation::isSiteAdmin()) {
-            return true;
-        }
-
-        $user = $request->getUser();
-        $context = $request->getContext();
-        if (!$user || !$context) {
-            return false;
-        }
-
-        foreach (Repo::userGroup()->userUserGroups($user->getId(), $context->getId()) as $userGroup) {
-            if ($userGroup->getRoleId() === Role::ROLE_ID_MANAGER) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     public function getReviewsTemplate(): string
