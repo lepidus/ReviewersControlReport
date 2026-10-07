@@ -5,7 +5,7 @@ import('lib.pkp.classes.user.User');
 import('plugins.generic.reviewersControlReport.classes.RCRCompletedReview');
 import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportForm');
 
-class ReviewersControlReportFormTest extends DatabaseTestCase
+class ReviewerDataForReportsTest extends DatabaseTestCase
 {
     private $reviewerId;
     private $locale = 'en_US';

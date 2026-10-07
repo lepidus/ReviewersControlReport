@@ -5,7 +5,7 @@ import('lib.pkp.classes.submission.reviewAssignment.ReviewAssignment');
 import('plugins.generic.reviewersControlReport.classes.RCRCompletedReview');
 import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportDAO');
 
-class ReviewersGridContentSecurityTest extends PKPTestCase
+class ReviewersControlReportDAOTest extends PKPTestCase
 {
     public function testReviewOfTheGridCarriesItsTitleLinkAndCompletionDate()
     {

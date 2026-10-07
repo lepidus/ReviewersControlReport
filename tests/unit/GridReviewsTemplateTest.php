@@ -59,7 +59,7 @@ class GridReviewsTemplateTest extends PKPTestCase
             'columnsCount' => 6,
             'dateFormatShort' => '%Y-%m-%d',
         ]);
-        return $templateManager->fetch('file:' . dirname(__DIR__) . '/templates/gridReviews.tpl');
+        return $templateManager->fetch('file:' . dirname(__DIR__, 2) . '/templates/gridReviews.tpl');
     }
 
     private function requestWithoutSession()

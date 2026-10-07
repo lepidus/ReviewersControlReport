@@ -3,7 +3,7 @@
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.reviewersControlReport.classes.RCRClosedDateInterval');
 
-class ClosedDateIntervalTest extends PKPTestCase
+class RCRClosedDateIntervalTest extends PKPTestCase
 {
     public function testIntervalIsValidWhenBeginningComesBeforeEnd()
     {

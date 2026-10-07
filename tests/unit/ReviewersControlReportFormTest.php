@@ -3,7 +3,7 @@
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportForm');
 
-class ReviewersControlReportDateValidationTest extends PKPTestCase
+class ReviewersControlReportFormTest extends PKPTestCase
 {
     /**
      * @dataProvider invalidDateProvider

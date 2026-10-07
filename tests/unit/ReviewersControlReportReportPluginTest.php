@@ -2,7 +2,7 @@
 
 import('lib.pkp.tests.PKPTestCase');
 import('lib.pkp.classes.core.PKPRequest');
-require_once dirname(__DIR__) . '/ReviewersControlReportReportPlugin.inc.php';
+require_once dirname(__DIR__, 2) . '/ReviewersControlReportReportPlugin.inc.php';
 
 class ReviewersControlReportReportPluginTest extends PKPTestCase
 {
@@ -12,7 +12,7 @@ class ReviewersControlReportReportPluginTest extends PKPTestCase
         $request->method('getBaseUrl')->willReturn('https://example.test');
         $plugin = new ReviewersControlReportReportPlugin();
         $plugin->pluginPath = 'plugins/generic/reviewersControlReport';
-        $styleSheetVersion = filemtime(dirname(__DIR__) . '/styles/reviewersControlReport.css');
+        $styleSheetVersion = filemtime(dirname(__DIR__, 2) . '/styles/reviewersControlReport.css');
 
         $this->assertSame(
             'https://example.test/plugins/generic/reviewersControlReport/styles/reviewersControlReport.css?v=' . $styleSheetVersion,

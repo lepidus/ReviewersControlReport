@@ -8,7 +8,7 @@ import('lib.pkp.classes.submission.reviewAssignment.ReviewAssignment');
 import('plugins.generic.reviewersControlReport.classes.RCRClosedDateInterval');
 import('plugins.generic.reviewersControlReport.classes.ReviewersControlReportDAO');
 
-class ReviewersControlReportDAOTest extends DatabaseTestCase
+class CompletedReviewsQueryTest extends DatabaseTestCase
 {
     private $dao;
     private $locale = 'en_US';
