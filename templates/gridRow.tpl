@@ -75,11 +75,5 @@
 	</tr>
 {/if}
 {if $hasReviews}
-	{foreach from=$row->getReviews() item=review}
-		<tr class="row_controls row_review-{$row_id}">
-			{foreach from=$review item=reviewData}
-					{$reviewData}
-			{/foreach}
-		</tr>
-	{/foreach}
+	{include file=$row->getReviewsTemplate() rowId=$row_id reviews=$row->getReviews() columnsCount=$grid->getColumnsCount('indent')}
 {/if}

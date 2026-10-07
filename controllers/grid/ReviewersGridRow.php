@@ -74,8 +74,13 @@ class ReviewersGridRow extends GridRow
         return false;
     }
 
+    public function getReviewsTemplate(): string
+    {
+        return $this->plugin->getTemplateResource('gridReviews.tpl');
+    }
+
     public function getReviews()
     {
-        return $this->getData()->getReviewedSubmissionsTitleAndDate();
+        return $this->getData()->getCompletedReviews();
     }
 }
